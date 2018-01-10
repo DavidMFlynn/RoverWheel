@@ -35,8 +35,10 @@
 // WheelMount();
 // **************************************************
 // for viewing
-// ShowWheel();
-// ShowCuttawayView();
+//  ShowPlanets(CutAway=true,HideGears=false);
+//  ShowPlanets(CutAway=true,HideGears=true);
+//  ShowWheel();
+//  ShowCutAwayView();
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
@@ -258,6 +260,43 @@ module InnerPlanetCarrier(){
 
 //InnerPlanetCarrier();
 
+module ShowPlanets(CutAway=true,HideGears=true){
+	PlanetShaft_l=24.5;
+	PitchA=PlanetaryPitchA;
+		PitchB=PlanetaryPitchB;
+		Planet_BC=Pinion_t*PitchA/180 + PlanetA_t*PitchA/180;
+		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/Pinion_t);
+		
+		PinionRA=$t*Ratio*360;
+		PlanetPosRA=PinionRA/((InputRing_t/Pinion_t)+(InputRing_t/Pinion_t));//  29.7r /(InputRing_t/Pinion_t); // 2.57 4.5
+		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
+		OutputRingRA=-360*$t;
+	
+	translate([0,0,bead_h+3])rotate([180,0,0]) color("Brown")OuterPlanetCarrier();
+	for (j=[0:nPlanets-1])rotate([0,0,PlanetPosRA+360/nPlanets*j])
+		translate([Planet_BC/2,0,bead_h+3.05])color("Red")cylinder(d=6.35,h=PlanetShaft_l);
+	translate([0,0,bead_h+3.1+PlanetShaft_l])color("Brown")InnerPlanetCarrier();
+	
+	if (HideGears==false)
+	difference(){
+		translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+			for (j=[0:nPlanets-1])
+				rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
+					color("Tan")
+					CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
+				
+					translate([0,0,GearWidth])
+						CompoundPlanetGearHelixB(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
+				}
+			
+				if (CutAway==true)
+			translate([0,-Planet_BC,bead_h+3.1])cube([Planet_BC,Planet_BC,PlanetShaft_l]);
+		} // diff
+			/**/
+} // ShowPlanets
+
+//ShowPlanets(CutAway=true,HideGears=false);
+//ShowPlanets(CutAway=true,HideGears=true);
 
 module ShowWheel(){
 
@@ -272,13 +311,14 @@ module ShowWheel(){
 		OutputRingRA=-360*$t;
 	
 	HubCap();
-	translate([0,0,bead_h+3])rotate([180,0,0]) OuterPlanetCarrier();
-	translate([0,0,bead_h+3+GearWidth*2+0.5])InnerPlanetCarrier();
-	InnerRim();
+	//translate([0,0,bead_h+3])rotate([180,0,0]) OuterPlanetCarrier();
+	//translate([0,0,bead_h+3+GearWidth*2+0.5])InnerPlanetCarrier();
+	color("Green")InnerRim();
 
 	// Planets
+	ShowPlanets(CutAway=false,HideGears=true);
 		/*
-	translate([0,0,24+bead_h+3.1]) mirror([0,0,1])
+	translate([0,0,GearWidth*2+bead_h+3.1]) mirror([0,0,1])
 	for (j=[0:nPlanets-1])
 		rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
 		
@@ -292,7 +332,7 @@ module ShowWheel(){
 		}
 		/**/
 		translate([0,0,bead_h+3.3+GearWidth]){
-			rotate([180,0,0])Pinion();
+			rotate([180,0,0])color("Black")Pinion();
 			
 			rotate([0,0,76+36-9])translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
 			rotate([0,0,76])	translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
@@ -302,14 +342,14 @@ module ShowWheel(){
 		// drive ring
 		translate([0,0,bead_h+3.1]) {
 			
-			DriveRingGear();
+			color("Tan")DriveRingGear();
 			translate([0,0,InnerSleve_l]) {
 				translate([0,0,Race_w])color("Pink")ShowMyBalls();
 				OutsideRace(myFn=90);
-				InsideRace(myFn=90);
+				color("LightBlue")InsideRace(myFn=90);
 				translate([0,0,Race_w*2]) rotate([180,0,0]){
 					OutsideRace(myFn=90);
-					InsideRace(myFn=90);
+					color("LightBlue")InsideRace(myFn=90);
 				}
 			}
 		}
@@ -319,35 +359,35 @@ module ShowWheel(){
 		
 		//input ring
 		translate([0,0,bead_h+3.2+GearWidth]) {
-			InputRingGear();
+			color("Orange")InputRingGear();
 			translate([0,0,-Overlap*2])color("Tan")SensorMount();
 		}
 			
 			
 		
-	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) AdapterRing();
+	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Blue")AdapterRing();
 		
 	translate([0,0,tire_w])rotate([180,0,0]){
 		OuterRim();
-		InnerRim();
+		color("Green")InnerRim();
 		}
 		
-	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) WheelMount();
+	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Gray")WheelMount();
 	/**/
 } // ShowWheel
 
 //ShowWheel();
 
-module ShowCuttawayView(){
+module ShowCutAwayView(){
 	difference(){
 		ShowWheel();
 		
 		translate([-100,-100,-Overlap])cube([100,100,200]);
 	} // diff
 	
-} // ShowCuttawayView
+} // ShowCutAwayView
 
-//ShowCuttawayView();
+//ShowCutAwayView();
 
 Ada_h=6; // AdapterRing height
 Race_w=5;
