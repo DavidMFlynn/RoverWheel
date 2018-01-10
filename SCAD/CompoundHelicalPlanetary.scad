@@ -2,11 +2,13 @@
 // Compound Helical Planetary Drive Unit Library
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
-// Created: 12/27/2017
-// Rev: 1.1.0 1/1/2018
+// Created: 1/9/2018
+// Rev: 1.1.1 1/1/2018
 // Units: millimeters
 // *************************************************
 // History:
+echo("Compound Helical Planetary Library 1.1.1");
+// 1.1.1 1/1/2018 use Spline_Hole_d
 // 1.1.0 1/1/2018 Made harringbone an option.
 // 1.0.1 12/29/2017 Adjusted Gap, added Key=true to splines, split pinion.
 // 1.0.0 12/27/2017 Copied from Compound Panetary Drive
@@ -110,11 +112,11 @@ gear (
 	flat=false);
 /**/
 
-include<CommonStuffSAE.scad>
+include<CommonStuffSAE.scad> // This lib is in inches.
 
 include<SplineLib.scad>
-// SplineShaft(d=20,l=30,nSplines=6,Spline_w=30,Hole=6);
-// SplineHole(d=20,l=20,nSplines=6,Spline_w=30,Gap=IDXtra);
+// SplineShaft(d=20,l=30,nSplines=Spline_nSplines,Spline_w=30,Hole=Spline_Hole_d,Key=false);
+// SplineHole(d=20,l=20,nSplines=Spline_nSplines,Spline_w=30,Gap=IDXtra,Key=false);
 
 // must be after last include so it doesn't get over ridden
 $fn=90;
@@ -581,7 +583,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 	
 		
 			
-	SplineShaft(d=Spline_d,l=Thickness*PlanetStack,nSplines=nSplines,Spline_w=30,Hole=6,Key=true);
+	SplineShaft(d=Spline_d,l=Thickness*PlanetStack,nSplines=nSplines,Spline_w=30,Hole=Spline_Hole_d,Key=true);
 	
 } // CompoundPlanetGearHelixA
 

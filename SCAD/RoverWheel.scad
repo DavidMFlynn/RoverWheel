@@ -35,6 +35,16 @@
 // WheelMount();
 // **************************************************
 // for viewing
+// ShowWheel();
+// ShowCuttawayView();
+// **************************************************
+// Routines and parts.
+//  OPB490N_Sensor_Cutout();
+//  OPB490N_Sensor();
+//  OPB490_Sensor();
+//  RS775_DC_Motor();
+//  RS775_MotorMountHoles();
+//  ShowMyBalls();
 // **************************************************
 
 include<Motors.scad>
@@ -44,6 +54,7 @@ include<CommonStuffSAE.scad>
 $fn=90;
 IDXtra=0.2;
 Overlap=0.05;
+Spline_Hole_d=6.35+IDXtra; // for a 1/4" standoff
 
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
@@ -79,8 +90,6 @@ module OPB490N_Sensor_Cutout(){
 } // OPB490N_Sensor_Cutout
 
 //OPB490N_Sensor_Cutout();
-
-
 
 module OPB490N_Sensor(){
 	OPB490N_z=12.32;
@@ -202,16 +211,25 @@ translate([17.5,0,GearWidth+11.5])rotate([0,-90,0])OPB490_Sensor();}
 */
 
 module OuterPlanetCarrier(){
+	// Added Stiffenner 1/9/18
 	PC_r=25;
 	PC_t=3;
 	difference(){
 		union(){
-			for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])
-				hull(){
-					cylinder(d=10, h=PC_t);
-					translate([PC_r,0,0]) cylinder(d=10, h=PC_t);
-				} // hull
+			for (j=[0:nPlanets-1]){
+				rotate([0,0,360/nPlanets*j])
+					hull(){
+						cylinder(d=10, h=PC_t);
+						translate([PC_r,0,0]) cylinder(d=8, h=PC_t);
+					} // hull
 				
+				// Stiffenner
+				hull(){
+					rotate([0,0,360/nPlanets*j]) translate([PC_r+2,0,0]) cylinder(d=3, h=PC_t-0.3);
+					rotate([0,0,360/nPlanets*(j+1)]) translate([PC_r+2,0,0]) cylinder(d=3, h=PC_t-0.3);
+				} // hull
+			} // for
+			
 			cylinder(d=11,h=PC_t+1);
 			cylinder(d=10,h=PC_t+5);
 		} // union
@@ -226,7 +244,7 @@ module OuterPlanetCarrier(){
 module InnerPlanetCarrier(){
 	PC_r=25;
 	PC_t=4;
-	PC_w=8;
+	PC_w=10; // changed from 8 to 10 1/9/18
 	
 	difference(){
 		cylinder(r=PC_r+PC_w/2,h=PC_t);
@@ -565,7 +583,7 @@ translate([0,0,tire_w])rotate([180,0,0]){
 
 module ShowMyBalls(){
 	nBalls=12;
-	for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d);
+	for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d-Overlap*2);
 } // ShowMyBalls
 
 //translate([0,0,9.1+InnerSleve_l+Race_w])color("Pink")ShowMyBalls();
