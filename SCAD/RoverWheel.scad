@@ -32,7 +32,7 @@
 // AdapterRing();
 // OuterRim();
 
-// WheelMount();
+WheelMount();
 // **************************************************
 // for viewing
 //  ShowPlanets(CutAway=true,HideGears=false);
@@ -77,6 +77,67 @@ bead_minD=94; // 3.46"
 tire_w=78.0; // 3"
 nBeadBolts=8;
 
+module ChannelBoltPattern0770(){
+	// inches
+	BC_d=0.77;
+	BC_r=BC_d/2;
+	
+	translate([BC_r,0,0]) children();
+	rotate([0,0,45]) translate([BC_r,0,0]) children();
+	rotate([0,0,90]) translate([BC_r,0,0]) children();
+	rotate([0,0,135]) translate([BC_r,0,0]) children();
+	rotate([0,0,180]) translate([BC_r,0,0]) children();
+	rotate([0,0,225]) translate([BC_r,0,0]) children();
+	rotate([0,0,270]) translate([BC_r,0,0]) children();
+	rotate([0,0,315]) translate([BC_r,0,0]) children();
+	
+} // ChannelBoltPattern0770
+
+//scale(25.4)ChannelBoltPattern0770() Bolt6Hole();
+
+module ChannelBoltPattern1500(){
+	// inches
+	BC_d=1.50;
+	BC_r=BC_d/2;
+	
+	rotate([0,0,45]) translate([BC_r,0,0]) children();
+	rotate([0,0,135]) translate([BC_r,0,0]) children();
+	rotate([0,0,225]) translate([BC_r,0,0]) children();
+	rotate([0,0,315]) translate([BC_r,0,0]) children();
+	
+} // ChannelBoltPattern1500
+
+//scale(25.4)ChannelBoltPattern1500() Bolt6Hole();
+
+module ChannelMountingBlock(){
+	ChannelDepth=1.410;
+	ChannelWidth=1.320;
+	
+	difference(){
+		cube([1.500,ChannelWidth,ChannelDepth],center=true);
+		
+		cylinder(d=0.5,h=ChannelDepth+0.01,center=true);
+		rotate([90,0,0])cylinder(d=0.5,h=ChannelWidth+0.01,center=true);
+		
+		translate([0,0,ChannelDepth/2]){
+			ChannelBoltPattern0770() Bolt6Hole();
+			ChannelBoltPattern1500() Bolt6Hole();
+		}
+		
+		rotate([90,0,0])
+		translate([0,0,ChannelWidth/2]){
+			ChannelBoltPattern0770() Bolt6Hole();
+			ChannelBoltPattern1500() Bolt6Hole();
+		}
+		rotate([-90,0,0])
+		translate([0,0,ChannelWidth/2]){
+			ChannelBoltPattern0770() Bolt6Hole();
+			ChannelBoltPattern1500() Bolt6Hole();
+		}
+	} // diff
+} // ChannelMountingBlock
+
+//scale(25.4)ChannelMountingBlock();
 
 module OPB490N_Sensor_Cutout(){
 	OPB490N_z=12.32+IDXtra;
@@ -435,11 +496,43 @@ translate([0,0,bead_h+3.1])
 //HubCap();
 //InnerRim();
 
+WheelMount_l=25;
+WheelMount_OD=bead_minD-17;
+nMountingBolts=8;
+MBoltInset=3.5;
+	
+module ChannelConnector(){
+	
+	
+	difference(){
+		union(){
+		translate([WheelMount_OD/2-4,0,0])
+				scale(25.4)translate([0.75,0,1.41/2])ChannelMountingBlock();
+		cylinder(d=WheelMount_OD,h=25);
+		}
+		
+		translate([0,0,3]) hull(){
+			translate([-WheelMount_OD/4,0,0]) cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,0.01],center=true);
+			translate([0,0,23]) cube([WheelMount_OD-8,WheelMount_OD+Overlap*2,0.01],center=true);
+		}
+		
+		translate([0,0,-Overlap])cylinder(d=WheelMount_OD-MBoltInset*4,h=WheelMount_l+Overlap*2);
+		
+		translate([-WheelMount_OD/2-Overlap,-WheelMount_OD/2-Overlap,-Overlap]) 
+			cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,26]);
+		
+		// Mounting Bolts
+		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
+			translate([WheelMount_OD/2-MBoltInset,0,8])
+				scale(25.4) Bolt6HeadHole(lAccess=2);
+		
+	} // diff
+} // ChannelConnector
+
+//color("Red")RS775_DC_Motor();
+translate([0,0,WheelMount_l])ChannelConnector();
+
 module WheelMount(){
-	WheelMount_OD=bead_minD-17;
-	WheelMount_l=25;
-	nMountingBolts=8;
-	MBoltInset=3.5;
 	
 	difference(){
 		cylinder(d=WheelMount_OD,h=6);
