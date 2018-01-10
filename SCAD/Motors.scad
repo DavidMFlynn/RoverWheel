@@ -2,10 +2,11 @@
 // Author: David M. Flynn
 // Project: 3D Printer
 // filename: Motors.scad
-// Rev: 1.1 9/29/2016
+// Rev: 1.1.1 1/9/2018
 // Units: Inches
 // *******************************************************
 // History:
+//  1.1.1 1/9/2018 Changed Stepper17_Holes(Thickness=0.5);
 //  1.1 9/29/2016 Converted to a more generic form
 //  1.0 8/21/2016 changes hight of Stepper17_ZBracket, also makes it easier to print
 //
@@ -13,7 +14,8 @@
 //StepperKL23Mount(MountThickness=0.375, BoltHole_d=KL23_BoltHole_d);
 //StepperKL23H256Bolts();
 //SepperKL23H256();
-//Stepper17_Holes();
+//Stepper17_Holes(Thickness=0.5);
+//Stepper17_BtnHoles(Thickness=0.2);
 //SepperKL17();
 //MototMountRound(Diameter=2.625, Thickness=0.2);
 //Stepper17_YBracket(YSB_CL=0.5);
@@ -145,10 +147,10 @@ module SepperKL17(){
 		
 } // SepperKL17
 
-module Stepper17_Holes(){
+module Stepper17_Holes(Thickness=0.5){
 				// motor boss
 			translate([-OverLap,0,0])
-				rotate([0,90,0]) cylinder(r=KL17_Boss_d/2+ID_Xtra, h=RB_Foot_t+OverLap*2);
+				rotate([0,90,0]) cylinder(r=KL17_Boss_d/2+ID_Xtra, h=Thickness+OverLap*2);
 	
 		// motor bolts
 		for (J=[0:3]) rotate([J*90,0,0])

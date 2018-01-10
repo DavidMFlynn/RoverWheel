@@ -3,17 +3,19 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0 1/5/2018
+// Rev: 1.0.0a1 1/9/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0a1 1/9/2018 Added encoder mount. worked on InputRingGear()
 // 1.0.0 1/5/2018 First code
 // **************************************************
-// for STL output from outside inward
+// for STL output, from outside inward
 //	HubCap();
 //	rotate([180,0,0]) InnerRim();
 //  OuterPlanetCarrier();
 //  InnerPlanetCarrier();
+
 
 // Planet A
 //  CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
@@ -22,13 +24,20 @@
 //CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
 
 //	Pinion();
-//DriveRingGear();
+// DriveRingGear();
+// SensorMount();
+// InputRingGear();
 // OutsideRace(myFn=360); // print 2
 // InsideRace(myFn=360); // Print 2
 // AdapterRing();
 // OuterRim();
+
+// WheelMount();
+// **************************************************
+// for viewing
 // **************************************************
 
+include<Motors.scad>
 include<CompoundHelicalPlanetary.scad>
 include<CommonStuffSAE.scad>
 
@@ -70,6 +79,8 @@ module OPB490N_Sensor_Cutout(){
 } // OPB490N_Sensor_Cutout
 
 //OPB490N_Sensor_Cutout();
+
+
 
 module OPB490N_Sensor(){
 	OPB490N_z=12.32;
@@ -289,7 +300,10 @@ module ShowWheel(){
 		//translate([0,0,25-12.7+4.5]) color("Red") RS775_DC_Motor();
 		
 		//input ring
-		translate([0,0,bead_h+3.2+GearWidth]) InputRingGear();
+		translate([0,0,bead_h+3.2+GearWidth]) {
+			InputRingGear();
+			translate([0,0,-Overlap*2])color("Tan")SensorMount();
+		}
 			
 			
 		
@@ -397,11 +411,45 @@ module WheelMount(){
 
 //translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) WheelMount();
 
+MotorPlate_t=4.5;
+MotorInset=25;
+Enc_a=76;
+InputGear_d=85.4;
+
+module SensorMount(){
+	Hub_d=30;
+	EncDiskClear_d=Hub_d+14;
+	
+	translate([0,0,MotorInset])
+	difference(){
+		translate([0,0,-3]) cylinder(d=InputGear_d-12,h=3);
+		
+		// crop ends
+		rotate([0,0,Enc_a-36]) translate([-InputGear_d/2,-InputGear_d,-3-Overlap]) cube([InputGear_d,InputGear_d,4]);
+		rotate([0,0,180+Enc_a+36-9+36]) translate([-InputGear_d/2,-InputGear_d,-3-Overlap]) cube([InputGear_d,InputGear_d,4]);
+		// encoder disk clearance
+		translate([0,0,-3-Overlap]) cylinder(d=EncDiskClear_d,h=4);
+		
+		rotate([0,0,Enc_a+36-9]) translate([18.0,0,-1.5])OPB490N_Sensor_Cutout();
+		rotate([0,0,Enc_a]) translate([18.0,0,-1.5])OPB490N_Sensor_Cutout();
+
+		// Encoder Mounting Bolts
+		rotate([0,0,Enc_a+36-9+30]) translate([EncDiskClear_d/2+12,0,0]) scale(25.4) Bolt4ClearHole();
+		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+12,0,0]) scale(25.4) Bolt4ClearHole();
+		rotate([0,0,Enc_a+36-9+30]) translate([EncDiskClear_d/2+3,0,0]) scale(25.4) Bolt4ClearHole();
+		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+3,0,0]) scale(25.4) Bolt4ClearHole();
+
+	} // diff
+} // SensorMount
+
+//translate([0,0,-Overlap*2]) color("Tan")SensorMount();
+
 module InputRingGear(){
-	MotorPlate_t=4.5;
-	MotorInset=25;
-	InputGear_d=85.4;
-	Enc_a=76;
+	Hub_d=30;
+	EncDiskClear_d=Hub_d+14;
+	
+	
+	
 	
 	CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth+Overlap, twist=-twist, HB=false);
 	
@@ -409,9 +457,24 @@ module InputRingGear(){
 	difference(){
 		cylinder(d=InputGear_d,h=MotorPlate_t);
 		
+		// Wire paths / lightening holes
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*(j+0.5)])hull(){
+			translate([Race_ID/2+RaceBoltInset+7,0,-Overlap]) cylinder(d=10,h=MotorPlate_t+Overlap*2);
+			translate([Race_ID/2,0,-Overlap]) cylinder(d=10,h=MotorPlate_t+Overlap*2);
+		}
 		
-		rotate([0,0,Enc_a+36-9]) translate([18.0,0,-1.5])OPB490N_Sensor_Cutout();
-		rotate([0,0,Enc_a]) translate([18.0,0,-1.5])OPB490N_Sensor_Cutout();
+		// Encoder Mounting Bolts
+		rotate([0,0,Enc_a+36-9+30]) translate([EncDiskClear_d/2+12,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
+		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+12,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
+		rotate([0,0,Enc_a+36-9+30]) translate([EncDiskClear_d/2+3,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
+		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+3,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
+		
+		// test version only
+		rotate([0,0,5])rotate([0,-90,0])scale(25.4)Stepper17_BtnHoles(Thickness=MotorPlate_t/25.4);
+
+		// encoder clearance scaled for a loose fit
+		rotate([0,0,Enc_a+36-9]) translate([18.0,0,-1.5])scale(1.1)OPB490N_Sensor_Cutout();
+		rotate([0,0,Enc_a]) translate([18.0,0,-1.5])scale(1.1)OPB490N_Sensor_Cutout();
 		
 		
 		translate([0,0,MotorPlate_t])RS775_MotorMountHoles()scale(25.4)Bolt8ButtonHeadHole();
@@ -420,12 +483,20 @@ module InputRingGear(){
 			scale(25.4) Bolt4Hole();
 	} // diff
 	
+	// skirt
 	translate([0,0,GearWidth]) difference(){
-		cylinder(d=InputGear_d,h=MotorInset-GearWidth+MotorPlate_t);
+		Skirt_h=MotorInset-GearWidth+MotorPlate_t;
+		cylinder(d=InputGear_d,h=Skirt_h);
 		
 		translate([0,0,-Overlap])cylinder(d1=InputGear_d-14,d2=InputGear_d-4,h=10+Overlap*2);
 		
 		translate([0,0,10])cylinder(d=InputGear_d-4,h=MotorInset-GearWidth+MotorPlate_t+Overlap*2);
+		
+		// Set screw access
+		for (j=[0:4]) rotate([0,0,360/5*j]) translate([InputGear_d/2-10,0,2]) hull(){
+			rotate([0,90,0]) cylinder(d=1,h=20);
+			translate([0,0,Skirt_h-8]) rotate([0,90,0]) cylinder(d=12,h=20);
+		}
 	} // diff
 	
 	//translate([0,0,MotorInset-12.7+MotorPlate_t])color("Red")RS775_DC_Motor();
