@@ -2,13 +2,14 @@
 // Compound Helical Planetary Drive Unit Library
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
-// Created: 1/9/2018
-// Rev: 1.1.1 1/1/2018
+// Created: 1/1/2018
+// Rev: 1.1.2 1/10/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.1");
-// 1.1.1 1/1/2018 use Spline_Hole_d
+echo("Compound Helical Planetary Library 1.1.2");
+// 1.1.2 1/10/2018 added 
+// 1.1.1 1/9/2018 use Spline_Hole_d
 // 1.1.0 1/1/2018 Made harringbone an option.
 // 1.0.1 12/29/2017 Adjusted Gap, added Key=true to splines, split pinion.
 // 1.0.0 12/27/2017 Copied from Compound Panetary Drive
@@ -25,6 +26,7 @@ echo("Compound Helical Planetary Library 1.1.1");
 //280:308 = 54:51 = 76.5:1, 12t 21t,Pinion_a=0,nPlanets=3
 //260:283.636 = 60:57 = 95.0014:1. 12t,24t,Pinion_a=360/Pinion_t/2,nPlanets=3
 
+Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
 BackLash=0.3;
@@ -670,9 +672,8 @@ module CompoundPlanetGearHelixB(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 			flat=false);
 		
 		translate([0,0,-Overlap])
-		SplineHole(d=Spline_d,l=Thickness+Overlap*2,nSplines=nSplines,Spline_w=30,Gap=0.22,Key=true);
+		SplineHole(d=Spline_d,l=Thickness+Overlap*2,nSplines=nSplines,Spline_w=30,Gap=Spline_Gap,Key=true);
 	} // diff
-	
 	
 } // CompoundPlanetGearHelixB
 

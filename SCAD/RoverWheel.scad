@@ -3,36 +3,31 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0a1 1/9/2018
+// Rev: 1.0.0a2 1/10/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0a2 1/10/2018 Test fit on everything.
 // 1.0.0a1 1/9/2018 Added encoder mount. worked on InputRingGear()
 // 1.0.0 1/5/2018 First code
 // **************************************************
 // for STL output, from outside inward
 //	HubCap();
-//	rotate([180,0,0]) InnerRim();
+//	rotate([180,0,0]) InnerRim(); // Print 2
 //  OuterPlanetCarrier();
+//  PlanetA();
+//  rotate([180,0,0]) PlanetB();
 //  InnerPlanetCarrier();
-
-
-// Planet A
-//  CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
-			
-// Planet B
-//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
-
 //	Pinion();
-// DriveRingGear();
-// SensorMount();
-// InputRingGear();
-// OutsideRace(myFn=360); // print 2
-// InsideRace(myFn=360); // Print 2
-// AdapterRing();
-// OuterRim();
-
-WheelMount();
+//  DriveRingGear();
+//  SensorMount();
+//  rotate([180,0,0]) InputRingGear();
+//  OutsideRace(myFn=360); // print 2
+//  InsideRace(myFn=360); // Print 2
+//  AdapterRing();
+//  OuterRim();
+//  WheelMount();
+//  ChannelConnector();
 // **************************************************
 // for viewing
 //  ShowPlanets(CutAway=true,HideGears=false);
@@ -57,6 +52,7 @@ $fn=90;
 IDXtra=0.2;
 Overlap=0.05;
 Spline_Hole_d=6.35+IDXtra; // for a 1/4" standoff
+Spline_Gap=0.20; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
@@ -76,6 +72,7 @@ bead_t=1.4;
 bead_minD=94; // 3.46"
 tire_w=78.0; // 3"
 nBeadBolts=8;
+
 
 module ChannelBoltPattern0770(){
 	// inches
@@ -272,6 +269,43 @@ rotate([0,0,36-9])
 translate([17.5,0,GearWidth+11.5])rotate([0,-90,0])OPB490_Sensor();
 translate([17.5,0,GearWidth+11.5])rotate([0,-90,0])OPB490_Sensor();}
 */
+
+PlanetClearance=1; // cut-away 1mm of teeth
+
+module PlanetA(){
+	
+	difference(){
+		CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
+		
+		// clearance for misaligned ring gears
+		translate([0,0,GearWidth-PlanetClearance])
+		difference(){
+			cylinder(d=30,h=PlanetClearance+Overlap);
+			translate([0,0,-Overlap])cylinder(d=21,h=PlanetClearance+Overlap*4);
+		}
+	} // diff
+} // PlanetA
+
+//PlanetA();
+
+module PlanetB(){
+	
+	difference(){
+
+		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
+		
+		
+		// clearance for misaligned ring gears
+		translate([0,0,-Overlap])
+		difference(){
+			cylinder(d=30,h=PlanetClearance+Overlap);
+			translate([0,0,-Overlap])cylinder(d=18.8,h=PlanetClearance+Overlap*4);
+		}
+		/**/
+	} // diff
+} // PlanetB
+
+//rotate([180,0,0])PlanetB();
 
 module OuterPlanetCarrier(){
 	// Added Stiffenner 1/9/18
@@ -509,7 +543,10 @@ module ChannelConnector(){
 		translate([WheelMount_OD/2-4,0,0])
 				scale(25.4)translate([0.75,0,1.41/2])ChannelMountingBlock();
 		cylinder(d=WheelMount_OD,h=25);
-		}
+		} // union
+		
+		// wire path
+		translate([WheelMount_OD/2-8,0,0.705*25.4])rotate([0,90,0]) cylinder(d=12.7,h=45);
 		
 		translate([0,0,3]) hull(){
 			translate([-WheelMount_OD/4,0,0]) cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,0.01],center=true);
@@ -524,13 +561,13 @@ module ChannelConnector(){
 		// Mounting Bolts
 		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
 			translate([WheelMount_OD/2-MBoltInset,0,8])
-				scale(25.4) Bolt6HeadHole(lAccess=2);
+				scale(25.4) Bolt4HeadHole(lHead=2); //Bolt6HeadHole(lAccess=2);
 		
 	} // diff
 } // ChannelConnector
 
 //color("Red")RS775_DC_Motor();
-translate([0,0,WheelMount_l])ChannelConnector();
+//translate([0,0,WheelMount_l])ChannelConnector();
 
 module WheelMount(){
 	
@@ -550,7 +587,7 @@ module WheelMount(){
 		// Mounting Bolts
 		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
 			translate([WheelMount_OD/2-MBoltInset,0,WheelMount_l]) scale(25.4)
-				Bolt6Hole();
+				Bolt4Hole(); //Bolt6Hole();
 		
 		// cut away
 		hull(){
@@ -599,9 +636,6 @@ module InputRingGear(){
 	Hub_d=30;
 	EncDiskClear_d=Hub_d+14;
 	
-	
-	
-	
 	CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth+Overlap, twist=-twist, HB=false);
 	
 	translate([0,0,MotorInset])
@@ -620,8 +654,8 @@ module InputRingGear(){
 		rotate([0,0,Enc_a+36-9+30]) translate([EncDiskClear_d/2+3,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
 		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+3,0,MotorPlate_t]) scale(25.4) Bolt4Hole();
 		
-		// test version only
-		rotate([0,0,5])rotate([0,-90,0])scale(25.4)Stepper17_BtnHoles(Thickness=MotorPlate_t/25.4);
+		// test version only, doesn't fit in wheel mount
+		//rotate([0,0,5])rotate([0,-90,0])scale(25.4)Stepper17_BtnHoles(Thickness=MotorPlate_t/25.4);
 
 		// encoder clearance scaled for a loose fit
 		rotate([0,0,Enc_a+36-9]) translate([18.0,0,-1.5])scale(1.1)OPB490N_Sensor_Cutout();
