@@ -33,7 +33,7 @@
 //  ShowPlanets(CutAway=true,HideGears=false);
 //  ShowPlanets(CutAway=true,HideGears=true);
 //  ShowWheel();
-//  ShowCutAwayView();
+//  ShowCutAwayView(a=-50);
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
@@ -43,6 +43,7 @@
 //  RS775_MotorMountHoles();
 //  ShowMyBalls();
 //  rotate([180,0,0]) InputRingGearMountingPlate();
+//  SensorMountAssyTool();
 // **************************************************
 
 include<Motors.scad>
@@ -474,11 +475,11 @@ module ShowWheel(){
 
 //ShowWheel();
 
-module ShowCutAwayView(){
+module ShowCutAwayView(a=30){
 	difference(){
 		ShowWheel();
 		
-		translate([-100,-100,-Overlap])cube([100,100,200]);
+		rotate([0,0,a])translate([-100,-100,-Overlap])cube([100,100,200]);
 	} // diff
 	
 } // ShowCutAwayView
@@ -599,6 +600,21 @@ module WheelMount(){
 } // WheelMount
 
 //translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) WheelMount();
+
+module SensorMountAssyTool(){
+	Hub_d=30;
+	EncDiskClear_d=Hub_d+14;
+	
+	difference(){
+		cylinder(d=EncDiskClear_d,h=3);
+		
+		translate([0,0,-Overlap])cylinder(d=17,h=4);
+	} // diff
+	
+} // SensorMountAssyTool
+
+//SensorMountAssyTool();
+
 
 MotorPlate_t=4.5;
 MotorInset=25;
