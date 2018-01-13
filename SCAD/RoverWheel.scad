@@ -18,7 +18,7 @@
 //  PlanetA();
 //  rotate([180,0,0]) PlanetB();
 //  InnerPlanetCarrier();
-//	Pinion();
+//	Pinion(); // aka sun gear
 //  DriveRingGear();
 //  rotate([180,0,0]) SensorMount();
 //  rotate([180,0,0]) InputRingGear();
@@ -606,9 +606,12 @@ module SensorMountAssyTool(){
 	EncDiskClear_d=Hub_d+14;
 	
 	difference(){
+		union(){
 		cylinder(d=EncDiskClear_d,h=3);
+		cylinder(d=Hub_d+1,h=5);
+		}
 		
-		translate([0,0,-Overlap])cylinder(d=17,h=4);
+		translate([0,0,-Overlap])cylinder(d=17,h=6);
 	} // diff
 	
 } // SensorMountAssyTool
