@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0a2 1/10/2018
+// Rev: 1.0.0a3 1/13/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0a3 1/13/2018 Added GearSlop to InputRingGear for planet clearance.
 // 1.0.0a2 1/10/2018 Test fit on everything.
 // 1.0.0a1 1/9/2018 Added encoder mount. worked on InputRingGear()
 // 1.0.0 1/5/2018 First code
@@ -697,14 +698,14 @@ module InputRingGearMountingPlate(){
 //InputRingGearMountingPlate();
 
 module InputRingGear(){
-	
-	CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth+Overlap, twist=-twist, HB=false);
+	GearSlop=1;
+	CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth+GearSlop+Overlap, twist=-twist, HB=false);
 	
 	translate([0,0,MotorInset]) InputRingGearMountingPlate();
 	
 	// skirt
-	translate([0,0,GearWidth]) difference(){
-		Skirt_h=MotorInset-GearWidth+MotorPlate_t;
+	translate([0,0,GearWidth+GearSlop]) difference(){
+		Skirt_h=MotorInset-(GearWidth+GearSlop)+MotorPlate_t;
 		cylinder(d=InputGear_d,h=Skirt_h);
 		
 		translate([0,0,-Overlap])cylinder(d1=InputGear_d-14,d2=InputGear_d-4,h=10+Overlap*2);
