@@ -725,15 +725,16 @@ module InputRingGear(){
 //InputRingGear();
 
 module DriveRingGear(){
-	
+	SkirtThickness=2;
 	Nut_l=8;
+	GearEndClearance=0.4; // just a little extra so the two ring gears don't press on each other
 	
 	difference(){
 		union(){
-			CompoundRingGearHelix(Pitch=PlanetaryPitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false);
+			CompoundRingGearHelix(Pitch=PlanetaryPitchB, nTeeth=OutputRing_t, Thickness=GearWidth-GearEndClearance, twist=twist, HB=false);
 			
 			for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([bead_minD/2-3,0,0]) 
-			cylinder(d=7.5,h=GearWidth);
+				cylinder(d=7.5,h=GearWidth-GearEndClearance);
 		} // union
 		
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([bead_minD/2-3,0,0]) 
@@ -742,11 +743,8 @@ module DriveRingGear(){
 	
 	
 	difference(){
-			cylinder(d=bead_minD+4,h=InnerSleve_l);	
+		cylinder(d=bead_minD+SkirtThickness*2,h=InnerSleve_l);	
 			
-			
-			
-
 		// ID
 		translate([0,0,-Overlap])cylinder(d=bead_minD,h=InnerSleve_l+Overlap*2);
 		

@@ -1,4 +1,23 @@
+Off-The-Shelf Parts
+---------------------------------------------
 Traxxas #4973 Tires, Maxx 3.8" (6.3" outer)
 Traxxas #5119 10mm x 15mm x 4mm Bearing
 
 Optical sensor 365-1650-ND OPB490P11Z
+
+Hardware usage
+---------------------------------------------
+#4-40 x 1/2" Socket Head Cap screw 
+  (8) Channel Mount to Wheel Mount
+  (8) Inner Rim to Adapter Ring
+  (8) Hub-Cap to Drive Ring Gear
+#4-40 x 3/4" Socket Head Cap screw 
+  (8) Wheel Mount to Input Ring Gear
+  (8) Adapter Ring to Drive Ring Gear
+#4-40 x 1/4" Button Head
+  (10) Inner and Outer Planet Carrier
+#4-40 x 3/8" Button Head
+  (4) Sensor Mount to Input Ring Gear
+  
+3/8" Balls, steel or acrylic
+  (25) Wheel Bearing
