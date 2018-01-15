@@ -3,21 +3,26 @@ Off-The-Shelf Parts
 Traxxas #4973 Tires, Maxx 3.8" (6.3" outer)
 Traxxas #5119 10mm x 15mm x 4mm Bearing
 
+Alt. Bearing 6800-2Z 10mm x 19mm x 5mm McM 5972K153
+
 Optical sensor 365-1650-ND OPB490P11Z
 
-Hardware usage
+Hardware usage (Qty per Wheel, Qty for 6 Wheels)
 ---------------------------------------------
-#4-40 x 1/2" Socket Head Cap screw 
+#4-40 x 1/2" Socket Head Cap screw (24,144) McM 92610A110
   (8) Channel Mount to Wheel Mount
   (8) Inner Rim to Adapter Ring
   (8) Hub-Cap to Drive Ring Gear
-#4-40 x 3/4" Socket Head Cap screw 
+#4-40 x 3/4" Socket Head Cap screw (16,96) McM 92610A114
   (8) Wheel Mount to Input Ring Gear
   (8) Adapter Ring to Drive Ring Gear
-#4-40 x 1/4" Button Head
+#4-40 x 1/4" Button Head (10, 60) McM 96452A106
   (10) Inner and Outer Planet Carrier
-#4-40 x 3/8" Button Head
+#4-40 x 3/8" Button Head (4,24) McM 96452A108
   (4) Sensor Mount to Input Ring Gear
+
+#8-32 x 1/4" Setscrew (1,6)
+  (1) Sun Gear to Motor Shaft
   
-3/8" Balls, steel or acrylic
+3/8" Balls, steel, Delrin or acrylic (25,150) McM 9614K58
   (25) Wheel Bearing
