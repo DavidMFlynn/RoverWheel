@@ -47,6 +47,7 @@
 //  SensorMountAssyTool();
 // **************************************************
 
+include<TubeConnectorLib.scad>
 include<Motors.scad>
 include<CompoundHelicalPlanetary.scad>
 include<CommonStuffSAE.scad>
@@ -538,6 +539,45 @@ WheelMount_OD=bead_minD-17;
 nMountingBolts=8;
 MBoltInset=3.5;
 	
+	
+
+module TubeConnector(){
+	Tube_OD=25.4;
+	
+	difference(){
+		union(){
+			translate([WheelMount_OD/2-2,0,Tube_OD/2])
+				rotate([0,90,0])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14);
+			
+			translate([WheelMount_OD/2-4,0,Tube_OD/2])
+				rotate([0,90,0])cylinder(d=Tube_OD,h=3);
+			
+			cylinder(d=WheelMount_OD,h=25);
+		} // union
+		
+		// wire path
+		translate([WheelMount_OD/2-8,0,Tube_OD/2])rotate([0,90,0]) cylinder(d=14,h=45);
+		
+		translate([0,0,3]) hull(){
+			translate([-WheelMount_OD/4,0,0]) cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,0.01],center=true);
+			translate([0,0,23]) cube([WheelMount_OD-8,WheelMount_OD+Overlap*2,0.01],center=true);
+		}
+		
+		translate([0,0,-Overlap])cylinder(d=WheelMount_OD-MBoltInset*4,h=WheelMount_l+Overlap*2);
+		
+		translate([-WheelMount_OD/2-Overlap,-WheelMount_OD/2-Overlap,-Overlap]) 
+			cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,26]);
+		
+		// Mounting Bolts
+		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
+			translate([WheelMount_OD/2-MBoltInset,0,8])
+				scale(25.4) Bolt4HeadHole(lHead=2); //Bolt6HeadHole(lAccess=2);
+		
+	} // diff
+} // TubeConnector
+
+TubeConnector();
+
 module ChannelConnector(){
 	
 	
