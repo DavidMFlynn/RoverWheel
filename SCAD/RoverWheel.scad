@@ -19,7 +19,7 @@
 //  PlanetA();
 //  rotate([180,0,0]) PlanetB();
 //  InnerPlanetCarrier();
-	SunGear();
+//	SunGear();
 //  DriveRingGear();
 //  rotate([180,0,0]) SensorMount();
 //  rotate([180,0,0]) InputRingGear();
@@ -30,12 +30,13 @@
 //  WheelMount();
 //  ChannelConnector(); // Connects 1.5" channel to the hub.
 //  TubeConnector(); // Connects 1" O.D. x 0.035" wall aluminum tube to the hub.
+//  MotorCover(); // optional snap on cover
 // **************************************************
 // for viewing
 //  ShowPlanets(CutAway=true,HideGears=false);
 //  ShowPlanets(CutAway=true,HideGears=true);
 //  ShowWheel();
-//  ShowCutAwayView(a=-50);
+  ShowCutAwayView(a=+50);
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
@@ -646,6 +647,35 @@ module ChannelConnector(){
 
 //color("Red")RS775_DC_Motor();
 //translate([0,0,WheelMount_l])ChannelConnector();
+
+module MotorCover(){
+	BackOfMotor=63;
+	
+	difference(){
+		cylinder(d=Race_ID+1,h=BackOfMotor+6+2);
+		
+		// wires
+		hull(){
+			translate([0,0,BackOfMotor+2-10]) rotate([90,0,0])cylinder(d=10,h=Race_ID);
+			translate([0,0,BackOfMotor+2+10]) rotate([90,0,0])cylinder(d=10,h=Race_ID);
+		} // hull
+		
+		// inside
+		translate([0,0,2])cylinder(d=Race_ID-2,h=BackOfMotor+6+Overlap);
+		
+		// Press fit and stop
+		translate([0,0,BackOfMotor+2])
+		difference(){
+			cylinder(d=Race_ID+3,h=7);
+			translate([0,0,-Overlap])cylinder(d=Race_ID,h=8);
+		} // diff
+	} // diff
+	
+} // MotorCover
+
+//MotorCover();
+
+
 
 module WheelMount(){
 	
