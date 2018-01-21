@@ -19,7 +19,7 @@
 //  PlanetA();
 //  rotate([180,0,0]) PlanetB();
 //  InnerPlanetCarrier();
-//	Pinion(); // aka sun gear
+	SunGear();
 //  DriveRingGear();
 //  rotate([180,0,0]) SensorMount();
 //  rotate([180,0,0]) InputRingGear();
@@ -28,7 +28,8 @@
 //  AdapterRing();
 //  OuterRim();
 //  WheelMount();
-//  ChannelConnector();
+//  ChannelConnector(); // Connects 1.5" channel to the hub.
+//  TubeConnector(); // Connects 1" O.D. x 0.035" wall aluminum tube to the hub.
 // **************************************************
 // for viewing
 //  ShowPlanets(CutAway=true,HideGears=false);
@@ -45,6 +46,7 @@
 //  ShowMyBalls();
 //  rotate([180,0,0]) InputRingGearMountingPlate();
 //  SensorMountAssyTool();
+//  rotate([180,0,0])SunGearCollet();
 // **************************************************
 
 include<TubeConnectorLib.scad>
@@ -60,8 +62,8 @@ Spline_Gap=0.20; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
-Pinion_t=15;
-Pinion_a=0;
+SunGear_t=15;
+SunGear_a=0;
 PlanetA_t=15;
 PlanetB_t=14;
 PlanetStack=2; // number of gears 2 or 3
@@ -223,56 +225,89 @@ module RS775_MotorMountHoles(){
 
 //RS775_MotorMountHoles() scale(25.4)Bolt8ButtonHeadHole();
 
-module Pinion(){
+module SunGear(){
 	Hub_d=30;
 	Shaft_d=5;
 	EncDisk_d=Hub_d+12;
 	EncDisk_t=1.5;
-	nEncPulses=10;
-	PinionHub_l=12;
+	nEncPulses=10; // 10 * 4 * 45 = 1800 counts, 16 = 2880, 20 = 3600
+	SunGearHub_l=12;
 	
-	CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, nTeeth=Pinion_t, Thickness=GearWidth, bEndScrew=0, HB=false,Hub_t=0,Hub_d=0);
+	CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, nTeeth=SunGear_t, Thickness=GearWidth, bEndScrew=0, HB=false,Hub_t=0,Hub_d=0);
 	
-	translate([0,0,-GearWidth-PinionHub_l])
+	translate([0,0,-GearWidth-SunGearHub_l])
 	difference(){
-		cylinder(d=Hub_d,h=PinionHub_l+Overlap);
+		union(){
+			cylinder(d=Hub_d-1,h=SunGearHub_l+Overlap);
+			
+			// make a smooth surface for the planets to run against
+			hull(){
+				translate([0,0,SunGearHub_l-1])cylinder(d=Hub_d,h=1+Overlap);
+				translate([0,0,8])cylinder(d=Hub_d-1,h=0.01);
+			} // hull
+			
+			// Encoder disc
+			cylinder(d=EncDisk_d,h=EncDisk_t);
+		} // union
 		
+		
+		// motor shaft
 		translate([0,0,-Overlap]) cylinder(d=Shaft_d,h=20);
+		// Set screw
 		translate([0,0,6]) rotate([90,0,0]) scale(25.4) Bolt8Hole();
-	} // diff
-	
-	// encoder disk
-	translate([0,0,-GearWidth-PinionHub_l])
-	difference(){
-		cylinder(d=EncDisk_d,h=EncDisk_t);
 		
+		// Motor bolt access
+		rotate([0,0,180/SunGear_t])
+		hull(){
+			translate([14.5,0,-1])cylinder(d=4.8,h=0.01);
+			translate([17,0,SunGearHub_l+Overlap*2])cylinder(d=4.4,h=0.01);
+		} // hull
+		
+		// Encoder disc
+		rotate([0,0,180/SunGear_t])
 		for (j=[0:nEncPulses])
 			hull(){
 				rotate([0,0,360/nEncPulses*j+360/nEncPulses/4])
-			translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
-				cube([7,0.01,EncDisk_t+Overlap*2],center=true);
+					translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
+						cube([5,0.01,EncDisk_t+Overlap*2],center=true);
 				
-		rotate([0,0,360/nEncPulses*j-360/nEncPulses/4])
-			translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
-				cube([7,0.01,EncDisk_t+Overlap*2],center=true);
+				rotate([0,0,360/nEncPulses*j-360/nEncPulses/4])
+					translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
+						cube([5,0.01,EncDisk_t+Overlap*2],center=true);
 			}
-			translate([0,0,-Overlap]) cylinder(d=Shaft_d,h=20);
+			
 	} // diff
-	translate([0,0,-GearWidth-PinionHub_l])
+	
+	// Encoder disc outer ring
+	translate([0,0,-GearWidth-SunGearHub_l])
 	difference(){
 		cylinder(d=EncDisk_d,h=EncDisk_t);
 		translate([0,0,-Overlap])cylinder(d=EncDisk_d-EncDisk_t*2,h=EncDisk_t+Overlap*2);
 	}
-} // Pinion
+} // SunGear
 
 //InputRingGear();
-//rotate([180,0,0])Pinion();
+//rotate([180,0,0])SunGear();
 /*
 rotate([0,0,80])color("Red"){
 rotate([0,0,36-9])
 translate([17.5,0,GearWidth+11.5])rotate([0,-90,0])OPB490_Sensor();
 translate([17.5,0,GearWidth+11.5])rotate([0,-90,0])OPB490_Sensor();}
 */
+
+module SunGearCollet(){
+	difference(){
+		translate([0,0,-18]) cylinder(d=40,h=18-Overlap);
+		
+		scale(1.01)SunGear();
+		translate([0,0,-18-Overlap]) {
+			cylinder(d=10,h=20);
+			cylinder(d=30+IDXtra,h=6);
+		}
+	} // diff
+} // SunGearCollet
+
+//rotate([180,0,0])SunGearCollet();
 
 PlanetClearance=1; // cut-away 1mm of teeth
 
@@ -363,11 +398,11 @@ module ShowPlanets(CutAway=true,HideGears=true){
 	PlanetShaft_l=24.5;
 	PitchA=PlanetaryPitchA;
 		PitchB=PlanetaryPitchB;
-		Planet_BC=Pinion_t*PitchA/180 + PlanetA_t*PitchA/180;
-		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/Pinion_t);
+		Planet_BC=SunGear_t*PitchA/180 + PlanetA_t*PitchA/180;
+		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/SunGear_t);
 		
-		PinionRA=$t*Ratio*360;
-		PlanetPosRA=PinionRA/((InputRing_t/Pinion_t)+(InputRing_t/Pinion_t));//  29.7r /(InputRing_t/Pinion_t); // 2.57 4.5
+		SunGearRA=$t*Ratio*360;
+		PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
 		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
 		OutputRingRA=-360*$t;
 	
@@ -401,11 +436,11 @@ module ShowWheel(){
 
 	PitchA=PlanetaryPitchA;
 		PitchB=PlanetaryPitchB;
-		Planet_BC=Pinion_t*PitchA/180 + PlanetA_t*PitchA/180;
-		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/Pinion_t);
+		Planet_BC=SunGear_t*PitchA/180 + PlanetA_t*PitchA/180;
+		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/SunGear_t);
 		echo(Ratio=Ratio);
-		PinionRA=$t*Ratio*360;// 76.5r
-		PlanetPosRA=PinionRA/((InputRing_t/Pinion_t)+(InputRing_t/Pinion_t));//  29.7r /(InputRing_t/Pinion_t); // 2.57 4.5
+		SunGearRA=$t*Ratio*360;// 76.5r
+		PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
 		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
 		OutputRingRA=-360*$t;
 	
@@ -431,7 +466,7 @@ module ShowWheel(){
 		}
 		/**/
 		translate([0,0,bead_h+3.3+GearWidth]){
-			rotate([180,0,0])color("Black")Pinion();
+			rotate([180,0,0])color("Black")SunGear();
 			
 			rotate([0,0,76+36-9])translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
 			rotate([0,0,76])	translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
@@ -501,7 +536,7 @@ InnerSleve_l=tire_w-(bead_h+3.1)*2-Race_w*2-Ada_h;
 
 translate([0,0,bead_h+3.2+GearWidth]){
 	InputRingGear();
-	rotate([180,0,0])Pinion();
+	rotate([180,0,0])SunGear();
 	translate([0,0,GearWidth+0.5])InnerPlanetCarrier();
 	
 	rotate([0,0,76])color("Red"){
@@ -576,7 +611,7 @@ module TubeConnector(){
 	} // diff
 } // TubeConnector
 
-TubeConnector();
+//TubeConnector();
 
 module ChannelConnector(){
 	
@@ -727,7 +762,7 @@ module InputRingGearMountingPlate(){
 		rotate([0,0,Enc_a+36-9]) translate([18.0,0,-1.5])scale(1.1)OPB490N_Sensor_Cutout();
 		rotate([0,0,Enc_a]) translate([18.0,0,-1.5])scale(1.1)OPB490N_Sensor_Cutout();
 		
-		
+		// Motor bolts
 		translate([0,0,MotorPlate_t])RS775_MotorMountHoles()scale(25.4)Bolt8ButtonHeadHole();
 		
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_ID/2+RaceBoltInset,0,Race_w]) 
