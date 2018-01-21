@@ -7,6 +7,8 @@ Alt. Bearing 6800-2Z 10mm x 19mm x 5mm McM 5972K153
 
 Optical sensor 365-1650-ND OPB490P11Z
 
+RS-775-3860 12V 3500 RPM Motor
+
 Hardware usage (Qty per Wheel, Qty for 6 Wheels)
 ---------------------------------------------
 #4-40 x 1/2" Socket Head Cap screw (24,144) McM 92610A110
@@ -24,5 +26,82 @@ Hardware usage (Qty per Wheel, Qty for 6 Wheels)
 #8-32 x 1/4" Setscrew (1,6)
   (1) Sun Gear to Motor Shaft
   
+M4 x 6mm Button Head Torx screw (2,12)
+  (2) Motor Mounting
+  
+#4 Flat Washer (small and thin) (4,24)
+  (4) Sensor Mount
+  
+Standoff 1/4" Dia. x 1" #4-40 thread Modified 0.247" x 24.5mm (5,30)
+  (5) Planet Carrier
+  
 3/8" Balls, steel, Delrin or acrylic (25,150) McM 9614K58
   (25) Wheel Bearing
+  
+3D Printed Parts
+-------------------------------------------------------------------
+Hub Cap
+Inner Rim (2)
+Outer Rim
+Planet A (5)
+Planet B (5)
+Outer Bearing Race (2)
+Inner Bearing Race (2)
+Sun Gear
+Inner Planet Carrier
+Outer Planet Carrier
+Sensor Mount
+Adapter Ring
+Input Ring Gear
+Output Ring Gear
+Wheel Mount
+Channel or Tube or Frame Mount (optional)
+Motor Cover (optional)
+Sensor Gluing fixture (optional)
+
+Tools & Supplies
+---------------------------
+T20 Torx Driver
+8IP Torx Plus Driver
+10IP Torx Plus Driver
+5/64" Hex Driver
+#4-40 Tap
+#8-32 Tap
+Hobby Knife #11 Blade
+5 minute epoxy
+Light plastic safe oil (motor oil)
+
+Assembly Notes
+-----------------------------------------------------------------------------------
+Remove strings, lumps and bumps from 3D printed parts
+Sand the inner and outer races so the faces contact with no visible gap.
+
+Tap Holes
+  Don't tap deep 3-4 threads is good.
+  Tap sensor mounting holes (4) from gear side of input ring gear.
+  Tap inner race mounting holes (8) from flat side of input ring gear.
+  
+Input Ring Gear Assy:
+Glue sensors to sensor mount, be sure botton of slot is parallel to the bottom of the mount.
+Thread #8-32 set screw into sun gear.
+Attach sensor mount to input ring gear with #4-40 x 3/8" button head screws and flat washers.
+Screw length issue: Drill thru the input ring gear into the sensor mount about 2mm or grind down the 3/4" screws.
+Attach wheel mount and inner races to input ring gear w/ #4-40 x 3/4" socket head cap screws.
+Route the sensor wires and glue in place with a dab of hot melt glue so they can't touch
+ the planet gears or planet carrier.
+
+Motor Mounting:
+Test fit the motor to the input ring gear and remove.
+Test fit the sun gear to the motor shaft and remove.
+Place M4 screws in input ring gear, slide sun gear into place, push the motor part way
+ and align the screws.
+Working each screw a couple threads at a time, align the notch in the sun gear and use
+ a T20 driver to tighten the motor screws.
+Placing some card stock behind the sun gear may be useful as a spacer.  Motor should spin freely when done.
+
+Tire Mounting:
+Assemble the complete wheel, but only use 4 screws each in the inner rim and hub cap.
+Work the tire over the wheel.
+One side at a time remove the inner rim or hub cap.
+Align the tire's beed in the inner rim and replace the inner rim or hub cap, with all 8 screws.
+Gradually tighten the screws while holding the wheel tightly together.
