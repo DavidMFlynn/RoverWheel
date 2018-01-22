@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0a3 1/13/2018
+// Rev: 1.0.0b1 1/21/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0b1 1/21/2018 Modified Sensor mount, added MotorCover. First wheel is assembled and working.
 // 1.0.0a3 1/13/2018 Added GearSlop to InputRingGear for planet clearance.
 // 1.0.0a2 1/10/2018 Test fit on everything.
 // 1.0.0a1 1/9/2018 Added encoder mount. worked on InputRingGear()
@@ -300,7 +301,7 @@ module SunGearCollet(){
 	difference(){
 		translate([0,0,-18]) cylinder(d=40,h=18-Overlap);
 		
-		scale(1.01)SunGear();
+		scale(1.04)SunGear();
 		translate([0,0,-18-Overlap]) {
 			cylinder(d=10,h=20);
 			cylinder(d=30+IDXtra,h=6);
@@ -761,6 +762,9 @@ module SensorMount(){
 		rotate([0,0,Enc_a-30]) translate([EncDiskClear_d/2+3,0,-SM_Thickness]) rotate([180,0,0])
 			scale(25.4) Bolt4ButtonHeadHole();
 
+		// clearance for WheelMount bolts
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_ID/2+RaceBoltInset,0,0]) 
+			scale(25.4) Bolt4Hole(depth=0.07);
 	} // diff
 } // SensorMount
 
