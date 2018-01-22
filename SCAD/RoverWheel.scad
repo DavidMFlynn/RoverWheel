@@ -36,7 +36,7 @@
 //  ShowPlanets(CutAway=true,HideGears=false);
 //  ShowPlanets(CutAway=true,HideGears=true);
 //  ShowWheel();
-  ShowCutAwayView(a=+50);
+//  ShowCutAwayView(a=+50);
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
