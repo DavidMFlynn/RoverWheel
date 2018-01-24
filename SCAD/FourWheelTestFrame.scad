@@ -65,11 +65,11 @@ module OneCorner(){
 } // OneCorner
 
 
-OneCorner();
-translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2])rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
-translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0])mirror([0,1,0])OneCorner();
+//OneCorner();
+//translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2])rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
+//translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0])mirror([0,1,0])OneCorner();
 
-module Tube2Pivot(TubeAngle=180,Length=50){
+module Tube2Pivot(TubeAngle=180,Length=50,WireExit=0){
 	nBolts=6;
 	
 	difference(){
@@ -91,13 +91,17 @@ module Tube2Pivot(TubeAngle=180,Length=50){
 		translate([0,0,-Tube_OD/2+2]) cylinder(d=Bearing_OD+IDXtra,h=Tube_OD);
 		//translate([0,0,-Tube_OD/2+2+Bearing_W]) cylinder(d=Bearing_OD+10,h=Tube_OD);
 		
+		// Wire Exit
+		if (WireExit!=0){
+			rotate([0,-90,0]) rotate([WireExit,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+		}
+		
 		// wire path
 		difference(){
 			translate([0,0,-Tube_OD/2+3]) cylinder(d=Length-6,h=Tube_OD);
 			translate([0,0,-Tube_OD/2+3-Overlap]) cylinder(d=Bearing_OD+6,h=Tube_OD+Overlap*2);
-			
-			
 		} // diff
+		
 		rotate([0,-90,0]) translate([0,0,Length/2-7]) cylinder(d=14,h=8);
 		rotate([0,-90,0]) rotate([TubeAngle,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
 	} // diff
@@ -110,7 +114,7 @@ module Tube2Pivot(TubeAngle=180,Length=50){
 		} // diff
 } // Tube2Pivot
 
-//Tube2Pivot(TubeAngle=180,Length=60);
+//rotate([0,-90,0])Tube2Pivot(TubeAngle=150,Length=60,WireExit=-105);
 
 module Tube2PivotCover(Length=50){
 	nBolts=6;
@@ -143,7 +147,8 @@ module Tube2PivotCover(Length=50){
 }
 } // Tube2PivotCover
 
-//translate([Tube_OD/2+Overlap,0,0])rotate([0,-90,0])Tube2PivotCover(Length=60);
+//translate([Tube_OD/2+Overlap,0,0])rotate([0,-90,0])
+//Tube2PivotCover(Length=60);
 
 
 

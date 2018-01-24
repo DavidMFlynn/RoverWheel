@@ -939,9 +939,75 @@ module OutsideRace(myFn=360){
 } // OutsideRace
 
 //OutsideRace(myFn=90);
+3D_Tire_id=180;
+
+module Spoke(){
+	// print nBeadBolts to mount 3d printed tire
+	// Spokes go in place of AdapterRing, InnerRim and OuterRim
+	
+	SpokeThickness=8;
+	SpokeWidth=4;
+	
+	difference(){
+		cylinder(d=Race_OD,h=SpokeThickness);
+		
+		translate([0,0,-Overlap]) cylinder(d=Race_OD-RaceBoltInset*4,h=SpokeThickness+Overlap*2);
+		
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_OD/2-RaceBoltInset,0,SpokeThickness]) 
+			scale(25.4) Bolt4HeadHole();
+		
+		// pie slice
+		difference(){
+			translate([0,0,-Overlap])cylinder(d=Race_OD+Overlap*2,h=SpokeThickness+Overlap*2);
+			
+			translate([0,0,-Overlap*2])
+			hull(){
+				rotate([0,0,180/nBeadBolts]) cube([Race_OD,Overlap,SpokeThickness+Overlap*4]);
+				rotate([0,0,-180/nBeadBolts]) cube([Race_OD,Overlap,SpokeThickness+Overlap*4]);
+			} // hull
+		} // diff
+	} // diff
+	
+	difference(){
+		translate([Race_OD/2-RaceBoltInset,-SpokeWidth/2,0])
+			rotate([0,0,20])cube([3D_Tire_id/2-Race_OD/2,SpokeWidth,SpokeThickness]);
+	
+		translate([0,0,-Overlap]) cylinder(d=Race_OD-Overlap,h=SpokeThickness+Overlap*2);
+		
+		difference(){
+			translate([0,0,-Overlap])cylinder(d=3D_Tire_id,h=SpokeThickness+Overlap*2);
+			translate([0,0,-Overlap*2])cylinder(d=3D_Tire_id-RaceBoltInset*4+Overlap*2,h=SpokeThickness+Overlap*4);
+		} // diff
+	} // diff
+	
+	//*
+	rotate([0,0,9])
+	difference(){
+		cylinder(d=3D_Tire_id,h=SpokeThickness);
+		
+		translate([0,0,-Overlap]) cylinder(d=3D_Tire_id-RaceBoltInset*4,h=SpokeThickness+Overlap*2);
+		
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([3D_Tire_id/2-RaceBoltInset,0,SpokeThickness]) 
+			scale(25.4) Bolt4HeadHole();
+		
+		// pie slice
+		difference(){
+			translate([0,0,-Overlap])cylinder(d=3D_Tire_id+Overlap*2,h=SpokeThickness+Overlap*2);
+			
+			translate([0,0,-Overlap*2])
+			hull(){
+				rotate([0,0,5]) cube([3D_Tire_id,Overlap,SpokeThickness+Overlap*4]);
+				rotate([0,0,-5]) cube([3D_Tire_id,Overlap,SpokeThickness+Overlap*4]);
+			} // hull
+		} // diff
+	} // diff
+	/**/
+} // Spoke
+
+//Spoke();
 
 module AdapterRing(){
-	
+	// Required for traxis tire
 	difference(){
 		cylinder(d1=Race_OD,d2=bead_d+bead_t*2,h=Ada_h);
 		
@@ -956,7 +1022,7 @@ module AdapterRing(){
 } // AdapterRing
 
 module InnerRim(){
-	
+	// Required for traxis tire
 	difference(){
 		cylinder(d=bead_d+bead_t*2,h=bead_h+3);
 		
@@ -977,6 +1043,7 @@ module InnerRim(){
 //InnerRim();
 
 module OuterRim(){
+	// Required for traxis tire
 	difference(){
 		union(){
 			cylinder(d=bead_d,h=1);
