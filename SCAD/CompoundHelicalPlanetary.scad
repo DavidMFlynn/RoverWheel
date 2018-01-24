@@ -3,12 +3,13 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.2 1/10/2018
+// Rev: 1.1.3 1/23/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.2");
-// 1.1.2 1/10/2018 added 
+echo("Compound Helical Planetary Library 1.1.3");
+// 1.1.3 1/23/2018 fixed ratio calculator
+// 1.1.2 1/10/2018 added notes
 // 1.1.1 1/9/2018 use Spline_Hole_d
 // 1.1.0 1/1/2018 Made harringbone an option.
 // 1.0.1 12/29/2017 Adjusted Gap, added Key=true to splines, split pinion.
@@ -45,14 +46,34 @@ twist=0;
 // 54 PlanetA_t*2 + Pinion_t
 InputRing_t=PlanetA_t*2 + Pinion_t; 
 // PlanetA_t*2 + Pinion_t - (PlanetA_t - PlanetB_t*2) 53
-OutputRing_t=(PlanetA_t*PlanetaryPitchA/180 + PlanetB_t*PlanetaryPitchB/180 + Pinion_t*PlanetaryPitchA/180)*180/PlanetaryPitchB; 
+OutputRing_tc=(PlanetA_t*PlanetaryPitchA/180 + PlanetB_t*PlanetaryPitchB/180 + Pinion_t*PlanetaryPitchA/180)*180/PlanetaryPitchB;
+ 
 Shaft_d=5;
 PlanetB_a=0;
 
+OutputRing_t=floor(OutputRing_tc);
 echo(InputRing_t=InputRing_t);
+echo(OutputRing_tc=OutputRing_tc);
 echo(OutputRing_t=OutputRing_t);
-Ratio=OutputRing_t*PlanetaryPitchB/180/((InputRing_t*PlanetaryPitchA/180  / (PlanetA_t*PlanetaryPitchA/180) * (PlanetB_t*PlanetaryPitchB/180)-OutputRing_t*PlanetaryPitchB/180))*(InputRing_t/Pinion_t);
-	echo(Ratio=Ratio);
+
+//OutputRing_t=floor(OutputRing_t);
+
+// from wikapedia
+Ns=Pinion_t;
+Npa=PlanetA_t;
+Npb=PlanetB_t;
+Nra=InputRing_t;
+Nrb=OutputRing_t;
+Ws=1000;
+Wra=0;
+Wc= (Ns*Ws + Nra*Wra)/(Ns + Nra);
+//echo(Wc=Wc);
+Wpa= (Ns*Ws - (Nra - Npa) * Wc) / Npa;
+Wpb = Wpa; // common shaft
+Wrb= (Npb*Wpb - (Nrb - Npb) * Wc) / Nrb;
+Ratio= Ws/Wrb;
+	
+echo(Ratio=Ratio);
 	
 // *** Routines ***
 
