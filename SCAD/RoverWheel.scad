@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0b1 1/21/2018
+// Rev: 1.0.0b2 1/24/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0b2 1/24/2018 Changed BackLash to 0.5mm, any distortion in the ring gears caused binding.
 // 1.0.0b1 1/21/2018 Modified Sensor mount, added MotorCover. First wheel is assembled and working.
 // 1.0.0a3 1/13/2018 Added GearSlop to InputRingGear for planet clearance.
 // 1.0.0a2 1/10/2018 Test fit on everything.
@@ -64,6 +65,7 @@ Spline_Gap=0.20; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
+BackLash=0.5; // 0.3 works but is tight
 SunGear_t=15;
 SunGear_a=0;
 PlanetA_t=15;
@@ -877,6 +879,8 @@ module DriveRingGear(){
 			scale(25.4) Bolt4Hole(depth=0.35);
 	} // diff
 } // DriveRingGear
+
+//DriveRingGear();
 
 /*
 DriveRingGear();

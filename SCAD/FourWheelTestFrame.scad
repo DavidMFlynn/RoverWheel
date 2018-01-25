@@ -69,6 +69,75 @@ module OneCorner(){
 //translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2])rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
 //translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0])mirror([0,1,0])OneCorner();
 
+
+module CasterMount(){
+	CasterPost_d=11.0;
+	CasterPost_h=32;
+	TubeAngle=75;
+
+	difference(){
+		union(){
+		translate([0,0,CasterPost_h-Tube_OD/2])rotate([TubeAngle,0,0])translate([0,0,18.1])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=13);
+		cylinder(d=28,h=CasterPost_h+10);
+		} // union
+		
+		translate([0,0,-Overlap])cylinder(d=CasterPost_d+IDXtra,h=CasterPost_h+2);
+		translate([0,0,CasterPost_h*0.75])cylinder(d=CasterPost_d+1,h=CasterPost_h*0.25+2);
+	} // diff
+	
+} // CasterMount
+
+//rotate([180,0,0])CasterMount();
+
+module Tube3Junction(TubeAngle=150,Length=60,WireExit=-105){
+	nBolts=6;
+	
+	difference(){
+		union(){
+			translate([0,0,Length/2])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=6);
+			rotate([TubeAngle,0,0])translate([0,0,Length/2])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=6);
+			rotate([TubeAngle/2-180,0,0])translate([0,0,Length/2])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=6);
+		} // union
+		
+		rotate([0,90,0])cylinder(d=Length-1,h=Tube_OD+Overlap*2,center=true);
+	} // diff
+	
+	rotate([0,90,0])
+	difference(){
+		cylinder(d=Length,h=Tube_OD,center=true);
+		
+		cylinder(d=Bearing_OD-2,h=Tube_OD+Overlap*2,center=true);
+		
+		// Bearing
+		translate([0,0,-Tube_OD/2+2]) cylinder(d=Bearing_OD+IDXtra,h=Tube_OD);
+		//translate([0,0,-Tube_OD/2+2+Bearing_W]) cylinder(d=Bearing_OD+10,h=Tube_OD);
+		
+		// Wire Exit
+		if (WireExit!=0){
+			rotate([0,-90,0]) rotate([WireExit,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+		}
+		
+		// wire path
+		difference(){
+			translate([0,0,-Tube_OD/2+3]) cylinder(d=Length-6,h=Tube_OD);
+			translate([0,0,-Tube_OD/2+3-Overlap]) cylinder(d=Bearing_OD+6,h=Tube_OD+Overlap*2);
+		} // diff
+		
+		rotate([0,-90,0]) translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+		rotate([0,-90,0]) rotate([TubeAngle,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+	} // diff
+	
+	// bolts
+	for (j=[0:nBolts-1]) rotate([360/nBolts*j,0,0]) translate([-Tube_OD/2,0,Bearing_OD/2+4.5]) rotate([0,90,0])
+		difference(){
+			cylinder(d=7,h=Tube_OD);
+			translate([0,0,Tube_OD])scale(25.4)Bolt4Hole();
+		} // diff
+	
+} // Tube3Junction
+
+//rotate([0,-90,0])Tube3Junction(TubeAngle=150,Length=60,WireExit=75);
+
 module Tube2Pivot(TubeAngle=180,Length=50,WireExit=0){
 	nBolts=6;
 	
