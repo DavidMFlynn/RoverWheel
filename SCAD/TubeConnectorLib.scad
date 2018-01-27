@@ -2,31 +2,47 @@
 // Tube Connector Library
 // by David M. Flynn
 // Created: 1/16/2018
-// Revision: 1.0.1 1/21/2018
+// Revision: 1.0.2 1/26/2018
 // Units: mm
 // ***************************************************
 // History:
+// 1.0.2 1/26/2018 Added GlueAllowance. Added Tube2Pivot, Tube2PivotCover.
 // 1.0.1 1/21/2018 Added TubeSection.
 // 1.0.0 1/16/2018 First code.
 // ***************************************************
+// Notes:
+//  if GlueAllowance is >0 (0.4 is recommended) the tube end is a
+//   looser fit and has a glue grip groove.
+// ***************************************************
 // for STL output
 
-// TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
+// TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+// rotate([0,-90,0])Tube2Pivot(TubeAngle=150,Length=60,WireExit=-105, GlueAllowance=0.2);
+// Tube2PivotCover(Length=60);
 
 // ***************************************************
 // Routines
-// TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
-// TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100, Stop_l=TubeStop_l);
-// TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
-// TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
+// TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+// TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100);
+// TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+// TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+// Tube2Pivot(TubeAngle=180,Length=50,WireExit=0, GlueAllowance=0.40);
+// Tube2PivotCover(Length=60);
 // ***************************************************
 
+include<CommonStuffSAEmm.scad>
+
+// Override these constants as required
 $fn=90;
 Overlap=0.05;
 IDXtra=0.2;
 
 TubeStop_l=2;
-TubeGrip_l=0.375; // x TubeOD
+TubeGrip_l=0.5; //x TubeOD (default 0.375)
+Tube_OD=25.4;
+Bearing_ID=12.7;
+Bearing_OD=28.575;
+Bearing_W=7.938;
 
 module TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100){
 	difference(){
@@ -35,31 +51,36 @@ module TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100){
 	} // diff
 } // TubeSection
 
-module TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, Stop_l=TubeStop_l){
+module TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, Stop_l=TubeStop_l, GlueAllowance=0.00){
 	translate([0,0,-Stop_l])
 	difference(){
 		union(){
 			cylinder(d=TubeOD,h=Stop_l);
-			translate([0,0,Stop_l-Overlap]) cylinder(d=TubeOD-Wall_t*2,h=TubeGrip_l*TubeOD+Overlap);
-			translate([0,0,Stop_l+TubeGrip_l*TubeOD-Overlap]) cylinder(d1=TubeOD-Wall_t*2,d2=TubeOD-Wall_t*2-1,h=2);
+			translate([0,0,Stop_l-Overlap]) cylinder(d=TubeOD-Wall_t*2-GlueAllowance,h=TubeGrip_l*TubeOD+Overlap);
+			translate([0,0,Stop_l+TubeGrip_l*TubeOD-Overlap]) cylinder(d1=TubeOD-Wall_t*2-GlueAllowance,d2=TubeOD-Wall_t*2-GlueAllowance-1,h=2);
 		} // union
 		
+		// Glue grip
+		if (GlueAllowance!=0) translate([0,0,Stop_l+TubeGrip_l*TubeOD/2]) rotate_extrude() translate([TubeOD/2-Wall_t+0.25,0,0]) circle(d=2);
+		
+		// Center hole
 		translate([0,0,-Overlap]) cylinder(d=Hole_d,h=Stop_l+TubeGrip_l*TubeOD+2+Overlap*2);
 	} // diff
 } // TubeEnd
 
 //TubeEnd();
 	
-module TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14){
+module TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.00){
 	rotate([0,90,0])difference(){
-		TubeEll(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d);
+		TubeEll(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d, GlueAllowance=GlueAllowance);
 		rotate([0,90,0]) cylinder(d=100,h=100);
 	} // diff
 } // TubeEll_STL
 
-module TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14){
-	rotate([-90,0,0])translate([0,0,TubeOD/2])TubeEnd(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d);
-	translate([0,0,TubeOD/2])TubeEnd(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d);
+module TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.00){
+	
+	rotate([-90,0,0])translate([0,0,TubeOD/2]) TubeEnd(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d, GlueAllowance=GlueAllowance);
+	translate([0,0,TubeOD/2])TubeEnd(TubeOD=TubeOD,Wall_t=Wall_t,Hole_d=Hole_d, GlueAllowance=GlueAllowance);
 	
 	difference(){
 		hull(){
@@ -77,4 +98,99 @@ module TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14){
 	} // diff
 } // TubeEll
 
-//TubeEll();
+//TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+
+module Tube2Pivot(TubeAngle=180,Length=50,WireExit=0, GlueAllowance=0.40){
+	nBolts=6;
+	
+	difference(){
+		union(){
+			translate([0,0,Length/2])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=6, GlueAllowance=GlueAllowance);
+			rotate([TubeAngle,0,0])translate([0,0,Length/2])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, Stop_l=6, GlueAllowance=GlueAllowance);
+		} // union
+		
+		rotate([0,90,0])cylinder(d=Length-1,h=Tube_OD+Overlap*2,center=true);
+	} // diff
+	
+	rotate([0,90,0])
+	difference(){
+		cylinder(d=Length,h=Tube_OD,center=true);
+		
+		cylinder(d=Bearing_OD-2,h=Tube_OD+Overlap*2,center=true);
+		
+		// Bearing
+		translate([0,0,-Tube_OD/2+2]) cylinder(d=Bearing_OD+IDXtra,h=Tube_OD);
+		//translate([0,0,-Tube_OD/2+2+Bearing_W]) cylinder(d=Bearing_OD+10,h=Tube_OD);
+		
+		// Wire Exit
+		if (WireExit!=0){
+			rotate([0,-90,0]) rotate([WireExit,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+		}
+		
+		// wire path
+		difference(){
+			translate([0,0,-Tube_OD/2+3]) cylinder(d=Length-6,h=Tube_OD);
+			translate([0,0,-Tube_OD/2+3-Overlap]) cylinder(d=Bearing_OD+6,h=Tube_OD+Overlap*2);
+		} // diff
+		
+		rotate([0,-90,0]) translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+		rotate([0,-90,0]) rotate([TubeAngle,0,0])translate([0,0,Length/2-7]) cylinder(d=14,h=8);
+	} // diff
+	
+	// bolts
+	for (j=[0:nBolts-1]) rotate([360/nBolts*j,0,0]) translate([-Tube_OD/2,0,Bearing_OD/2+4.5]) rotate([0,90,0])
+		difference(){
+			cylinder(d=7,h=Tube_OD);
+			translate([0,0,Tube_OD]) Bolt4Hole();
+		} // diff
+} // Tube2Pivot
+
+//rotate([0,-90,0])Tube2Pivot(TubeAngle=150,Length=60,WireExit=-105, GlueAllowance=0.2);
+
+
+
+
+module Tube2PivotCover(Length=50){
+	nBolts=6;
+	translate([0,0,-2]){
+	difference(){
+		cylinder(d=Length,h=2);
+		
+		// Center hole
+		translate([0,0,-Overlap])cylinder(d=Bearing_OD-2,h=3);
+		
+		// bolts
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Bearing_OD/2+4.5,0,2])
+			 Bolt4ClearHole();
+		
+	} // diff
+	
+	difference(){
+		cylinder(d=Bearing_OD-IDXtra,h=4);
+		
+		translate([0,0,-Overlap]) cylinder(d=Bearing_OD-4,h=10);
+	} // diff
+	
+	difference(){
+		cylinder(d=Length-6-IDXtra,h=4);
+		
+	
+		
+		translate([0,0,-Overlap]) cylinder(d=Length-6-IDXtra-4,h=10);
+	} // diff
+}
+} // Tube2PivotCover
+
+//translate([Tube_OD/2+Overlap,0,0])rotate([0,-90,0]) Tube2PivotCover(Length=60);
+
+
+
+
+
+
+
+
+
+
+
+
