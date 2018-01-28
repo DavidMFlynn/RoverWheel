@@ -2,10 +2,11 @@
 // Tube Connector Library
 // by David M. Flynn
 // Created: 1/16/2018
-// Revision: 1.0.2 1/26/2018
+// Revision: 1.0.3 1/27/2018
 // Units: mm
 // ***************************************************
 // History:
+// 1.0.3 1/27/2018 Added cone to TubeEnd to make wire threading easier.
 // 1.0.2 1/26/2018 Added GlueAllowance. Added Tube2Pivot, Tube2PivotCover.
 // 1.0.1 1/21/2018 Added TubeSection.
 // 1.0.0 1/16/2018 First code.
@@ -65,10 +66,11 @@ module TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, Stop_l=TubeStop_l, GlueAllowan
 		
 		// Center hole
 		translate([0,0,-Overlap]) cylinder(d=Hole_d,h=Stop_l+TubeGrip_l*TubeOD+2+Overlap*2);
+		translate([0,0,Stop_l+TubeGrip_l*TubeOD-1]) cylinder(d1=Hole_d,d2=TubeOD-6,h=3);
 	} // diff
 } // TubeEnd
 
-//TubeEnd();
+//TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, Stop_l=TubeStop_l, GlueAllowance=0.40);
 	
 module TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.00){
 	rotate([0,90,0])difference(){

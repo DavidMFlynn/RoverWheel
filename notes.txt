@@ -7,7 +7,9 @@ Alt. Bearing 6800-2Z 10mm x 19mm x 5mm McM 5972K153
 
 Optical sensor 365-1650-ND OPB490P11Z
 
-RS-775-3860 12V 3500 RPM Motor
+RS-775-3860 12V 3500 RPM Motor (Drive Motor)
+
+Pololu 3245 227:1 25Dx56L Gear Motor (Stearing Motor)
 
 Hardware usage (Qty per Wheel, Qty for 6 Wheels)
 ---------------------------------------------
