@@ -1,7 +1,7 @@
 // *************************************************
 // filename: CommondStuffSAE.scad
 //  by Dave Flynn 2015, GPL v2
-// Rev: 0.9.4 1/26/2018 Metric version
+// Rev: 0.9.5 1/27/2018 Adjusted #4 hole
 // Some hole sizes have not been tested.
 //
 // This file contains constants and some common routines
@@ -45,7 +45,8 @@
 // Size17Stepper();
 // *************************************************
 // History
-echo("CommonStuffSAEmm 0.9.4");
+echo("CommonStuffSAEmm 0.9.5");
+// 0.9.5 1/27/2018 Adjusted #4 hole
 // 0.9.4 1/26/2018  Metric version
 // 0.9.3 11/23/2017 Added Bolt4FlatHeadHole
 // 0.9.2 9/19/2017  Added Size17StepperBolts, Size17StepperMount, Size17Stepper.
@@ -69,7 +70,7 @@ Bolt2_BtnHead_r=0.090*25.4;
 Bolt2_BtnHead_h=0.045*25.4;
 Bolt2_Clear_r=0.053*25.4;
 
-Bolt4_r=0.050*25.4;
+Bolt4_r=0.0445*25.4; // was 0.050 too loose in the mm version for PETG
 Bolt4TapHole_r=0.0445*25.4;
 Bolt4_Head_r=0.091*25.4;	
 Bolt4_Head_h=0.116*25.4;
@@ -153,7 +154,6 @@ module Bolt4HeadHole(depth=8,lHead=12){
 		cylinder(r=Bolt4_Head_r+ID_Xtra,h=lHead,$fn=24);
 } // Bolt4HeadHole
 
-
 module Bolt4FlatHeadHole(depth=8,lAccess=12){
 	translate([0,0,-depth])
 		cylinder(r=Bolt4_Clear_r+ID_Xtra,h=depth+Overlap,$fn=24);
@@ -162,9 +162,8 @@ module Bolt4FlatHeadHole(depth=8,lAccess=12){
 	translate([0,0,-Overlap])cylinder(d=Bolt4_FlatHd_d+ID_Xtra,h=lAccess,$fn=24);
 } // Bolt4FlatHeadHole
 
-
-
 module Bolt4Hole(depth=12){
+	//echo(Bolt4_r+ID_Xtra);
 	translate([0,0,-depth-Overlap])
 		cylinder(r=Bolt4_r+ID_Xtra,h=depth+Overlap*2,$fn=24);
 } // Bolt4Hole
