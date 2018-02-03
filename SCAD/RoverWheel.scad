@@ -17,8 +17,8 @@
 // 1.0.0 1/5/2018 First code
 // **************************************************
 // for STL output, from outside inward
-//	HubCap();
-//	rotate([180,0,0]) InnerRim(); // Print 2
+//	HubCap(); // used w/ Traxxas tire
+//	rotate([180,0,0]) InnerRim(); // used w/ Traxxas tire, Print 2
 //  OuterPlanetCarrier();
 //  PlanetA();
 //  rotate([180,0,0]) PlanetB();
@@ -30,11 +30,17 @@
 //  RW_OutsideRace(myFn=360); // print 2
 //  RW_InsideRace(myFn=360); // Print 2
 //  AdapterRing();
-//  OuterRim();
+//  OuterRim(); // used w/ Traxxas tire
 //  WheelMount();
 //  ChannelConnector(); // Connects 1.5" channel to the hub.
 //  TubeConnector(); // Connects 1" O.D. x 0.035" wall aluminum tube to the hub.
 //  MotorCover(); // optional snap on cover
+// ---- Alt. Tire used in place of Traxxas tire ----
+//  TireSection(Tread_Dir=1); // print 8
+//  TireSection(Tread_Dir=-1); // print 8
+// 	Spoke(); // print 16
+//  HubCap2();
+//  OuterRim2();
 // **************************************************
 // for viewing
 //  ShowPlanets(CutAway=true,HideGears=false);
@@ -55,7 +61,6 @@
 // **************************************************
 
 include<TubeConnectorLib.scad>
-include<Motors.scad>
 include<CompoundHelicalPlanetary.scad>
 include<CommonStuffSAEmm.scad>
 include<BearingLib.scad>
@@ -969,15 +974,19 @@ module RW_OutsideRace(myFn=360){
 
 
 module TireSection(Tread_Dir=1){
-	TireThickness=2;
+	TireThickness=1.5;
 	TireSection_a=45;
 	TireWidth=40;
 	CutExtra=20;
-	Rim_Conn_a=10;
-	RimConnector_w=7;
+	RimBoltInset=4;
+	RimConnector_w=RimBoltInset*2;
 	Size_z=3;
-	SpokeOffset=30;
+	SpokeOffset=29;
 	nTreads=8;
+	ChevBase=3.8;
+	ChevTop=1.5;
+	Chev_h=TireThickness;
+	Rim_Conn_a=360/((3D_Tire_id-RimBoltInset*2)*3.14159/(RimBoltInset*4));
 	
 	// tread
 	difference(){
@@ -991,26 +1000,27 @@ module TireSection(Tread_Dir=1){
 		// trim outside
 		difference(){
 			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+TireThickness*2+CutExtra*2+Overlap*2,h=TireWidth+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+TireThickness*2+Overlap*2,h=TireWidth+Overlap*4);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+TireThickness*2,h=TireWidth+Overlap*4,$fn=360);
 		}
 		
 		// inside hole
-		translate([0,0,-Overlap])cylinder(d=3D_Tire_id,h=TireWidth+Overlap*2);
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id,h=TireWidth+Overlap*2,$fn=360);
 	} // diff
 	
+	// chevrons
 	difference(){
 		for (j=[0:nTreads]) rotate([0,0,TireSection_a/nTreads*j-TireSection_a/2]){
 			hull(){
-				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,1.5])
-					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,ChevBase/2])
+					rotate([-90,0,0]) cylinder(d1=ChevBase,d2=ChevTop,h=Chev_h);
 				rotate([0,0,2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth/2])
-					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+					rotate([-90,0,0]) cylinder(d1=ChevBase,d2=ChevTop,h=Chev_h);
 			} // hull
 			hull(){
-				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth-1.5])
-					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth-ChevBase/2])
+					rotate([-90,0,0]) cylinder(d1=ChevBase,d2=ChevTop,h=Chev_h);
 				rotate([0,0,2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth/2])
-					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+					rotate([-90,0,0]) cylinder(d1=ChevBase,d2=ChevTop,h=Chev_h);
 			} // hull
 		} // for
 		
@@ -1019,117 +1029,88 @@ module TireSection(Tread_Dir=1){
 	} // diff
 	
 	// hub attachment
-	translate([0,0,SpokeOffset]) rotate([0,0,TireSection_a/2])
+	translate([0,0,SpokeOffset]) 
 	difference(){
-		hull(){
-			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-		} // hull
+		union(){
+			rotate([0,0,TireSection_a/2])
+			hull(){
+				rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+				rotate([0,0,-Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+				
+				translate([0,3D_Tire_id/2,-RimConnector_w]) cube([RimConnector_w/2,2,0.01]);
+			} // hull
+			
+			rotate([0,0,-TireSection_a/2])
+			hull(){
+				rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+				rotate([0,0,Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+				
+				rotate([0,0,Rim_Conn_a/4])translate([0,3D_Tire_id/2,-RimConnector_w]) cube([RimConnector_w/2,2,0.01]);
+			} // hull
+		} // union
 		
 		// trim outside
 		difference(){
-			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+			translate([0,0,-RimConnector_w-Overlap]) cylinder(d=3D_Tire_id+10,h=RimConnector_w+Size_z+Overlap*2);
+			translate([0,0,-RimConnector_w-Overlap*2]) cylinder(d=3D_Tire_id+1,h=RimConnector_w+Size_z+Overlap*4);
 		}
 		
 		// inside hole
 		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
 		
 		// bolt
-		//rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
-		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		rotate([0,0,-TireSection_a/2+Rim_Conn_a/4])translate([0,3D_Tire_id/2-RimBoltInset,Size_z]) Bolt4Hole();
+		rotate([0,0,TireSection_a/2-Rim_Conn_a/4])translate([0,3D_Tire_id/2-RimBoltInset,Size_z]) Bolt4Hole();
 	} // diff
 	
-	// hub attachment
-	translate([0,0,SpokeOffset]) rotate([0,0,-TireSection_a/2])
+	// tire joinner
 	difference(){
-		hull(){
-			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-		} // hull
+		union(){
+			rotate([0,0,-TireSection_a/2])
+			hull(){
+				rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+				rotate([0,0,Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			} // hull
+			
+			rotate([0,0,TireSection_a/2])
+			hull(){
+				rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+				rotate([0,0,-Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+			} // hull
+			
+			hull(){
+				rotate([0,0,Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+				rotate([0,0,-Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+				rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+			} // hull
+		} // union
 		
 		// trim outside
 		difference(){
 			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+1,h=Size_z+Overlap*4);
 		}
 		
 		// inside hole
 		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
 		
-		// bolt
-		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
-		//rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		// bolts
+		rotate([0,0,-TireSection_a/2+Rim_Conn_a/4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		rotate([0,0,TireSection_a/2-Rim_Conn_a/4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		rotate([0,0,Rim_Conn_a/4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		rotate([0,0,-Rim_Conn_a/4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
 	} // diff
 	
-	// middle tire joinner
-	difference(){
-		hull(){
-			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-		} // hull
-		
-		// trim outside
-		difference(){
-			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
-		}
-		
-		// inside hole
-		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
-		
-		// bolt
-		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
-		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
-	} // diff
-	
-	// end tire joinner
-	rotate([0,0,-TireSection_a/2])
-	difference(){
-		hull(){
-			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-		} // hull
-		
-		// trim outside
-		difference(){
-			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
-		}
-		
-		// inside hole
-		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
-		
-		// bolt
-		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
-		//rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
-	} // diff
-	
-	// end tire joinner
-	rotate([0,0,TireSection_a/2])
-	difference(){
-		hull(){
-			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-		} // hull
-		
-		// trim outside
-		difference(){
-			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
-			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
-		}
-		
-		// inside hole
-		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
-		
-		// bolt
-		//rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
-		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
-	} // diff
+
 } // TireSection
 
 //for (j=[0:7]) rotate([0,0,45*j])
-//TireSection(Tread_Dir=1);
+//TireSection(Tread_Dir=-1);
 
 module ShowTire(){
 	for (j=[0:7]) rotate([0,0,45*j]) TireSection(Tread_Dir=1);
@@ -1138,19 +1119,22 @@ module ShowTire(){
 		for (j=[0:7]) rotate([0,0,45*j]) TireSection(Tread_Dir=-1);
 } // ShowTire
 
-ShowTire();
+//ShowTire();
 
 module Spoke(){
 	// print nBeadBolts * 2 to mount 3d printed tire
-	Size_x=4;
+	Size_x=3;
 	Size_z=3;
-	Radius=31.5;  // for 180mm 16.5;
+	
 	Rim_a=22.5;
 	Connector_a=12;
-	Rim_Conn_a=13;
+	RimBoltInset=4;
+	RimConnector_w=RimBoltInset*2;
+	Rim_Conn_a=360/((3D_Tire_id-RimBoltInset*2)*3.14159/(RimBoltInset*4));
+	
 	Hub_ID=bead_minD-12;
 	Hub_OD=bead_d+bead_t*2;
-	RimConnector_w=7;
+	
 	
 	// hub connector
 	difference(){
@@ -1177,8 +1161,10 @@ module Spoke(){
 	rotate([0,0,Rim_a])
 	difference(){
 		hull(){
-			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
-			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+			rotate([0,0,Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
+			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cube([0.01,RimConnector_w/2+2,Size_z]);
+			rotate([0,0,-Rim_Conn_a/4]) translate([0,3D_Tire_id/2-RimConnector_w/2,0]) cylinder(d=RimConnector_w+Overlap,h=Size_z);
 		} // hull
 		
 		// trim outside
@@ -1191,31 +1177,109 @@ module Spoke(){
 		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
 		
 		// bolt
-		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
-		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		rotate([0,0,Rim_Conn_a/4])translate([0,3D_Tire_id/2-RimBoltInset,Size_z]) Bolt4ClearHole();
+		rotate([0,0,-Rim_Conn_a/4])translate([0,3D_Tire_id/2-RimBoltInset,Size_z]) Bolt4ClearHole();
 	} // diff
 	
 	
 	// spoke
-	translate([0,Hub_OD/2,0]){
-	translate([-Radius,0,0]) rotate_extrude(angle=90) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
+	Radius=(3D_Tire_id/2-RimConnector_w-Hub_OD/2)/1.67;  // for 180mm 16.5;
 	
-	translate([-Radius,Radius*2,0]) rotate([0,0,180+Rim_a]) rotate_extrude(angle=90-Rim_a) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
-	}
+	
+	translate([-Radius,Hub_OD/2,0]) 
+		rotate_extrude(angle=45+Rim_a) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
+	
+	rotate([0,0,Rim_a])
+	translate([Radius,3D_Tire_id/2-RimConnector_w,0]) rotate([0,0,180]) 
+		rotate_extrude(angle=45) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
+	
 } // Spoke
 
 //*
-for (j=[0:7]) rotate([0,0,45*j])
-translate([0,0,33])Spoke();
-
+//for (j=[0:7]) rotate([0,0,45*j])
+//translate([0,0,32.5])
+//translate([0,0,7])
+//Spoke();
+/*
 rotate([0,0,22.5])
 rotate([180,0,0])
 for (j=[0:7]) rotate([0,0,45*j])
-translate([0,0,33]) Spoke();
+translate([0,0,32.5]) Spoke();
 	/**/
 
+module OuterRim2(){
+	Connector_a=12;
+	Hub_ID=bead_minD-12;
+	Hub_OD=bead_d+bead_t*2;
+
+	difference(){
+		cylinder(d=Hub_OD,h=bead_h+3);
+		
+		// spoke
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) 
+		hull(){
+			rotate([0,0,Connector_a/2]) translate([-IDXtra,Hub_ID/2-Overlap,bead_h]) cube([IDXtra,(Hub_OD-Hub_ID)/2+2,3+Overlap]);
+			rotate([0,0,-Connector_a/2]) translate([0,Hub_ID/2-Overlap,bead_h]) cube([IDXtra,(Hub_OD-Hub_ID)/2+2,3+Overlap]);
+		} // hull
+		
+		// center hole
+			translate([0,0,-Overlap]) cylinder(d=Hub_ID, h=1+bead_h+3+Overlap*2);
+		
+		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([bead_minD/2-3,0,bead_h-6]) 
+			rotate([180,0,0]) Bolt4HeadHole();
+		
+		translate([0,0,3])
+		difference(){
+			cylinder(d=Hub_OD-2,h=bead_h+3);
+			
+			translate([0,0,-Overlap]) cylinder(d=Hub_ID+2, h=bead_h+3+Overlap*2);
+			
+			for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) 
+				hull(){
+					rotate([0,0,Connector_a/2+1.75]) translate([0.01,Hub_ID/2-Overlap,-Overlap])
+						cube([IDXtra,(Hub_OD-Hub_ID)/2+2,bead_h+3+Overlap*2]);
+					rotate([0,0,-Connector_a/2-1.75]) translate([0,Hub_ID/2-Overlap,-Overlap])
+						cube([0.01,(Hub_OD-Hub_ID)/2+2,bead_h+3+Overlap*2]);
+				} // hull
+		} // diff
+	} // diff
+} // OuterRim2
+
+//OuterRim2();
+
+module HubCap2(){
+	
+	nSpokes=8;
+	Connector_a=12;
+	Hub_ID=bead_minD-12;
+	Hub_OD=bead_d+bead_t*2;
+	
+	OuterRim2();
+	
+	difference(){
+		union(){
+			// spokes
+			for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)]) hull(){
+				translate([bead_minD/2-3,0,0]) cylinder(d=5,h=3);
+				cylinder(d=10,h=3);
+			} // hull
+			
+			// bearing holder
+			cylinder(d=18,h=6);
+		} // union
+		
+		// center hole
+		translate([0,0,-Overlap]) cylinder(d=13,h=4);
+		
+		// planet carrier bearing
+		translate([0,0,2]) cylinder(d=15+IDXtra,h=6);
+	} // diff
+} // HubCap2
+
+//HubCap2();
+
 module AdapterRing(){
-	// Required for traxis tire
+	// Required for Traxxas tire
 	difference(){
 		cylinder(d1=Race_OD,d2=bead_d+bead_t*2,h=Ada_h);
 		
@@ -1230,7 +1294,7 @@ module AdapterRing(){
 } // AdapterRing
 
 module InnerRim(){
-	// Required for traxis tire
+	// Required for Traxxas tire
 	difference(){
 		cylinder(d=bead_d+bead_t*2,h=bead_h+3);
 		
@@ -1254,7 +1318,7 @@ module InnerRim(){
 //InnerRim();
 
 module OuterRim(){
-	// Required for traxis tire
+	// Required for Traxxas tire
 	difference(){
 		union(){
 			cylinder(d=bead_d,h=1);
@@ -1262,6 +1326,7 @@ module OuterRim(){
 			
 		} // union
 		
+		// center hole
 		translate([0,0,-Overlap]) cylinder(d=bead_minD-13, h=1+bead_h+Overlap*2);
 		
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([bead_minD/2-3,0,bead_h-6]) 
