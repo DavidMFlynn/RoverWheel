@@ -79,7 +79,7 @@ Remove strings, lumps and bumps from 3D printed parts
 Sand the inner and outer races so the faces contact with no visible gap.
 
 Tap Holes
-  Don't tap deep 3-4 threads is good.
+  Don't tap too deep, 3 to 4 threads is good.
   Tap sensor mounting holes (4) from gear side of input ring gear.
   Tap inner race mounting holes (8) from flat side of input ring gear.
   
