@@ -3,11 +3,12 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.3 1/23/2018
+// Rev: 1.1.4 2/2/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.3");
+echo("Compound Helical Planetary Library 1.1.4");
+// 1.1.4 2/2/2018 Went metric on bolts lib.
 // 1.1.3 1/23/2018 fixed ratio calculator
 // 1.1.2 1/10/2018 added notes
 // 1.1.1 1/9/2018 use Spline_Hole_d
@@ -135,7 +136,7 @@ gear (
 	flat=false);
 /**/
 
-include<CommonStuffSAE.scad> // This lib is in inches.
+include<CommonStuffSAEmm.scad> // This lib is in inches.
 
 include<SplineLib.scad>
 // SplineShaft(d=20,l=30,nSplines=Spline_nSplines,Spline_w=30,Hole=Spline_Hole_d,Key=false);
@@ -377,7 +378,7 @@ module CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB, n
 			
 			if (bEndScrew==1 || PlanetStack==2)
 			// Set screw
-			translate([0,-Shaft_d*3/2,Thickness+4]) rotate([90,0,0]) scale(25.4)# Bolt8Hole();			
+			translate([0,-Shaft_d*3/2,Thickness+4]) rotate([90,0,0]) Bolt8Hole();			
 		} // diff
 	else
 		difference(){
@@ -420,7 +421,7 @@ module CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB, n
 			if (bEndScrew==1 || PlanetStack==2)
 			// Set screw
 			if (Hub_t>0)
-			translate([0,0,-Thickness-Hub_t/2]) rotate([90,0,0]) scale(25.4) Bolt8Hole();
+			translate([0,0,-Thickness-Hub_t/2]) rotate([90,0,0]) Bolt8Hole();
 			
 			
 		} // diff
@@ -436,7 +437,7 @@ module CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB, n
 		
 		if (bEndScrew==0)
 		// Set screw
-		translate([0,0,3]) rotate([90,0,0]) scale(25.4) Bolt8Hole();
+		translate([0,0,3]) rotate([90,0,0]) Bolt8Hole();
 	} // diff
 	
 	if (PlanetStack>2)

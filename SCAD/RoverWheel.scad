@@ -3,10 +3,12 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0b2 1/24/2018
+// Rev: 1.0.0b4 2/2/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0b4 2/2/2018 Now using BearingLib.scad.
+// 1.0.0b3 1/31/2018 Increased encoder resolution.
 // 1.0.0b2 1/24/2018 Changed BackLash to 0.5mm, any distortion in the ring gears caused binding.
 // 1.0.0b1 1/21/2018 Modified Sensor mount, added MotorCover. First wheel is assembled and working.
 // 1.0.0a3 1/13/2018 Added GearSlop to InputRingGear for planet clearance.
@@ -25,8 +27,8 @@
 //  DriveRingGear();
 //  rotate([180,0,0]) SensorMount();
 //  rotate([180,0,0]) InputRingGear();
-//  OutsideRace(myFn=360); // print 2
-//  InsideRace(myFn=360); // Print 2
+//  RW_OutsideRace(myFn=360); // print 2
+//  RW_InsideRace(myFn=360); // Print 2
 //  AdapterRing();
 //  OuterRim();
 //  WheelMount();
@@ -56,6 +58,7 @@ include<TubeConnectorLib.scad>
 include<Motors.scad>
 include<CompoundHelicalPlanetary.scad>
 include<CommonStuffSAEmm.scad>
+include<BearingLib.scad>
 
 $fn=90;
 IDXtra=0.2;
@@ -229,8 +232,9 @@ module RS775_MotorMountHoles(){
 
 //RS775_MotorMountHoles() Bolt8ButtonHeadHole();
 
-module EncoderDisc(EncDisk_d=42, nEncPulses=30, Shaft_d=5){
+module EncoderDisc(EncDisk_d=42, nEncPulses=30, Shaft_d=5, ShowLightPath=false){
 	EncDisk_t=1.5;
+	EncSlotLen=3.5;
 	
 	difference(){
 		cylinder(d=EncDisk_d,h=EncDisk_t);
@@ -240,12 +244,12 @@ module EncoderDisc(EncDisk_d=42, nEncPulses=30, Shaft_d=5){
 		for (j=[0:nEncPulses])
 			hull(){
 				rotate([0,0,360/nEncPulses*j+360/nEncPulses/4])
-					translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
-						cube([5,0.01,EncDisk_t+Overlap*2],center=true);
+					translate([-EncDisk_d/2+3,0.0,EncDisk_t/2]) 
+						cube([EncSlotLen,0.01,EncDisk_t+Overlap*2],center=true);
 				
 				rotate([0,0,360/nEncPulses*j-360/nEncPulses/4])
-					translate([-EncDisk_d/2+3,0,EncDisk_t/2]) 
-						cube([5,0.01,EncDisk_t+Overlap*2],center=true);
+					translate([-EncDisk_d/2+3,-0.01,EncDisk_t/2]) 
+						cube([EncSlotLen,0.01,EncDisk_t+Overlap*2],center=true);
 			}
 			
 			// shaft
@@ -260,9 +264,16 @@ module EncoderDisc(EncDisk_d=42, nEncPulses=30, Shaft_d=5){
 		cylinder(d=EncDisk_d,h=EncDisk_t);
 		translate([0,0,-Overlap])cylinder(d=EncDisk_d-EncDisk_t*2,h=EncDisk_t+Overlap*2);
 	}
+	
+	// Light path
+	if (ShowLightPath==true)
+	rotate([0,0,0]){
+			rotate([0,0,36-9])translate([18.0,0,-1])color("Blue")cylinder(d=0.3,h=3);
+				translate([18.0,0,-1])color("Blue")cylinder(d=0.3,h=3);}
 } // EncoderDisc
 
-//EncoderDisc();
+//projection()
+//EncoderDisc(EncDisk_d=42, nEncPulses=30, Shaft_d=5, ShowLightPath=false);
 
 //rotate([0,0,0]){
 //			rotate([0,0,36-9])translate([18.0,0,0])color("Blue")cylinder(d=0.3,h=3);
@@ -274,7 +285,7 @@ module SunGear(){
 	Shaft_d=5;
 	EncDisk_d=Hub_d+12;
 	
-	nEncPulses=10; // 10 * 4 * 45 = 1800 counts, 16 = 2880, 20 = 3600
+	nEncPulses=30; // 10 * 4 * 60 = 2400 counts, 30 = 7200
 	SunGearHub_l=12;
 	
 	CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, nTeeth=SunGear_t, Thickness=GearWidth, bEndScrew=0, HB=false,Hub_t=0,Hub_d=0);
@@ -303,7 +314,12 @@ module SunGear(){
 		// Motor bolt access
 		rotate([0,0,180/SunGear_t])
 		hull(){
-			translate([14.5,0,-1])cylinder(d=4.8,h=0.01);
+			translate([14.2,0,-Overlap])cylinder(d=4.2,h=0.01);
+			translate([17,0,SunGearHub_l+Overlap*2])cylinder(d=4.4,h=0.01);
+		} // hull
+		rotate([0,0,180/SunGear_t+180])
+		hull(){
+			translate([14.2,0,-Overlap])cylinder(d=4.2,h=0.01);
 			translate([17,0,SunGearHub_l+Overlap*2])cylinder(d=4.4,h=0.01);
 		} // hull
 		
@@ -314,7 +330,8 @@ module SunGear(){
 } // SunGear
 
 //InputRingGear();
-//rotate([180,0,0])SunGear();
+//rotate([180,0,0])
+//SunGear();
 /*
 rotate([0,0,80])color("Red"){
 rotate([0,0,36-9])
@@ -506,11 +523,11 @@ module ShowWheel(){
 			color("Tan")DriveRingGear();
 			translate([0,0,InnerSleve_l]) {
 				translate([0,0,Race_w])color("Pink")ShowMyBalls();
-				OutsideRace(myFn=90);
-				color("LightBlue")InsideRace(myFn=90);
+				RW_OutsideRace(myFn=90);
+				color("LightBlue")RW_InsideRace(myFn=90);
 				translate([0,0,Race_w*2]) rotate([180,0,0]){
-					OutsideRace(myFn=90);
-					color("LightBlue")InsideRace(myFn=90);
+					RW_OutsideRace(myFn=90);
+					color("LightBlue")RW_InsideRace(myFn=90);
 				}
 			}
 		}
@@ -582,12 +599,12 @@ translate([0,0,bead_h+3.2+GearWidth]){
 	
 translate([0,0,bead_h+3.1])
 	translate([0,0,InnerSleve_l]) {
-				//OutsideRace(myFn=90);
-				InsideRace(myFn=90);
+				//RW_OutsideRace(myFn=90);
+				RW_InsideRace(myFn=90);
 	//translate([0,0,Race_w])color("Pink")ShowMyBalls();
 				translate([0,0,Race_w*2]) rotate([180,0,0]){
-					//OutsideRace(myFn=90);
-					//InsideRace(myFn=90);
+					//RW_OutsideRace(myFn=90);
+					//RW_InsideRace(myFn=90);
 				}}
 
 /**/
@@ -906,8 +923,8 @@ module DriveRingGear(){
 
 /*
 DriveRingGear();
-translate([0,0,InnerSleve_l]) OutsideRace(myFn=90);
-translate([0,0,InnerSleve_l+Race_w*2]) rotate([180,0,0])OutsideRace(myFn=90);
+translate([0,0,InnerSleve_l]) RW_OutsideRace(myFn=90);
+translate([0,0,InnerSleve_l+Race_w*2]) rotate([180,0,0])RW_OutsideRace(myFn=90);
 
 translate([0,0,tire_w])rotate([180,0,0]){
 		OuterRim();
@@ -925,46 +942,28 @@ module ShowMyBalls(){
 
 	Race_ID=50; // motor is 46
 
-module InsideRace(myFn=360){
+module RW_InsideRace(myFn=360){
 	
 	difference(){
-		cylinder(d=BallCircle_d-7,h=Race_w);
-		
-		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
-		
-		translate([0,0,Race_w])
-		rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) circle(d = Ball_d);
+		InsideRace(BallCircle_d=BallCircle_d, Race_ID=Race_ID, Ball_d=Ball_d, Race_w=Race_w, nBolts=nBeadBolts, myFn=myFn)
+			Bolt4ClearHole();
 		
 		// wire path
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*(j+0.5)]) translate([Race_ID/2-5,0,-Overlap]) 
 			cylinder(d=15,h=Race_w+Overlap*2);
 		
-		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_ID/2+RaceBoltInset,0,Race_w]) 
-			Bolt4ClearHole();
 	} // diff
-} // InsideRace
+} // RW_InsideRace
 
-//InsideRace(myFn=90);
+//RW_InsideRace(myFn=90);
 
-module OutsideRace(myFn=360){
-	
-	difference(){
-		cylinder(d=Race_OD,h=Race_w);
+module RW_OutsideRace(myFn=360){
 		
-		translate([0,0,-Overlap]) cylinder(d=BallCircle_d+7,h=Race_w+Overlap*2);
+	OutsideRace(BallCircle_d=BallCircle_d,Race_OD=Race_OD,Ball_d=Ball_d,Race_w=Race_w,nBolts=nBeadBolts,RaceBoltInset=BL_RaceBoltInset,myFn=myFn) Bolt4ClearHole();
 		
-		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_OD/2-RaceBoltInset,0,Race_w]) 
-			Bolt4ClearHole();
-		
-		translate([0,0,Race_w])
-		rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) circle(d = Ball_d);
-		
-	} // diff
-} // OutsideRace
+} // RW_OutsideRace
 
-//OutsideRace(myFn=90);
+//RW_OutsideRace(myFn=90);
 3D_Tire_id=180;
 
 module Spoke(){
