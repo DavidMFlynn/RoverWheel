@@ -964,72 +964,255 @@ module RW_OutsideRace(myFn=360){
 } // RW_OutsideRace
 
 //RW_OutsideRace(myFn=90);
-3D_Tire_id=180;
+
+3D_Tire_id=250;
+
+
+module TireSection(Tread_Dir=1){
+	TireThickness=2;
+	TireSection_a=45;
+	TireWidth=40;
+	CutExtra=20;
+	Rim_Conn_a=10;
+	RimConnector_w=7;
+	Size_z=3;
+	SpokeOffset=30;
+	nTreads=8;
+	
+	// tread
+	difference(){
+		hull(){
+			rotate([0,0,TireSection_a/2]) translate([0,3D_Tire_id/2,0])
+				cube([0.01,TireThickness+CutExtra,TireWidth]);
+			rotate([0,0,-TireSection_a/2]) translate([0,3D_Tire_id/2,0])
+				cube([0.01,TireThickness+CutExtra,TireWidth]);
+		} // hull
+	
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+TireThickness*2+CutExtra*2+Overlap*2,h=TireWidth+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+TireThickness*2+Overlap*2,h=TireWidth+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id,h=TireWidth+Overlap*2);
+	} // diff
+	
+	difference(){
+		for (j=[0:nTreads]) rotate([0,0,TireSection_a/nTreads*j-TireSection_a/2]){
+			hull(){
+				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,1.5])
+					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+				rotate([0,0,2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth/2])
+					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+			} // hull
+			hull(){
+				rotate([0,0,-2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth-1.5])
+					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+				rotate([0,0,2.5*Tread_Dir]) translate([0,3D_Tire_id/2+TireThickness/2,TireWidth/2])
+					rotate([-90,0,0]) cylinder(d=3,h=TireThickness);
+			} // hull
+		} // for
+		
+		rotate([0,0,-TireSection_a/2]) translate([0,3D_Tire_id/2,-Overlap]) cube([50,20,TireWidth+Overlap*2]);
+		rotate([0,0,TireSection_a/2]) translate([0,3D_Tire_id/2,-Overlap]) mirror([1,0,0]) cube([50,20,TireWidth+Overlap*2]);
+	} // diff
+	
+	// hub attachment
+	translate([0,0,SpokeOffset]) rotate([0,0,TireSection_a/2])
+	difference(){
+		hull(){
+			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
+		
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		//rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+	} // diff
+	
+	// hub attachment
+	translate([0,0,SpokeOffset]) rotate([0,0,-TireSection_a/2])
+	difference(){
+		hull(){
+			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
+		
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		//rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+	} // diff
+	
+	// middle tire joinner
+	difference(){
+		hull(){
+			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
+		
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+	} // diff
+	
+	// end tire joinner
+	rotate([0,0,-TireSection_a/2])
+	difference(){
+		hull(){
+			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
+		
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		//rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4Hole();
+	} // diff
+	
+	// end tire joinner
+	rotate([0,0,TireSection_a/2])
+	difference(){
+		hull(){
+			rotate([0,0,0]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
+		
+		// trim outside
+		difference(){
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		//rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+	} // diff
+} // TireSection
+
+//for (j=[0:7]) rotate([0,0,45*j])
+//TireSection(Tread_Dir=1);
+
+module ShowTire(){
+	for (j=[0:7]) rotate([0,0,45*j]) TireSection(Tread_Dir=1);
+
+	rotate([0,0,22.5]) rotate([180,0,0])
+		for (j=[0:7]) rotate([0,0,45*j]) TireSection(Tread_Dir=-1);
+} // ShowTire
+
+ShowTire();
 
 module Spoke(){
-	// print nBeadBolts to mount 3d printed tire
-	// Spokes go in place of AdapterRing, InnerRim and OuterRim
+	// print nBeadBolts * 2 to mount 3d printed tire
+	Size_x=4;
+	Size_z=3;
+	Radius=31.5;  // for 180mm 16.5;
+	Rim_a=22.5;
+	Connector_a=12;
+	Rim_Conn_a=13;
+	Hub_ID=bead_minD-12;
+	Hub_OD=bead_d+bead_t*2;
+	RimConnector_w=7;
 	
-	SpokeThickness=8;
-	SpokeWidth=4;
-	
+	// hub connector
 	difference(){
-		cylinder(d=Race_OD,h=SpokeThickness);
+		hull(){
+			rotate([0,0,Connector_a/2]) translate([0,Hub_ID/2,0]) cube([0.01,(Hub_OD-Hub_ID)/2+2,Size_z]);
+			rotate([0,0,-Connector_a/2]) translate([0,Hub_ID/2,0]) cube([0.01,(Hub_OD-Hub_ID)/2+2,Size_z]);
+		} // hull
 		
-		translate([0,0,-Overlap]) cylinder(d=Race_OD-RaceBoltInset*4,h=SpokeThickness+Overlap*2);
-		
-		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_OD/2-RaceBoltInset,0,SpokeThickness]) 
-			Bolt4HeadHole();
-		
-		// pie slice
+		// trim outside
 		difference(){
-			translate([0,0,-Overlap])cylinder(d=Race_OD+Overlap*2,h=SpokeThickness+Overlap*2);
-			
-			translate([0,0,-Overlap*2])
-			hull(){
-				rotate([0,0,180/nBeadBolts]) cube([Race_OD,Overlap,SpokeThickness+Overlap*4]);
-				rotate([0,0,-180/nBeadBolts]) cube([Race_OD,Overlap,SpokeThickness+Overlap*4]);
-			} // hull
-		} // diff
+			translate([0,0,-Overlap]) cylinder(d=Hub_OD+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=Hub_OD+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=Hub_ID,h=Size_z+Overlap*2);
+		
+		// bolt
+		translate([0,bead_minD/2-3,Size_z]) Bolt4ClearHole();
 	} // diff
 	
-	difference(){
-		translate([Race_OD/2-RaceBoltInset,-SpokeWidth/2,0])
-			rotate([0,0,20])cube([3D_Tire_id/2-Race_OD/2,SpokeWidth,SpokeThickness]);
 	
-		translate([0,0,-Overlap]) cylinder(d=Race_OD-Overlap,h=SpokeThickness+Overlap*2);
+	// tire connector
+	rotate([0,0,Rim_a])
+	difference(){
+		hull(){
+			rotate([0,0,Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+			rotate([0,0,-Rim_Conn_a/2]) translate([0,3D_Tire_id/2-RimConnector_w,0]) cube([0.01,RimConnector_w+2,Size_z]);
+		} // hull
 		
+		// trim outside
 		difference(){
-			translate([0,0,-Overlap])cylinder(d=3D_Tire_id,h=SpokeThickness+Overlap*2);
-			translate([0,0,-Overlap*2])cylinder(d=3D_Tire_id-RaceBoltInset*4+Overlap*2,h=SpokeThickness+Overlap*4);
-		} // diff
+			translate([0,0,-Overlap]) cylinder(d=3D_Tire_id+10,h=Size_z+Overlap*2);
+			translate([0,0,-Overlap*2]) cylinder(d=3D_Tire_id+Overlap*2,h=Size_z+Overlap*4);
+		}
+		
+		// inside hole
+		translate([0,0,-Overlap])cylinder(d=3D_Tire_id-RimConnector_w*2,h=Size_z+Overlap*2);
+		
+		// bolt
+		rotate([0,0,4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
+		rotate([0,0,-4])translate([0,3D_Tire_id/2-3.5,Size_z]) Bolt4ClearHole();
 	} // diff
 	
-	//*
-	rotate([0,0,9])
-	difference(){
-		cylinder(d=3D_Tire_id,h=SpokeThickness);
-		
-		translate([0,0,-Overlap]) cylinder(d=3D_Tire_id-RaceBoltInset*4,h=SpokeThickness+Overlap*2);
-		
-		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([3D_Tire_id/2-RaceBoltInset,0,SpokeThickness]) 
-			Bolt4HeadHole();
-		
-		// pie slice
-		difference(){
-			translate([0,0,-Overlap])cylinder(d=3D_Tire_id+Overlap*2,h=SpokeThickness+Overlap*2);
-			
-			translate([0,0,-Overlap*2])
-			hull(){
-				rotate([0,0,5]) cube([3D_Tire_id,Overlap,SpokeThickness+Overlap*4]);
-				rotate([0,0,-5]) cube([3D_Tire_id,Overlap,SpokeThickness+Overlap*4]);
-			} // hull
-		} // diff
-	} // diff
-	/**/
+	
+	// spoke
+	translate([0,Hub_OD/2,0]){
+	translate([-Radius,0,0]) rotate_extrude(angle=90) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
+	
+	translate([-Radius,Radius*2,0]) rotate([0,0,180+Rim_a]) rotate_extrude(angle=90-Rim_a) translate([Radius-Size_x/2,0]) square([Size_x,Size_z]);
+	}
 } // Spoke
 
-//Spoke();
+//*
+for (j=[0:7]) rotate([0,0,45*j])
+translate([0,0,33])Spoke();
+
+rotate([0,0,22.5])
+rotate([180,0,0])
+for (j=[0:7]) rotate([0,0,45*j])
+translate([0,0,33]) Spoke();
+	/**/
 
 module AdapterRing(){
 	// Required for traxis tire
@@ -1051,13 +1234,16 @@ module InnerRim(){
 	difference(){
 		cylinder(d=bead_d+bead_t*2,h=bead_h+3);
 		
+		// trim outside
 		translate([0,0,-Overlap]) cylinder(d=bead_d+1+bead_t*2, h=2);
 		
+		// taper inside
 		translate([0,0,-Overlap]) cylinder(d1=bead_d-2+bead_t*2, d2=bead_minD+bead_t*2, h=bead_h);
 		
+		// thru hole
 		cylinder(d=bead_minD-12, h=bead_h+4);
 		
-		
+		// bolts
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([bead_minD/2-3,0,0]) 
 			rotate([180,0,0]) Bolt4ClearHole();
 	} // diff
