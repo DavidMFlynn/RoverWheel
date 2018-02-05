@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0b4 2/2/2018
+// Rev: 1.0.0b5 2/4/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0b5 2/4/2018 Fixed math for spokeoffset, should be calculated, first print is 3mm too big.
 // 1.0.0b4 2/2/2018 Now using BearingLib.scad.
 // 1.0.0b3 1/31/2018 Increased encoder resolution.
 // 1.0.0b2 1/24/2018 Changed BackLash to 0.5mm, any distortion in the ring gears caused binding.
@@ -36,8 +37,9 @@
 //  TubeConnector(); // Connects 1" O.D. x 0.035" wall aluminum tube to the hub.
 //  MotorCover(); // optional snap on cover
 // ---- Alt. Tire used in place of Traxxas tire ----
-//  TireSection(Tread_Dir=1); // print 8
-//  TireSection(Tread_Dir=-1); // print 8
+//  translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=1); // outside tread, print 8
+//  translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=-1); // inside tread, print 8
+
 // 	Spoke(); // print 16
 //  HubCap2();
 //  OuterRim2();
@@ -973,15 +975,13 @@ module RW_OutsideRace(myFn=360){
 3D_Tire_id=250;
 
 
-module TireSection(Tread_Dir=1){
+module TireSection(TireWidth=40,SpokeOffset=29,Tread_Dir=1){
 	TireThickness=1.5;
 	TireSection_a=45;
-	TireWidth=40;
 	CutExtra=20;
 	RimBoltInset=4;
 	RimConnector_w=RimBoltInset*2;
 	Size_z=3;
-	SpokeOffset=29;
 	nTreads=8;
 	ChevBase=3.8;
 	ChevTop=1.5;
@@ -1029,7 +1029,7 @@ module TireSection(Tread_Dir=1){
 	} // diff
 	
 	// hub attachment
-	translate([0,0,SpokeOffset]) 
+	translate([0,0,SpokeOffset-Size_z]) 
 	difference(){
 		union(){
 			rotate([0,0,TireSection_a/2])
@@ -1110,7 +1110,8 @@ module TireSection(Tread_Dir=1){
 } // TireSection
 
 //for (j=[0:7]) rotate([0,0,45*j])
-//TireSection(Tread_Dir=-1);
+//translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=1); // outside tread
+//translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=-1); // inside tread
 
 module ShowTire(){
 	for (j=[0:7]) rotate([0,0,45*j]) TireSection(Tread_Dir=1);
