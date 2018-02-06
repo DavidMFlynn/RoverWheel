@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0b5 2/4/2018
+// Rev: 1.0.0b6 2/5/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0b6 2/5/2018 Fixed channel mount.
 // 1.0.0b5 2/4/2018 Fixed math for spokeoffset, should be calculated, first print is 3mm too big.
 // 1.0.0b4 2/2/2018 Now using BearingLib.scad.
 // 1.0.0b3 1/31/2018 Increased encoder resolution.
@@ -97,7 +98,7 @@ nBeadBolts=8;
 module ChannelBoltPattern0770(){
 	// inches
 	BC_d=0.77*25.4;
-	BC_r=BC_d/2*25.4;
+	BC_r=BC_d/2;
 	
 	translate([BC_r,0,0]) children();
 	rotate([0,0,45]) translate([BC_r,0,0]) children();
@@ -115,7 +116,7 @@ module ChannelBoltPattern0770(){
 module ChannelBoltPattern1500(){
 	// inches
 	BC_d=1.50*25.4;
-	BC_r=BC_d/2*25.4;
+	BC_r=BC_d/2;
 	
 	rotate([0,0,45]) translate([BC_r,0,0]) children();
 	rotate([0,0,135]) translate([BC_r,0,0]) children();
@@ -129,12 +130,16 @@ module ChannelBoltPattern1500(){
 module ChannelMountingBlock(){
 	ChannelDepth=1.410*25.4;
 	ChannelWidth=1.320*25.4;
+	ChannelLength=1.500*25.4;
+	ChannelCenterHole_d=0.5*25.4;
+	OffsetFix=1.5;  // move holes to inside
 	
 	difference(){
-		cube([1.500,ChannelWidth,ChannelDepth],center=true);
+		cube([ChannelLength,ChannelWidth,ChannelDepth],center=true);
 		
-		cylinder(d=0.5,h=ChannelDepth+0.01,center=true);
-		rotate([90,0,0])cylinder(d=0.5,h=ChannelWidth+0.01,center=true);
+		cylinder(d=ChannelCenterHole_d,h=ChannelDepth+Overlap,center=true);
+		rotate([90,0,0])translate([0,OffsetFix,0])cylinder(d=ChannelCenterHole_d,h=ChannelWidth+Overlap,center=true);
+		
 		
 		translate([0,0,ChannelDepth/2]){
 			ChannelBoltPattern0770() Bolt6Hole();
@@ -142,12 +147,12 @@ module ChannelMountingBlock(){
 		}
 		
 		rotate([90,0,0])
-		translate([0,0,ChannelWidth/2]){
+		translate([0,OffsetFix,ChannelWidth/2]){
 			ChannelBoltPattern0770() Bolt6Hole();
 			ChannelBoltPattern1500() Bolt6Hole();
 		}
 		rotate([-90,0,0])
-		translate([0,0,ChannelWidth/2]){
+		translate([0,-OffsetFix,ChannelWidth/2]){
 			ChannelBoltPattern0770() Bolt6Hole();
 			ChannelBoltPattern1500() Bolt6Hole();
 		}
@@ -670,7 +675,7 @@ module ChannelConnector(){
 	difference(){
 		union(){
 		translate([WheelMount_OD/2-4,0,0])
-				translate([0.75,0,1.41/2])ChannelMountingBlock();
+				translate([0.75*25.4,0,1.41/2*25.4])ChannelMountingBlock();
 		cylinder(d=WheelMount_OD,h=25);
 		} // union
 		
@@ -690,7 +695,7 @@ module ChannelConnector(){
 		// Mounting Bolts
 		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
 			translate([WheelMount_OD/2-MBoltInset,0,8])
-				Bolt4HeadHole(lHead=2); //Bolt6HeadHole(lAccess=2);
+				Bolt4HeadHole(lHead=50); //Bolt6HeadHole(lAccess=2);
 		
 	} // diff
 } // ChannelConnector
