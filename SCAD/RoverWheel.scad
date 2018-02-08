@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0b6 2/5/2018
+// Rev: 1.0.0 2/7/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.0 2/7/2018 First complete working wheel. Time to make more...
 // 1.0.0b6 2/5/2018 Fixed channel mount.
 // 1.0.0b5 2/4/2018 Fixed math for spokeoffset, should be calculated, first print is 3mm too big.
 // 1.0.0b4 2/2/2018 Now using BearingLib.scad.
@@ -50,6 +51,7 @@
 //  ShowPlanets(CutAway=true,HideGears=true);
 //  ShowWheel();
 //  ShowCutAwayView(a=+50);
+//  ShowWheelExploded();
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
@@ -132,7 +134,7 @@ module ChannelMountingBlock(){
 	ChannelWidth=1.320*25.4;
 	ChannelLength=1.500*25.4;
 	ChannelCenterHole_d=0.5*25.4;
-	OffsetFix=1.5;  // move holes to inside
+	OffsetFix=1.25;  // move holes to inside, was 1.5 2/6/2018
 	
 	difference(){
 		cube([ChannelLength,ChannelWidth,ChannelDepth],center=true);
@@ -449,9 +451,10 @@ module InnerPlanetCarrier(){
 } // InnerPlanetCarrier
 
 //InnerPlanetCarrier();
+PlanetShaft_l=25.4;
 
 module ShowPlanets(CutAway=true,HideGears=true){
-	PlanetShaft_l=24.5;
+	
 	PitchA=PlanetaryPitchA;
 		PitchB=PlanetaryPitchB;
 		Planet_BC=SunGear_t*PitchA/180 + PlanetA_t*PitchA/180;
@@ -587,40 +590,6 @@ RaceBoltInset=3.5;
 Race_OD=BallCircle_d+26;
 
 InnerSleve_l=tire_w-(bead_h+3.1)*2-Race_w*2-Ada_h;
-
-/*
-
-translate([0,0,bead_h+3.2+GearWidth]){
-	InputRingGear();
-	rotate([180,0,0])SunGear();
-	translate([0,0,GearWidth+0.5])InnerPlanetCarrier();
-	
-	rotate([0,0,76])color("Red"){
-		rotate([0,0,36-9]) translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
-		translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();}
-	}
-
-/**/
-
-//translate([0,0,tire_w])rotate([180,0,0]){OuterRim();InnerRim();}
-	
-
-	//translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) AdapterRing();
-	
-/*
-	
-translate([0,0,bead_h+3.1])
-	translate([0,0,InnerSleve_l]) {
-				//RW_OutsideRace(myFn=90);
-				RW_InsideRace(myFn=90);
-	//translate([0,0,Race_w])color("Pink")ShowMyBalls();
-				translate([0,0,Race_w*2]) rotate([180,0,0]){
-					//RW_OutsideRace(myFn=90);
-					//RW_InsideRace(myFn=90);
-				}}
-
-/**/
-//translate([0,0,bead_h+3.1]) DriveRingGear();
 		
 //HubCap();
 //InnerRim();
@@ -629,16 +598,14 @@ WheelMount_l=25;
 WheelMount_OD=bead_minD-17;
 nMountingBolts=8;
 MBoltInset=3.5;
-	
-	
 
 module TubeConnector(){
 	Tube_OD=25.4;
 	
 	difference(){
 		union(){
-			translate([WheelMount_OD/2-2,0,Tube_OD/2])
-				rotate([0,90,0])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14);
+			translate([WheelMount_OD/2,0,Tube_OD/2])
+				rotate([0,90,0])TubeEnd(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 			
 			translate([WheelMount_OD/2-4,0,Tube_OD/2])
 				rotate([0,90,0])cylinder(d=Tube_OD,h=3);
@@ -662,7 +629,7 @@ module TubeConnector(){
 		// Mounting Bolts
 		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
 			translate([WheelMount_OD/2-MBoltInset,0,8])
-				Bolt4HeadHole(lHead=2); //Bolt6HeadHole(lAccess=2);
+				Bolt4HeadHole(lHead=50); 
 		
 	} // diff
 } // TubeConnector
@@ -1366,9 +1333,76 @@ module HubCap(){
 
 //HubCap();
 
+module ShowWheelExploded(){
+	ExpX=10;
 
+	PitchA=PlanetaryPitchA;
+		PitchB=PlanetaryPitchB;
+		Planet_BC=SunGear_t*PitchA/180 + PlanetA_t*PitchA/180;
+		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/SunGear_t);
+		echo(Ratio=Ratio);
+		SunGearRA=$t*Ratio*360;// 76.5r
+		PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
+		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
+		OutputRingRA=-360*$t;
+	
+	translate([0,0,-ExpX*1]) rotate([0,-20,0])HubCap();
+	
+	translate([0,0,ExpX*1]) color("Green")rotate([0,-20,0])InnerRim();
+	
+	translate([0,0,ExpX*3]) color("Tan")rotate([0,-20,0])DriveRingGear();
+	
+	translate([0,0,bead_h+3+ExpX*7])rotate([180,0,0]) rotate([0,20,0])OuterPlanetCarrier();
+	
+	translate([0,0,ExpX*9]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])
+		translate([Planet_BC/2+ExpX*2,0,0]) PlanetA();
+	
+	
+	translate([0,0,ExpX*12]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])	translate([Planet_BC/2+ExpX*2,0,0]) PlanetB();
+		
+	translate([0,0,ExpX*13]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])
+		translate([Planet_BC/2+ExpX*2,0,0]) color("Red")
+		difference(){ cylinder(d=6.35,h=PlanetShaft_l); translate([0,0,-Overlap])cylinder(d=2.8,h=PlanetShaft_l+Overlap*2);}
+	
+	translate([0,0,bead_h+3+GearWidth*2+0.5+ExpX*10])rotate([0,-20,0])InnerPlanetCarrier();
+	
+	translate([0,0,ExpX*14])rotate([0,-20,0])rotate([180,0,0])SunGear();
+		
+	translate([0,ExpX*2,ExpX*14])rotate([0,-20,0]){
+		color("Tan")SensorMount();
+			rotate([0,0,76+36-9])translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
+			rotate([0,0,76])	translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
+		}
+		
+		translate([0,0,ExpX*18])color("Orange")rotate([0,-20,0])InputRingGear();
+	
+		translate([0,0,ExpX*22]){
+		
+			rotate([0,-20,0])RW_OutsideRace(myFn=90);
+			color("LightBlue")rotate([0,-20,0])RW_InsideRace(myFn=90);
+		
+			translate([0,0,ExpX*1])color("Pink")rotate([0,-20,0])ShowMyBalls();
+		
+		translate([0,0,ExpX*3])rotate([0,-20,0])rotate([180,0,0]){RW_OutsideRace(myFn=90);
+		color("LightBlue")RW_InsideRace(myFn=90);}
+		
+		translate([0,0,ExpX*4]) color("Blue")rotate([0,-20,0])AdapterRing();
+		
+		translate([0,0,ExpX*6])rotate([0,-20,0])
+		rotate([180,0,0]){
+				translate([0,0,-ExpX])OuterRim();
+				color("Green")InnerRim();
+				}
+		
+		}
 
+		translate([0,0,ExpX*30])color("Gray")rotate([0,-20,0])WheelMount();
+		
+		translate([0,0,ExpX*32]) color("Red") rotate([0,-20,0])RS775_DC_Motor();
+		
+} // ShowWheelExploded
 
+//ShowWheelExploded();
 
 
 
