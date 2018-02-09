@@ -63,6 +63,7 @@
 //  rotate([180,0,0]) InputRingGearMountingPlate();
 //  SensorMountAssyTool();
 //  rotate([180,0,0])SunGearCollet();
+//  rotate([180,0,0])PlanetA_DrillingFixture();
 // **************************************************
 
 include<TubeConnectorLib.scad>
@@ -87,7 +88,7 @@ PlanetStack=2; // number of gears 2 or 3
 nPlanets=5;
 Pressure_a=24; //22.5;
 GearWidth=12;
-twist=0;
+twist=200; // set to 0 for straight gears
 
 bead_d=97.8; // 3.8"
 bead_h=7;
@@ -346,6 +347,9 @@ module SunGear(){
 //InputRingGear();
 //rotate([180,0,0])
 //SunGear();
+//translate([26,0,12]) rotate([180,0,0])PlanetA();
+//translate([26,0,0]) rotate([180,0,0])PlanetB();
+//translate([0,0,-12])DriveRingGear();
 /*
 rotate([0,0,80])color("Red"){
 rotate([0,0,36-9])
@@ -384,6 +388,23 @@ module PlanetA(){
 } // PlanetA
 
 //PlanetA();
+
+module PlanetA_DrillingFixture(){
+	difference(){
+		cylinder(d=50,h=20,$fn=6);
+		
+		translate([0,0,-1]){
+			scale([1.08,1.08,1]) PlanetA();
+			cylinder(d=22,h=10);
+			cylinder(d=18,h=22);
+		}
+	} // diff
+	
+	//translate([0,0,-1])PlanetA();
+} // PlanetA_DrillingFixture
+
+//rotate([180,0,0])PlanetA_DrillingFixture();
+
 
 module PlanetB(){
 	
