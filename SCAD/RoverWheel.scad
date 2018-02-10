@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.0 2/7/2018
+// Rev: 1.0.1 2/10/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.1 2/10/2018 Little fixes. Planet drilling tool.
 // 1.0.0 2/7/2018 First complete working wheel. Time to make more...
 // 1.0.0b6 2/5/2018 Fixed channel mount.
 // 1.0.0b5 2/4/2018 Fixed math for spokeoffset, should be calculated, first print is 3mm too big.
@@ -395,6 +396,7 @@ module PlanetA_DrillingFixture(){
 		
 		translate([0,0,-1]){
 			scale([1.08,1.08,1]) PlanetA();
+			rotate([0,0,3])scale([1.08,1.08,1]) PlanetA();
 			cylinder(d=22,h=10);
 			cylinder(d=18,h=22);
 		}
@@ -805,7 +807,7 @@ module SensorMount(){
 
 		// clearance for WheelMount bolts
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_ID/2+RaceBoltInset,0,0]) 
-			Bolt4Hole(depth=0.07);
+			Bolt4Hole(depth=1.75);
 	} // diff
 } // SensorMount
 
@@ -900,7 +902,7 @@ module DriveRingGear(){
 		
 		// outer race bolts
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_OD/2-RaceBoltInset,0,InnerSleve_l]) 
-			Bolt4Hole(depth=0.35);
+			Bolt4Hole(depth=9);
 	} // diff
 	
 	difference(){
@@ -915,7 +917,7 @@ module DriveRingGear(){
 		
 		// outer race bolts
 		for (j=[0:nBeadBolts-1]) rotate([0,0,360/nBeadBolts*j]) translate([Race_OD/2-RaceBoltInset,0,InnerSleve_l]) 
-			Bolt4Hole(depth=0.35);
+			Bolt4Hole(depth=9);
 	} // diff
 } // DriveRingGear
 

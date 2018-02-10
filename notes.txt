@@ -16,6 +16,7 @@ Hardware usage (Qty per Wheel, Qty for 6 Wheels)
 #4-40 x 1/2" Socket Head Cap screw (24,144) McM 92610A110
   (8) Channel Mount to Wheel Mount
   (8) Inner Rim to Adapter Ring
+#4-40 x 5/8" Socket Head Cap screw (8,48) McM 92610A112
   (8) Hub-Cap to Drive Ring Gear
 #4-40 x 3/4" Socket Head Cap screw (16,96) McM 92610A114
   (8) Wheel Mount to Input Ring Gear
