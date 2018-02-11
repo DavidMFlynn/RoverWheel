@@ -3,11 +3,12 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.4 2/2/2018
+// Rev: 1.1.5 2/10/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.4");
+echo("Compound Helical Planetary Library 1.1.5");
+// 1.1.5 2/10/2018 Added 188:1 variant and Spline_a to planet B.
 // 1.1.4 2/2/2018 Went metric on bolts lib.
 // 1.1.3 1/23/2018 fixed ratio calculator
 // 1.1.2 1/10/2018 added notes
@@ -22,12 +23,12 @@ echo("Compound Helical Planetary Library 1.1.4");
 
 //PlanetaryPitchA=280;
 //PlanetaryPitchB=308;
-//300:290.3225 = 45:45 = -44.9999:1, 15t 15t 14t, nPlanets=5
+//300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
 //300:275 = 54:57 = -85.5:1, 12t 21t,Pinion_a=0,nPlanets=3
 //300:330 = 54:51 = 76.5:1, 12t 21t,Pinion_a=0,nPlanets=3
 //280:308 = 54:51 = 76.5:1, 12t 21t,Pinion_a=0,nPlanets=3
 //260:283.636 = 60:57 = 95.0014:1. 12t,24t,Pinion_a=360/Pinion_t/2,nPlanets=3
-
+//300:290.3225 = 45:47 = 188:1, 15t 15t 16t, nPlanets=5
 Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
@@ -86,9 +87,9 @@ echo(Ratio=Ratio);
 //CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a,HB=false);
 //CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=-PlanetB_a,HB=false);
 
-//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false);
-//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a, HB=false);
-//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=-PlanetB_a, HB=false);
+//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_a=0);
+//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a, HB=false,Spline_a=0);
+//CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=-PlanetB_a, HB=false,Spline_a=0);
 
 //CompoundPlanetGearHelixC(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false);
 //CompoundPlanetGearHelixC(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a, HB=true);
@@ -615,7 +616,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 
 
 module CompoundPlanetGearHelixB(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
-						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=20,nSplines=6){
+						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=20,nSplines=6,Spline_a=0){
 	
 	
 	// Pitch diameter: Diameter of pitch circle.
@@ -693,7 +694,7 @@ module CompoundPlanetGearHelixB(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 			involute_facets=0,
 			flat=false);
 		
-		translate([0,0,-Overlap])
+		translate([0,0,-Overlap]) rotate([0,0,Spline_a])
 		SplineHole(d=Spline_d,l=Thickness+Overlap*2,nSplines=nSplines,Spline_w=30,Gap=Spline_Gap,Key=true);
 	} // diff
 	

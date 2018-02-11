@@ -25,7 +25,7 @@
 //	rotate([180,0,0]) InnerRim(); // used w/ Traxxas tire, Print 2
 //  OuterPlanetCarrier();
 //  PlanetA();
-//  rotate([180,0,0]) PlanetB();
+//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j);
 //  InnerPlanetCarrier();
 //	SunGear();
 //  DriveRingGear();
@@ -84,12 +84,13 @@ BackLash=0.5; // 0.3 works but is tight
 SunGear_t=15;
 SunGear_a=0;
 PlanetA_t=15;
-PlanetB_t=14;
+//PlanetB_t=14; // -60:1 ratio
+PlanetB_t=16; // 188:1 ratio
 PlanetStack=2; // number of gears 2 or 3
 nPlanets=5;
 Pressure_a=24; //22.5;
 GearWidth=12;
-twist=200; // set to 0 for straight gears
+twist=200; // set to 0 for straight gears, 200 for helical gears
 
 bead_d=97.8; // 3.8"
 bead_h=7;
@@ -131,10 +132,11 @@ module ChannelBoltPattern1500(){
 
 //ChannelBoltPattern1500() Bolt6Hole();
 
-module ChannelMountingBlock(){
 	ChannelDepth=1.410*25.4;
 	ChannelWidth=1.320*25.4;
 	ChannelLength=1.500*25.4;
+
+module ChannelMountingBlock(){
 	ChannelCenterHole_d=0.5*25.4;
 	OffsetFix=1.25;  // move holes to inside, was 1.5 2/6/2018
 	
@@ -408,11 +410,14 @@ module PlanetA_DrillingFixture(){
 //rotate([180,0,0])PlanetA_DrillingFixture();
 
 
-module PlanetB(){
+module PlanetB(nB=0){
+	RotB=180/OutputRing_t*(OutputRing_t/nPlanets*nB); //*(PlanetA_t/PlanetB_t);
+		//echo(RotB=RotB);
 	
 	difference(){
-
-		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
+		
+		//rotate([0,0,RotB])
+		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5, Spline_a=-RotB);
 		
 		
 		// clearance for misaligned ring gears
@@ -421,11 +426,12 @@ module PlanetB(){
 			cylinder(d=30,h=PlanetClearance+Overlap);
 			translate([0,0,-Overlap])cylinder(d=18.8,h=PlanetClearance+Overlap*4);
 		}
-		/**/
+		
+		for (j=[1:nB+1]) rotate([0,0,360/PlanetB_t*j]) translate([PlanetB_t*PlanetaryPitchB/360-3.5,0,GearWidth-0.3]) cylinder(d=0.5,h=2);
 	} // diff
 } // PlanetB
 
-//rotate([180,0,0])PlanetB();
+//rotate([180,0,0])PlanetB(4);
 
 module OuterPlanetCarrier(){
 	// Added Stiffenner 1/9/18
@@ -498,11 +504,9 @@ module ShowPlanets(CutAway=true,HideGears=true){
 		translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
 			for (j=[0:nPlanets-1])
 				rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
-					color("Tan")
-					CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
+					color("Tan") PlanetA();
 				
-					translate([0,0,GearWidth])
-						CompoundPlanetGearHelixB(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
+					translate([0,0,GearWidth]) PlanetB(nB=j);
 				}
 			
 				if (CutAway==true)
@@ -514,7 +518,8 @@ module ShowPlanets(CutAway=true,HideGears=true){
 //ShowPlanets(CutAway=true,HideGears=false);
 //ShowPlanets(CutAway=true,HideGears=true);
 
-module ShowWheel(){
+module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=true,
+		SG=true,InnerRace=true,Balls=true,OuterRace=true,AR=true,IR=true,WM=true,Mo=true){
 
 	PitchA=PlanetaryPitchA;
 		PitchB=PlanetaryPitchB;
@@ -522,31 +527,41 @@ module ShowWheel(){
 		Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/SunGear_t);
 		echo(Ratio=Ratio);
 		SunGearRA=$t*Ratio*360;// 76.5r
-		PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
-		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
-		OutputRingRA=-360*$t;
+		//PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
+		//PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
+		//OutputRingRA=-360*$t;
 	
-	HubCap();
-	//translate([0,0,bead_h+3])rotate([180,0,0]) OuterPlanetCarrier();
-	//translate([0,0,bead_h+3+GearWidth*2+0.5])InnerPlanetCarrier();
-	color("Green")InnerRim();
+		PlanetPosRA=180/InputRing_t;
+		PlanetRA=0;
+			
+	if (HC==true) HubCap();
+	if (HC==true) color("Green") InnerRim();
+	if (OPC==true) 
+		translate([0,0,bead_h+3]) rotate([180,0,PlanetPosRA]) color("Brown") OuterPlanetCarrier();
+	if (SO==true) for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j])
+		translate([Planet_BC/2,0,bead_h+3.05]) color("Red") cylinder(d=6.35,h=PlanetShaft_l);
+	if (IPC==true)
+		translate([0,0,bead_h+3+PlanetShaft_l]) rotate([0,0,PlanetPosRA]) color("Brown") InnerPlanetCarrier();
 
-	// Planets
-	ShowPlanets(CutAway=false,HideGears=true);
-		/*
-	translate([0,0,GearWidth*2+bead_h+3.1]) mirror([0,0,1])
-	for (j=[0:nPlanets-1])
-		rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
+	// Planets	
+	//echo(PlanetPosRA=PlanetPosRA);
+	//echo(PlanetRA=PlanetRA);
+	
+	if (Pa==true) translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+			for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j])
+				translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA])
+					color("Tan") PlanetA();
+				
+	if (Pb==true) translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+			for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j]){
+				RotB=180/OutputRing_t*(OutputRing_t/nPlanets*j);
+				
+				translate([Planet_BC/2,0,0]) rotate([0,0,RotB])
+					translate([0,0,GearWidth]) PlanetB(nB=j);
+			}
+			
 		
-		
-			CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
-			
-			translate([0,0,GearWidth])
-			CompoundPlanetGearHelixB(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false, Spline_d=15, nSplines=5);
-			
-			
-		}
-		/**/
+	if (SG==true)
 		translate([0,0,bead_h+3.3+GearWidth]){
 			rotate([180,0,0])color("Black")SunGear();
 			
@@ -558,41 +573,43 @@ module ShowWheel(){
 		// drive ring
 		translate([0,0,bead_h+3.1]) {
 			
-			color("Tan")DriveRingGear();
+			if (DRG==true) color("Tan")DriveRingGear();
 			translate([0,0,InnerSleve_l]) {
-				translate([0,0,Race_w])color("Pink")ShowMyBalls();
-				RW_OutsideRace(myFn=90);
-				color("LightBlue")RW_InsideRace(myFn=90);
+				if (Balls==true) translate([0,0,Race_w])color("Pink")ShowMyBalls();
+				if (OuterRace==true) RW_OutsideRace(myFn=90);
+				if (InnerRace==true) color("LightBlue")RW_InsideRace(myFn=90);
 				translate([0,0,Race_w*2]) rotate([180,0,0]){
-					RW_OutsideRace(myFn=90);
-					color("LightBlue")RW_InsideRace(myFn=90);
+					if (OuterRace==true) RW_OutsideRace(myFn=90);
+					if (InnerRace==true) color("LightBlue")RW_InsideRace(myFn=90);
 				}
 			}
 		}
-/**/
+
 		
-		//translate([0,0,25-12.7+4.5]) color("Red") RS775_DC_Motor();
+		if (Mo==true) translate([0,0,25-12.7+4.5]) color("Red") RS775_DC_Motor();
 		
 		//input ring
-		translate([0,0,bead_h+3.2+GearWidth]) {
-			color("Orange")InputRingGear();
+		if (IRG==true) translate([0,0,bead_h+3.2+GearWidth]) {
+			color("Orange") InputRingGear();
 			translate([0,0,-Overlap*2])color("Tan")SensorMount();
 		}
-			
-			
 		
-	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Blue")AdapterRing();
+	if (AR==true) translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Blue")AdapterRing();
 		
+	if (IR==true)
 	translate([0,0,tire_w])rotate([180,0,0]){
 		OuterRim();
 		color("Green")InnerRim();
 		}
 		
-	translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Gray")WheelMount();
-	/**/
+	if (WM==true) translate([0,0,bead_h+3.1+InnerSleve_l+Race_w*2]) color("Gray")WheelMount();
+	
 } // ShowWheel
 
 //ShowWheel();
+//ShowWheel(Pa=false,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
+
+//ShowWheel(Pa=true,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
 module ShowCutAwayView(a=30){
 	difference(){
@@ -692,6 +709,45 @@ module ChannelConnector(){
 
 //color("Red")RS775_DC_Motor();
 //translate([0,0,WheelMount_l])ChannelConnector();
+
+module ChannelConnectorMid(){
+	//ChannelDepth=1.410*25.4;
+	//ChannelWidth=1.320*25.4;
+	//ChannelLength=1.500*25.4;
+
+	
+	difference(){
+		union(){
+			translate([WheelMount_OD/2-4,0,0]){
+				translate([0,-ChannelWidth/2,0])cube([ChannelLength,ChannelWidth,ChannelWidth]);
+				translate([ChannelLength+ChannelDepth/2,0,ChannelWidth/2]) rotate([90,0,0]) rotate([0,90,0]) ChannelMountingBlock();
+			}
+			
+			cylinder(d=WheelMount_OD,h=25);
+		} // union
+		
+		// wire path
+		translate([WheelMount_OD/2-8,0,0.705*25.4])rotate([0,90,0]) cylinder(d=12.7,h=45);
+		
+		translate([0,0,3]) hull(){
+			translate([-WheelMount_OD/4,0,0]) cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,0.01],center=true);
+			translate([0,0,23]) cube([WheelMount_OD-8,WheelMount_OD+Overlap*2,0.01],center=true);
+		}
+		
+		translate([0,0,-Overlap])cylinder(d=WheelMount_OD-MBoltInset*4,h=WheelMount_l+Overlap*2);
+		
+		translate([-WheelMount_OD/2-Overlap,-WheelMount_OD/2-Overlap,-Overlap]) 
+			cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,26]);
+		
+		// Mounting Bolts
+		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
+			translate([WheelMount_OD/2-MBoltInset,0,8])
+				Bolt4HeadHole(lHead=50); //Bolt6HeadHole(lAccess=2);
+		
+	} // diff
+} // ChannelConnectorMid
+//ChannelMountingBlock();
+ChannelConnectorMid();
 
 module MotorCover(){
 	BackOfMotor=63;
@@ -1381,7 +1437,7 @@ module ShowWheelExploded(){
 		translate([Planet_BC/2+ExpX*2,0,0]) PlanetA();
 	
 	
-	translate([0,0,ExpX*12]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])	translate([Planet_BC/2+ExpX*2,0,0]) PlanetB();
+	translate([0,0,ExpX*12]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])	translate([Planet_BC/2+ExpX*2,0,0]) PlanetB(nB=j);
 		
 	translate([0,0,ExpX*13]) rotate([0,-20,0]) for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j])
 		translate([Planet_BC/2+ExpX*2,0,0]) color("Red")
