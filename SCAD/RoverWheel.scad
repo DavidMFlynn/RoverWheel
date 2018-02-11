@@ -36,7 +36,8 @@
 //  AdapterRing();
 //  OuterRim(); // used w/ Traxxas tire
 //  WheelMount();
-//  ChannelConnector(); // Connects 1.5" channel to the hub.
+//  ChannelConnector(); // Connects 1.5" channel to the hub. Corner wheels. Print 4
+//  ChannelConnectorMid(); // Connects 1.5" channel to the hub. Middle wheels. Print 2
 //  TubeConnector(); // Connects 1" O.D. x 0.035" wall aluminum tube to the hub.
 //  MotorCover(); // optional snap on cover
 // ---- Alt. Tire used in place of Traxxas tire ----
@@ -53,6 +54,9 @@
 //  ShowWheel();
 //  ShowCutAwayView(a=+50);
 //  ShowWheelExploded();
+// ShowWheel(Pa=false, Pb=true, IRG=false, DRG=true, HC=false, OPC=false, IPC=false, SO=false, SG=false, InnerRace=false, Balls=false, OuterRace=false, AR=false, IR=false, WM=false, Mo=false);
+
+//  ShowWheel(Pa=true, Pb=true, IRG=false, DRG=true, HC=false, OPC=false, IPC=false, SO=false, SG=false, InnerRace=false, Balls=false, OuterRace=false, AR=false, IR=false, WM=false, Mo=false);
 // **************************************************
 // Routines and parts.
 //  OPB490N_Sensor_Cutout();
@@ -412,7 +416,7 @@ module PlanetA_DrillingFixture(){
 
 module PlanetB(nB=0){
 	RotB=180/OutputRing_t*(OutputRing_t/nPlanets*nB); //*(PlanetA_t/PlanetB_t);
-		//echo(RotB=RotB);
+	echo(RotB=RotB);
 	
 	difference(){
 		
@@ -501,7 +505,7 @@ module ShowPlanets(CutAway=true,HideGears=true){
 	
 	if (HideGears==false)
 	difference(){
-		translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+		translate([0,0,GearWidth*2+bead_h+3.2]) rotate([180,0,0])
 			for (j=[0:nPlanets-1])
 				rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
 					color("Tan") PlanetA();
@@ -531,7 +535,8 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		//PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
 		//OutputRingRA=-360*$t;
 	
-		PlanetPosRA=180/InputRing_t;
+		//PlanetPosRA=180/InputRing_t;
+		PlanetPosRA=0;
 		PlanetRA=0;
 			
 	if (HC==true) HubCap();
@@ -544,15 +549,15 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		translate([0,0,bead_h+3+PlanetShaft_l]) rotate([0,0,PlanetPosRA]) color("Brown") InnerPlanetCarrier();
 
 	// Planets	
-	//echo(PlanetPosRA=PlanetPosRA);
-	//echo(PlanetRA=PlanetRA);
+	echo(PlanetPosRA=PlanetPosRA);
+	echo(PlanetRA=PlanetRA);
 	
-	if (Pa==true) translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+	if (Pa==true) translate([0,0,GearWidth*2+bead_h+3.2]) rotate([180,0,0])
 			for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j])
 				translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA])
 					color("Tan") PlanetA();
 				
-	if (Pb==true) translate([0,0,GearWidth*2+bead_h+3.2]) mirror([0,0,1])
+	if (Pb==true) translate([0,0,GearWidth*2+bead_h+3.2]) rotate([180,0,0])
 			for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j]){
 				RotB=180/OutputRing_t*(OutputRing_t/nPlanets*j);
 				
@@ -563,7 +568,7 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		
 	if (SG==true)
 		translate([0,0,bead_h+3.3+GearWidth]){
-			rotate([180,0,0])color("Black")SunGear();
+			rotate([180,0,0])color("LightBlue")SunGear();
 			
 			rotate([0,0,76+36-9])translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
 			rotate([0,0,76])	translate([18.0,0,GearWidth+11.0])OPB490N_Sensor();
@@ -573,7 +578,8 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		// drive ring
 		translate([0,0,bead_h+3.1]) {
 			
-			if (DRG==true) color("Tan")DriveRingGear();
+			if (DRG==true) color("Tan") rotate([0,0,180/OutputRing_t*1.25]) DriveRingGear();
+				
 			translate([0,0,InnerSleve_l]) {
 				if (Balls==true) translate([0,0,Race_w])color("Pink")ShowMyBalls();
 				if (OuterRace==true) RW_OutsideRace(myFn=90);
@@ -589,7 +595,7 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		if (Mo==true) translate([0,0,25-12.7+4.5]) color("Red") RS775_DC_Motor();
 		
 		//input ring
-		if (IRG==true) translate([0,0,bead_h+3.2+GearWidth]) {
+		if (IRG==true) translate([0,0,bead_h+3.2+GearWidth]) rotate([0,0,180/InputRing_t]){
 			color("Orange") InputRingGear();
 			translate([0,0,-Overlap*2])color("Tan")SensorMount();
 		}
@@ -609,7 +615,9 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 //ShowWheel();
 //ShowWheel(Pa=false,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
-//ShowWheel(Pa=true,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
+ShowWheel(Pa=true,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
+
+//ShowWheel(Pa=true,Pb=false,IRG=true,DRG=false,HC=false,OPC=false,IPC=false,SO=false,SG=true,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
 module ShowCutAwayView(a=30){
 	difference(){
@@ -747,7 +755,7 @@ module ChannelConnectorMid(){
 	} // diff
 } // ChannelConnectorMid
 //ChannelMountingBlock();
-ChannelConnectorMid();
+//ChannelConnectorMid();
 
 module MotorCover(){
 	BackOfMotor=63;
