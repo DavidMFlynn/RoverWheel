@@ -3,9 +3,10 @@
 // by David M. Flynn
 // Filename: CornerPivot.scad
 // Created: 1/27/2018
-// Revision: 1.0.3 2/5/2018
+// Revision: 1.0.4 2/13/2018
 // **********************************************
 // History
+// 1.0.4 2/13/2018 Added CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 // 1.0.3 2/5/2018 Better servo.
 // 1.0.2 2/2/2018 Moved bearing races to BearingLib.scad
 // 1.0.1 2/1/2018 Servo top.
@@ -17,16 +18,20 @@
 // rotate([180,0,0]) Driver(); // goes on the motor shaft with a 5/32" shaft coller.
 
 // CornerPivotUpperSTL();
-// translate([-10,0,0])mirror([1,0,0])CornerPivotUpperSTL();
+// translate([-10,0,0]) mirror([1,0,0]) CornerPivotUpperSTL();
 // CornerPivotUpperS();
 
 // CornerPivotLowerSTL();
-// translate([10,0,0])mirror([1,0,0])CornerPivotLowerSTL();
+// translate([10,0,0]) mirror([1,0,0]) CornerPivotLowerSTL();
 
 // LowerInnerRace(myFn=360);
 // UpperInnerRace(myFn=360);
 // OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=360) Bolt4ClearHole();
 // OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
+// **********************************************
+// for Viewing
+// CornerPivotS(UpperTubeAngle=10,LowerRot=90);
+// Show_CP();
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
@@ -49,6 +54,17 @@ CornerPivot_bc=60;
 CP_OD=CornerPivot_bc+26;
 CP_ID=CornerPivot_bc-26;
 MotorCover_d=32;
+
+module CornerPivotS(UpperTubeAngle=10,LowerRot=90){
+	CornerPivotUpperS(Tube_a=UpperTubeAngle);
+	
+	translate([0,0,-Overlap]) rotate([180,0,22.5]) OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=90) Bolt4ClearHole();
+	translate([0,0,-7-5-Overlap*2]) rotate([0,0,22.5]) OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
+	
+	translate([0,0,-7-5-Overlap*2]) rotate([0,0,LowerRot]) CornerPivotLower();
+} // CornerPivotS
+
+//CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 
 module MotorCover(){
 	Motor_h=11.7+30.8+25;
@@ -290,7 +306,7 @@ module Servo_HS5645MG(BottomMount=true,TopAccess=true){
 
 //Servo_HS5645MG(BottomMount=true,TopAccess=true);
 
-module CornerPivotUpperS(){
+module CornerPivotUpperS(Tube_a=10){
 	// This version is for a standard r/c servo
 	Base_h=2;
 	nBolts=8;
@@ -300,7 +316,7 @@ module CornerPivotUpperS(){
 	Stop_a=45;
 	Servo_h=13;
 	
-	translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-80,0,0]) TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+	translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 	
 	difference(){
 		union(){
@@ -311,7 +327,7 @@ module CornerPivotUpperS(){
 			cylinder(d=CP_OD,h=3);
 			
 			hull(){
-				translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-80+180,0,0])cylinder(d=25.4,h=5);
+				translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-80+180,0,0]) cylinder(d=25.4,h=5);
 				translate([0,0,3]) cylinder(d=55,h=1);
 				
 				// Servo attachment
@@ -336,10 +352,10 @@ module CornerPivotUpperS(){
 			 Bolt4HeadHole();
 		
 		// tube clearance
-		translate([0,TubeStop_y, Tube_OD/2+Base_h]) rotate([-80,0,0]) cylinder(d=Tube_OD+IDXtra*2, h=CornerPivot_bc);
+		translate([0,TubeStop_y, Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) cylinder(d=Tube_OD+IDXtra*2, h=CornerPivot_bc);
 		
 		// wire path
-		translate([0, TubeStop_y, Tube_OD/2+Base_h]) rotate([-80,0,0]) translate([0,0,-16]) cylinder(d=14, h=CornerPivot_bc);
+		translate([0, TubeStop_y, Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) translate([0,0,-16]) cylinder(d=14, h=CornerPivot_bc);
 		hull(){
 			translate([0,15,-Overlap]) cylinder(d=14,h=13);
 			translate([0,0,-Overlap]) cylinder(d=14,h=13);

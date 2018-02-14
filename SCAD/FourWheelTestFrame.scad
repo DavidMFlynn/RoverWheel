@@ -10,19 +10,19 @@
 // 1.0.0 1/21/2018 First code
 // **********************************************
 // for STL output
-// TubeEll_STL(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14);
-//rotate([0,-90,0])Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
+// TubeEll_STL(TubeOD=Tube_OD, Wall_t=0.84, Hole_d=14, GlueAllowance=0.40);
+// rotate([0,-90,0]) Tube2Pivot(TubeAngle=180, Length=Pivot_OD, GlueAllowance=0.40);
 // Tube2PivotCover(Length=Pivot_OD);
 // RoboClaw15TubeMount();
-// rotate([180,0,0])CasterMount();
-// rotate([0,-90,0])Tube3Junction(TubeAngle=150,Length=60,WireExit=75);
+// rotate([180,0,0]) CasterMount();
+// rotate([0,-90,0]) Tube3Junction(TubeAngle=150,Length=60,WireExit=75);
 
-//CornerPivotLowerSTL();
-//translate([10,0,0])mirror([1,0,0])CornerPivotLowerSTL();
-//InsideRace(BallCircle_d=CornerPivot_bc, Race_ID=CP_ID, Ball_d=9.525, Race_w=5, nBolts=8, myFn=90) translate([0,0,1])Bolt4HeadHole();
+// CornerPivotLowerSTL();
+// translate([10,0,0]) mirror([1,0,0]) CornerPivotLowerSTL();
+// InsideRace(BallCircle_d=CornerPivot_bc, Race_ID=CP_ID, Ball_d=9.525, Race_w=5, nBolts=8, myFn=90) translate([0,0,1])Bolt4HeadHole();
 // LowerInnerRace();
-//OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=360) Bolt4ClearHole();
-//OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
+// OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=360) Bolt4ClearHole();
+// OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
@@ -34,6 +34,9 @@ include<TubeConnectorLib.scad>
 // TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
 
+include<CornerPivot.scad>
+//CornerPivotS(UpperTubeAngle=10,LowerRot=90);
+
 $fn=90;
 IDXtra=0.2;
 Overlap=0.05;
@@ -41,8 +44,8 @@ Overlap=0.05;
 Tube_OD=25.4;
 Tire_OD=155;
 Tire_w=88;
-TubeOffset_X=-Tire_w/2-2-Tube_OD/2;
-TubeOffset_Z=WheelMount_OD/2;
+//TubeOffset_X=-Tire_w/2-2-Tube_OD/2;
+//TubeOffset_Z=WheelMount_OD/2;
 Bearing_ID=12.7;
 Bearing_OD=28.575;
 Bearing_W=7.938;
@@ -54,9 +57,6 @@ CP_ID=CornerPivot_bc-26;
 YTubeLen=100;
 
 //echo(CP_OD=CP_OD);
-
-
-
 
 module RoboClaw15TubeMount(){
 	TM_h=8;
@@ -115,22 +115,49 @@ module PhantomWheel(){
 
 module OneCorner(){
 	PhantomWheel();
+	
 	translate([TubeOffset_X,0,TubeOffset_Z]){
-		color("LightGray")TubeSection(TubeOD=Tube_OD,Wall_t=0.84, Length=50);
+		
+		// wheel to ell tube
+		color("LightGray") TubeSection(TubeOD=Tube_OD,Wall_t=0.84, Length=50);
 		
 		translate([0,0,50+Tube_OD/2]){
-			rotate([-90,-90,0])rotate([0,0,90]) TubeEll(TubeOD=Tube_OD,Wall_t=0.84,Hole_d=14);
+			rotate([-90,-90,0]) rotate([0,0,90]) TubeEll(TubeOD=Tube_OD, Wall_t=0.84, Hole_d=14, GlueAllowance=0.40);
 			
-			translate([0,Tube_OD/2,0])rotate([-90,0,0])color("LightGray")TubeSection(TubeOD=Tube_OD,Wall_t=0.84, Length=YTubeLen);
-		}
+			translate([0,Tube_OD/2,0]) rotate([-90,0,0]) 
+				color("LightGray") TubeSection(TubeOD=Tube_OD, Wall_t=0.84, Length=YTubeLen);
+			}
+		
+	}
+} // OneCorner
+
+TubeOffset_X=-Tire_w/2-2-Tube_OD/2;
+TubeOffset_Z=WheelMount_OD/2;
+
+module OneCornerFL(){
+	PhantomWheel();
+	translate([0,0,TubeOffset_Z+93]) rotate([0,0,20]) CornerPivotS(UpperTubeAngle=10,LowerRot=70);
+	
+	translate([TubeOffset_X,0,TubeOffset_Z]){
+		
+		// wheel to ell tube
+		color("LightGray") TubeSection(TubeOD=Tube_OD,Wall_t=0.84, Length=50);
+		
+		translate([0,0,50+Tube_OD/2]){
+			rotate([180,0,90])  TubeEll(TubeOD=Tube_OD, Wall_t=0.84, Hole_d=14, GlueAllowance=0.40);
+			
+			translate([Tube_OD/2,0,0]) rotate([0,90,0]) 
+				color("LightGray") TubeSection(TubeOD=Tube_OD, Wall_t=0.84, Length=46);
+			}
 		
 	}
 } // OneCorner
 
 
-//OneCorner();
-//translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2])rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
-//translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0])mirror([0,1,0])OneCorner();
+
+//OneCornerFL();
+//translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2]) rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
+//translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0]) mirror([0,1,0]) OneCorner();
 
 
 module CasterMount(){
