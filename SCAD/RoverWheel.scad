@@ -615,7 +615,7 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 //ShowWheel();
 //ShowWheel(Pa=false,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
-ShowWheel(Pa=true,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
+//ShowWheel(Pa=true,Pb=true,IRG=false,DRG=true,HC=false,OPC=false,IPC=false,SO=false,SG=false,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
 //ShowWheel(Pa=true,Pb=false,IRG=true,DRG=false,HC=false,OPC=false,IPC=false,SO=false,SG=true,InnerRace=false,Balls=false,OuterRace=false,AR=false,IR=false,WM=false,Mo=false);
 
@@ -683,6 +683,37 @@ module TubeConnector(){
 } // TubeConnector
 
 //TubeConnector();
+
+module WheelSpacer(Len=9.5){
+	
+	
+	difference(){
+		
+		cylinder(d=WheelMount_OD,h=Len);
+		
+		
+		
+		//translate([0,0,3]) hull(){
+		//	translate([-WheelMount_OD/4,0,0]) cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,0.01],center=true);
+		//	translate([0,0,23]) cube([WheelMount_OD-8,WheelMount_OD+Overlap*2,0.01],center=true);
+		//}
+		
+		// center hole
+		translate([0,0,-Overlap])cylinder(d=WheelMount_OD-MBoltInset*4,h=Len+Overlap*2);
+		
+		// cut in half
+		translate([-WheelMount_OD/2-Overlap,-WheelMount_OD/2-Overlap,-Overlap]) 
+			cube([WheelMount_OD/2,WheelMount_OD+Overlap*2,26]);
+		
+		// Mounting Bolts
+		for (j=[0:nMountingBolts-1]) rotate([0,0,180/nMountingBolts*j+180/nMountingBolts/2-90]) 
+			translate([WheelMount_OD/2-MBoltInset,0,Len])
+				Bolt4ClearHole(depth=Len);
+		
+	} // diff
+} // WheelSpacer
+
+//WheelSpacer(Len=9.2);
 
 module ChannelConnector(){
 	
