@@ -3,9 +3,10 @@
 // by David M. Flynn
 // Filename: CornerPivot.scad
 // Created: 1/27/2018
-// Revision: 1.0.4 2/13/2018
+// Revision: 1.0.5 2/14/2018
 // **********************************************
 // History
+// 1.0.5 2/14/2018 Stop on any 45 degrees.
 // 1.0.4 2/13/2018 Added CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 // 1.0.3 2/5/2018 Better servo.
 // 1.0.2 2/2/2018 Moved bearing races to BearingLib.scad
@@ -556,8 +557,10 @@ module LowerInnerRace(myFn=90){
 		} // union
 		
 		// Rotation Stop
-		rotate([0,0,180/nBolts]) translate([CP_ID/2+RaceBoltInset,0,5])
-			Bolt4Hole();
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j+180/nBolts]) 
+			translate([CP_ID/2+RaceBoltInset,0,5])
+				Bolt4Hole();
+		
 		//translate([0,14.5/2,0]) rotate([180,0,0])Bolt2HeadHole();
 		//translate([0,-14.5/2,0]) rotate([180,0,0])Bolt2HeadHole();
 	} // diff
@@ -573,8 +576,9 @@ module UpperInnerRace(myFn=90){
 		translate([0,0,0.5]) Bolt4HeadHole();
 			
 		// Rotation Stop
-		rotate([0,0,180/nBolts]) translate([CP_ID/2+RaceBoltInset,0,5])
-			Bolt4Hole();
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j+180/nBolts]) 
+			translate([CP_ID/2+RaceBoltInset,0,5])
+				Bolt4Hole();
 		
 	} // diff
 } // UpperInnerRace

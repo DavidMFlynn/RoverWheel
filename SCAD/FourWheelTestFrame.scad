@@ -143,9 +143,11 @@ module OneCornerFL(){
 		// wheel to ell tube
 		color("LightGray") TubeSection(TubeOD=Tube_OD,Wall_t=0.84, Length=50);
 		
+		
 		translate([0,0,50+Tube_OD/2]){
 			rotate([180,0,90])  TubeEll(TubeOD=Tube_OD, Wall_t=0.84, Hole_d=14, GlueAllowance=0.40);
 			
+			// Corner pivot to ell tube
 			translate([Tube_OD/2,0,0]) rotate([0,90,0]) 
 				color("LightGray") TubeSection(TubeOD=Tube_OD, Wall_t=0.84, Length=46);
 			}
@@ -155,7 +157,7 @@ module OneCornerFL(){
 
 
 
-//OneCornerFL();
+OneCornerFL();
 //translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2]) rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
 //translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0]) mirror([0,1,0]) OneCorner();
 
