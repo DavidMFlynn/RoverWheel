@@ -103,8 +103,8 @@ module RoboClaw15TubeMount(){
 
 module PhantomWheel(){
 	
-	translate([-Tire_w/2+(WheelMount_l-2),0,0])rotate([0,-90,0])WheelMount();
-	translate([-Tire_w/2-2.1,0,0])rotate([0,-90,0])TubeConnector();
+	translate([-Tire_w/2+(WheelMount_l-6),0,0])rotate([0,-90,0])WheelMount();
+	translate([-Tire_w/2-6.1,0,0])rotate([0,-90,0])TubeConnector();
 	// tire
 	rotate([0,-90,0])
 	difference(){
@@ -131,12 +131,12 @@ module OneCorner(){
 	}
 } // OneCorner
 
-TubeOffset_X=-Tire_w/2-2-Tube_OD/2;
+TubeOffset_X=-Tire_w/2-6-Tube_OD/2;
 TubeOffset_Z=WheelMount_OD/2;
 
 module OneCornerFL(){
 	PhantomWheel();
-	translate([0,0,TubeOffset_Z+93]) rotate([0,0,20]) CornerPivotS(UpperTubeAngle=10,LowerRot=70);
+	translate([0,0,TubeOffset_Z+93]) rotate([0,0,0]) CornerPivotS(UpperTubeAngle=45,LowerRot=90);
 	
 	translate([TubeOffset_X,0,TubeOffset_Z]){
 		
@@ -149,7 +149,7 @@ module OneCornerFL(){
 			
 			// Corner pivot to ell tube
 			translate([Tube_OD/2,0,0]) rotate([0,90,0]) 
-				color("LightGray") TubeSection(TubeOD=Tube_OD, Wall_t=0.84, Length=46);
+				color("LightGray") TubeSection(TubeOD=Tube_OD, Wall_t=0.84, Length=50);
 			}
 		
 	}

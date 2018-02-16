@@ -171,6 +171,20 @@ module ChannelMountingBlock(){
 
 //ChannelMountingBlock();
 
+module ChannelToTube(){
+	ChannelMountingBlock();
+	rotate([0,135,0]) translate([0,0,27]) TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+	difference(){
+		hull(){
+			rotate([0,135,0]) translate([0,0,26]) cylinder(d=25.4,h=0.01);
+			cube([ChannelLength,ChannelWidth,ChannelDepth],center=true);
+		} // hull
+		translate([-Overlap,0,Overlap])cube([ChannelLength,ChannelWidth+Overlap*2,ChannelDepth],center=true);
+	} // diff
+} // ChannelToTube
+
+//rotate([180,0,0]) ChannelToTube();
+
 module OPB490N_Sensor_Cutout(){
 	OPB490N_z=12.32+IDXtra;
 	OPB490N_y=6.35+IDXtra;

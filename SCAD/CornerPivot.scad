@@ -238,7 +238,7 @@ module Servo_MG996R(BottomMount=true,TopAccess=true){
 
 
 module Servo_HS5645MG(BottomMount=true,TopAccess=true){
-	Servo_Shaft_Offset=10.25;
+	Servo_Shaft_Offset=9.75;
 	Servo_BoltSpace=10;
 	Servo_BoltSpace2=48.0;
 	Servo_x=53.5;
@@ -280,16 +280,14 @@ module Servo_HS5645MG(BottomMount=true,TopAccess=true){
 		
 	if (BottomMount==true){
 		translate([-Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
-	translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
-	translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
-	translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
-
+		translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+		translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+		translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
 	} else{
 		translate([-Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
-	translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
-	translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
-	translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
-
+		translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
+		translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
+		translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
 	}
 	
 	if (BottomMount==true){
@@ -325,15 +323,16 @@ module CornerPivotUpperS(Tube_a=10){
 			translate([0,0,3-Overlap]) cylinder(d1=CP_OD-RaceBoltInset*4,d2=40,h=3+Overlap);
 			//translate([0,0,6-Overlap])cylinder(d=MotorCover_d-2,h=3);
 			
+			// base
 			cylinder(d=CP_OD,h=3);
 			
 			hull(){
-				translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-80+180,0,0]) cylinder(d=25.4,h=5);
+				translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=25.4,h=5);
 				translate([0,0,3]) cylinder(d=55,h=1);
 				
 				// Servo attachment
-				translate([-17.25,-10,3]) cube([0.1,20.5,7.3]);
-				translate([36.75,-10,3]) cube([0.1,20.5,7.3]);
+				translate([-17.75,-10,3]) cube([0.1,20.0,7.5]);
+				translate([36.40,-10,3]) cube([0.1,20.0,7.5]);
 			} // hull
 		} // union
 		
@@ -381,7 +380,8 @@ module CornerPivotUpperS(Tube_a=10){
 	
 } // CornerPivotUpperS
 
-//CornerPivotUpperS();
+//CornerPivotUpperS(Tube_a=10);
+//CornerPivotUpperS(Tube_a=45);
 
 module CornerPivotLower(){
 	Base_h=6;
