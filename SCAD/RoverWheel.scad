@@ -140,7 +140,7 @@ module ChannelBoltPattern1500(){
 	ChannelWidth=1.320*25.4;
 	ChannelLength=1.500*25.4;
 
-module ChannelMountingBlock(){
+module ChannelMountingBlock(Use770=true,Use1500=true){
 	ChannelCenterHole_d=0.5*25.4;
 	OffsetFix=1.25;  // move holes to inside, was 1.5 2/6/2018
 	
@@ -152,24 +152,37 @@ module ChannelMountingBlock(){
 		
 		
 		translate([0,0,ChannelDepth/2]){
-			ChannelBoltPattern0770() Bolt6Hole();
-			ChannelBoltPattern1500() Bolt6Hole();
+			if (Use770==true) ChannelBoltPattern0770() Bolt6Hole();
+			if (Use1500==true) ChannelBoltPattern1500() Bolt6Hole();
 		}
 		
 		rotate([90,0,0])
 		translate([0,OffsetFix,ChannelWidth/2]){
-			ChannelBoltPattern0770() Bolt6Hole();
-			ChannelBoltPattern1500() Bolt6Hole();
+			if (Use770==true) ChannelBoltPattern0770() Bolt6Hole();
+			if (Use1500==true) ChannelBoltPattern1500() Bolt6Hole();
 		}
 		rotate([-90,0,0])
 		translate([0,-OffsetFix,ChannelWidth/2]){
-			ChannelBoltPattern0770() Bolt6Hole();
-			ChannelBoltPattern1500() Bolt6Hole();
+			if (Use770==true) ChannelBoltPattern0770() Bolt6Hole();
+			if (Use1500==true) ChannelBoltPattern1500() Bolt6Hole();
 		}
 	} // diff
 } // ChannelMountingBlock
 
 //ChannelMountingBlock();
+
+module CP_MtrCoverMount(){
+	CP_MotorCover_d=32;
+	
+	difference(){
+		ChannelMountingBlock(Use770=false);
+
+		translate([0,0,10]) cube([ChannelLength+Overlap,ChannelWidth+Overlap,ChannelDepth],center=true);
+		translate([0,0,-18]) cylinder(d=CP_MotorCover_d-1+IDXtra,h=11);
+	} // diff
+} // CP_MtrCoverMount
+
+//CP_MtrCoverMount();
 
 module ChannelToTube(){
 	difference(){

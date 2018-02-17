@@ -83,6 +83,29 @@ module MotorCover(){
 
 //MotorCover();
 
+module MotorCoverChannel(){
+	Motor_h=42; // height above channel
+	CoverWall=1.1;
+	
+	difference(){
+		union(){
+			cylinder(d=MotorCover_d,h=Motor_h);
+			translate([0,0,Motor_h-Overlap]) cylinder(d=MotorCover_d-1,h=7);
+		}
+		
+		translate([0,0,2])cylinder(d=MotorCover_d-CoverWall*2,h=Motor_h-2+Overlap);
+		translate([0,0,Motor_h-2])cylinder(d1=MotorCover_d-CoverWall*2,d2=MotorCover_d-CoverWall*2-1,h=2.1);
+		translate([0,0,Motor_h])cylinder(d=MotorCover_d-CoverWall*2-1,h=7);
+		
+		//hull(){
+		//	translate([0,0,Motor_h]) rotate([90,0,0])cylinder(d=14,h=MotorCover_d/2+1);
+		//	translate([0,0,Motor_h-10]) rotate([90,0,0])cylinder(d=14,h=MotorCover_d/2+1);
+		//} // hull
+	} // diff
+} // MotorCoverChannel
+
+//MotorCoverChannel();
+
 module CornerPivotUpperM(){
 	// This version is for the 25mm gear motor
 	Base_h=2;
