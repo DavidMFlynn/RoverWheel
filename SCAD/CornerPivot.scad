@@ -238,7 +238,7 @@ module Servo_MG996R(BottomMount=true,TopAccess=true){
 
 
 module Servo_HS5645MG(BottomMount=true,TopAccess=true){
-	Servo_Shaft_Offset=9.75;
+	Servo_Shaft_Offset=9.85; // this moves double
 	Servo_BoltSpace=10;
 	Servo_BoltSpace2=48.0;
 	Servo_x=53.5;
@@ -332,7 +332,7 @@ module CornerPivotUpperS(Tube_a=10){
 				
 				// Servo attachment
 				translate([-17.75,-10,3]) cube([0.1,20.0,7.5]);
-				translate([36.40,-10,3]) cube([0.1,20.0,7.5]);
+				translate([36.50,-10,3]) cube([0.1,20.0,7.5]);
 			} // hull
 		} // union
 		
@@ -510,7 +510,7 @@ module DriverS5645(){
 	// Used with the 25mm gear motor
 	Driver_w=9.5;
 	Driver_l=CP_ID/2-0.5;
-	ServoArm_h=7-4.3;
+	ServoArm_h=7-6.3;
 	
 	
 	BC=21;
