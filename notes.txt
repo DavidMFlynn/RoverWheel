@@ -108,3 +108,31 @@ Work the tire over the wheel.
 One side at a time remove the inner rim or hub cap.
 Align the tire's beed in the inner rim and replace the inner rim or hub cap, with all 8 screws.
 Gradually tighten the screws while holding the wheel tightly together.
+
+Wiring the motor and encoder
+----------------------------------------------------------------------------------
+Molex mini-fit Jr connectors
+Conn Recept 6 Pos DK WM3702-ND
+Conn Plug 6 Pos DK WM1031-ND
+Conn Term Male DK WM2500-ND
+Conn Term Female DK WM2501-ND
+
+Pin		Use
+1		Motor +	18AWG orange
+2		Enc +5V 22AWG Red
+3		Enc A 24AWG Blue
+4		Motor - 18AWG white
+5		Enc Gnd 22AWG Black
+6		Enc B 24AWG Blue
+
+Optical Switch wiring
+A anode Red 470Ω to Enc +5V Red 22AWG
+B anode Red 470Ω to Enc +5V
+A Switch +5V White to Enc +5V
+B Switch +5V White to Enc +5V
+A cathode Black to Enc Gnd Black 22AWG
+B cathode Black to Enc Gnd
+A Switch Gnd Green to Enc Gnd
+B Switch Gnd Green to Enc Gnd
+A Switch Blue
+B Switch Blue
