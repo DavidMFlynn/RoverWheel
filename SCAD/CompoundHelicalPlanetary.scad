@@ -3,11 +3,12 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.5 2/10/2018
+// Rev: 1.1.6 2/26/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.5");
+echo("Compound Helical Planetary Library 1.1.6");
+// 1.1.6 2/26/2018 Recalculated ratios
 // 1.1.5 2/10/2018 Added 188:1 variant and Spline_a to planet B.
 // 1.1.4 2/2/2018 Went metric on bolts lib.
 // 1.1.3 1/23/2018 fixed ratio calculator
@@ -23,23 +24,69 @@ echo("Compound Helical Planetary Library 1.1.5");
 
 //PlanetaryPitchA=280;
 //PlanetaryPitchB=308;
-//300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
-//300:275 = 54:57 = -85.5:1, 12t 21t,Pinion_a=0,nPlanets=3
-//300:330 = 54:51 = 76.5:1, 12t 21t,Pinion_a=0,nPlanets=3
-//280:308 = 54:51 = 76.5:1, 12t 21t,Pinion_a=0,nPlanets=3
-//260:283.636 = 60:57 = 95.0014:1. 12t,24t,Pinion_a=360/Pinion_t/2,nPlanets=3
+//280:308 = 54:51 = 93.5:1, 12t 21t 21t,Pinion_a=0,nPlanets=3
+/*
+PlanetaryPitchA=280;
+PlanetaryPitchB=308;
+Pinion_t=12;
+PlanetA_t=21;
+PlanetB_t=21;
+nPlanets=3;
+/**/
+//260:283.636 = 60:57 = 114:1. 12t,24t,24t,Pinion_a=360/Pinion_t/2,nPlanets=3
+/*
+PlanetaryPitchA=260;
+PlanetaryPitchB=283.636;
+Pinion_t=12;
+PlanetA_t=24;
+PlanetB_t=24;
+nPlanets=3;
+/**/
 //300:290.3225 = 45:47 = 188:1, 15t 15t 16t, nPlanets=5
-Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
+//*
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
-BackLash=0.3;
-//Pinion_t=12;
 Pinion_t=15;
-Pinion_a=0;
+PlanetA_t=15;
+PlanetB_t=16;
+nPlanets=5;
+/**/
+//300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
+/*
+PlanetaryPitchA=300;
+PlanetaryPitchB=290.3225;
+Pinion_t=15;
 PlanetA_t=15;
 PlanetB_t=14;
-PlanetStack=2; // number of gears 2 or 3
 nPlanets=5;
+/**/
+//300:330 = 54:51 = 53.9:1, 12t 21t 21t,Pinion_a=0,nPlanets=3
+/*
+PlanetaryPitchA=280;
+PlanetaryPitchB=330;
+Pinion_t=12;
+PlanetA_t=21;
+PlanetB_t=21;
+nPlanets=3;
+/**/
+//300:275 = 54:57 = -104.5:1, 12t 21t 21t,Pinion_a=0,nPlanets=3
+/*
+PlanetaryPitchA=300;
+PlanetaryPitchB=275;
+Pinion_t=12;
+PlanetA_t=21;
+PlanetB_t=21;
+nPlanets=3;
+/**/
+
+
+
+Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
+
+BackLash=0.3;
+//Pinion_t=12;
+Pinion_a=0;
+PlanetStack=2; // number of gears 2 or 3
 Pressure_a=22.5;
 GearWidth=12;
 //twist=200;
