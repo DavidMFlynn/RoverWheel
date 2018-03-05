@@ -1,11 +1,12 @@
 // ***************************************************
 // Tube Connector Library
 // by David M. Flynn
-// Created: 1/16/2018
-// Revision: 1.0.3 1/27/2018
+// Created: 3/4/2018
+// Revision: 1.1.0 3/4/2018
 // Units: mm
 // ***************************************************
 // History:
+// 1.1.0 3/4/2018  Added TubeSocket.
 // 1.0.3 1/27/2018 Added cone to TubeEnd to make wire threading easier.
 // 1.0.2 1/26/2018 Added GlueAllowance. Added Tube2Pivot, Tube2PivotCover.
 // 1.0.1 1/21/2018 Added TubeSection.
@@ -20,6 +21,8 @@
 // TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // rotate([0,-90,0])Tube2Pivot(TubeAngle=150,Length=60,WireExit=-105, GlueAllowance=0.2);
 // Tube2PivotCover(Length=60);
+// TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true);
+// TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=false);
 
 // ***************************************************
 // Routines
@@ -44,6 +47,30 @@ Tube_OD=25.4;
 Bearing_ID=12.7;
 Bearing_OD=28.575;
 Bearing_W=7.938;
+
+module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
+	BoltOffset=3.5;
+	
+	difference(){
+		hull(){
+			cylinder(d=TubeOD+BoltOffset*4, h=6);
+			cylinder(d=TubeOD+6, h=SocketLen);
+		} // union
+		
+		translate([0,0,SocketLen/2]) rotate_extrude() translate([TubeOD/2-0.35,0,0]) #circle(d=2);
+		translate([0,0,-Overlap]) cylinder(d=TubeOD-1, h=SocketLen);
+		translate([0,0,1]) cylinder(d=TubeOD+IDXtra, h=SocketLen);
+		
+		if (Threaded==true){
+				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,10]) Bolt4Hole(depth=13);
+			} else {
+				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,7]) Bolt4HeadHole(depth=13);
+			}
+	} // diff
+} // TubeSocket
+
+//TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true);
+//TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=false);
 
 module TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100){
 	difference(){
