@@ -49,7 +49,7 @@ Bearing_OD=28.575;
 Bearing_W=7.938;
 
 module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
-	BoltOffset=3.5;
+	BoltOffset=4;
 	
 	difference(){
 		hull(){

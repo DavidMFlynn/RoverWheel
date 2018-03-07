@@ -2,9 +2,10 @@
 // Four Wheel Test Frame
 // by David M. Flynn
 // Created: 1/21/2018
-// Revision: 1.0.2 1/25/2018
+// Revision: 1.0.3 3/6/2018
 // **********************************************
 // History
+// 1.0.3 3/6/2018 RoboClaw7 Tube Mount
 // 1.0.2 1/25/2018 RoboClaw Tube Mount
 // 1.0.1 1/24/2018 CasterMount, Tube3Junction
 // 1.0.0 1/21/2018 First code
@@ -57,6 +58,50 @@ CP_ID=CornerPivot_bc-26;
 YTubeLen=100;
 
 //echo(CP_OD=CP_OD);
+
+module RoboClaw7TubeMount(Boss=false){
+	TM_h=8;
+	RC_BoltSpace=32;
+	RC_Spacer_h=4;
+	
+	difference(){
+		union(){
+			cylinder(d=Tube_OD+4,h=TM_h);
+			translate([-(RC_BoltSpace+8)/2,Tube_OD/2-6,0]) cube([RC_BoltSpace+8,6,TM_h]);
+			
+			if (Boss==true){
+			// Spacers
+			translate([RC_BoltSpace/2,Tube_OD/2+RC_Spacer_h,TM_h/2])rotate([90,0,0])hull()
+			{
+				cylinder(d=7,h=RC_Spacer_h+Overlap);
+				translate([3,-TM_h/2,0])cube([1,TM_h/2+3.5,7]);
+				translate([-3.5,-TM_h/2,0])cube([TM_h/2+3.5,1,7]);
+			}
+			mirror([1,0,0])
+			translate([RC_BoltSpace/2,Tube_OD/2+RC_Spacer_h,TM_h/2])rotate([90,0,0])hull()
+			{
+				cylinder(d=7,h=RC_Spacer_h+Overlap);
+				translate([3,-TM_h/2,0])cube([1,TM_h/2+3.5,7]);
+				translate([-3.5,-TM_h/2,0])cube([TM_h/2+3.5,1,7]);
+			}
+		}
+
+		} // union
+		
+		// Tube cut
+		translate([-10,0,-Overlap]) cube([20,20,TM_h+Overlap*2]);
+		
+		// Bolts
+		translate([RC_BoltSpace/2,Tube_OD/2+RC_Spacer_h,TM_h/2])rotate([-90,0,0])  Bolt4Hole();
+		translate([-RC_BoltSpace/2,Tube_OD/2+RC_Spacer_h,TM_h/2])rotate([-90,0,0])  Bolt4Hole();
+		
+		// Tube
+		translate([0,0,-Overlap]) cylinder(d=Tube_OD+IDXtra,h=TM_h+Overlap*2);
+	} // diff
+	
+} // RoboClaw7TubeMount
+
+//RoboClaw7TubeMount();
 
 module RoboClaw15TubeMount(){
 	TM_h=8;
@@ -157,7 +202,7 @@ module OneCornerFL(){
 
 
 
-OneCornerFL();
+//OneCornerFL();
 //translate([TubeOffset_X,YTubeLen+Pivot_OD/2+Tube_OD/2,TubeOffset_Z+50+Tube_OD/2]) rotate([90,0,0]) Tube2Pivot(TubeAngle=180,Length=Pivot_OD);
 //translate([0,(YTubeLen+Pivot_OD/2+Tube_OD/2)*2,0]) mirror([0,1,0]) OneCorner();
 
