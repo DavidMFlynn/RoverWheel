@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.1 2/10/2018
+// Rev: 1.0.2 3/11/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.2 3/11/2018 Added JackStand().
 // 1.0.1 2/10/2018 Little fixes. Planet drilling tool.
 // 1.0.0 2/7/2018 First complete working wheel. Time to make more...
 // 1.0.0b6 2/5/2018 Fixed channel mount.
@@ -43,7 +44,9 @@
 // ---- Alt. Tire used in place of Traxxas tire ----
 //  translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=1); // outside tread, print 8
 //  translate([3D_Tire_id/4,-3D_Tire_id/3,0])TireSection(TireWidth=40,SpokeOffset=32,Tread_Dir=-1); // inside tread, print 8
-
+//
+//  JackStand();
+//
 // 	Spoke(); // print 16
 //  HubCap2();
 //  OuterRim2();
@@ -821,6 +824,36 @@ module ChannelConnectorMid(){
 } // ChannelConnectorMid
 //ChannelMountingBlock();
 //ChannelConnectorMid();
+
+module RoundRect(X=1,Y=1,H=0.2,R=0.2){
+	hull(){
+		translate([-X/2+R,-Y/2+R,-H/2]) cylinder(r=R,h=H);
+		translate([X/2-R,-Y/2+R,-H/2]) cylinder(r=R,h=H);
+		translate([-X/2+R,Y/2-R,-H/2]) cylinder(r=R,h=H);
+		translate([X/2-R,Y/2-R,-H/2]) cylinder(r=R,h=H);
+	} // hull
+} //RoundRect
+
+module JackStand(){
+	JS_h=50;
+	JS_w=40;
+	JS_t=8;
+	difference(){
+		translate([-JS_t/2,-JS_w/2,0]) cube([JS_t,JS_w,JS_h+8]);
+		
+		translate([-JS_t/2-Overlap,0,JS_h+Race_ID/2+0.5]) rotate([0,90,0]) cylinder(d=Race_ID+1,h=11);
+		
+		translate([-JS_t/2-Overlap,-JS_w/2-JS_h/3,JS_h/2+5]) rotate([0,90,0]) cylinder(d=JS_h+4,h=11);
+		mirror([0,1,0])
+		translate([-JS_t/2-Overlap,-JS_w/2-JS_h/3,JS_h/2+5]) rotate([0,90,0]) cylinder(d=JS_h+4,h=11);
+	} // diff
+	
+	translate([0,0,2]) RoundRect(X=20,Y=JS_w+20,H=4,R=2);
+	
+} // JackStand
+
+//JackStand();
+
 
 module MotorCover(){
 	BackOfMotor=63;
