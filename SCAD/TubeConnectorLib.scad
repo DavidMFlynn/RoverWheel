@@ -28,7 +28,7 @@
 // Routines
 // TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100);
-// TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+// TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, Stop_l=TubeStop_l, GlueAllowance=0.40);
 // TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // Tube2Pivot(TubeAngle=180,Length=50,WireExit=0, GlueAllowance=0.40);
 // Tube2PivotCover(Length=60);

@@ -3,9 +3,10 @@
 // by David M. Flynn
 // Filename: CornerPivot.scad
 // Created: 1/27/2018
-// Revision: 1.0.5 2/14/2018
+// Revision: 1.0.6 3/21/2018
 // **********************************************
 // History
+// 1.0.6 3/21/2018 Added a new servo and CornerPivotUpperDS20KG
 // 1.0.5 2/14/2018 Stop on any 45 degrees.
 // 1.0.4 2/13/2018 Added CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 // 1.0.3 2/5/2018 Better servo.
@@ -328,6 +329,76 @@ module Servo_HS5645MG(BottomMount=true,TopAccess=true){
 
 //Servo_HS5645MG(BottomMount=true,TopAccess=true);
 
+module Servo_DS20KG(BottomMount=true,TopAccess=true){
+	Servo_Shaft_Offset=9.85; // this moves double
+	Servo_BoltSpace=10;
+	Servo_BoltSpace2=49.4;
+	Servo_x=54.5;
+	Servo_h1=28.2; // bottom of servo to bottom of mount
+	Servo_w=20.2;
+	Servo_Body_l=40.5;
+	Servo_Deck_h=3.2;
+	Servo_TopStep_h=9.7;
+	Servo_TopOfWheel=20.7;
+	
+	translate([-Servo_Shaft_Offset,0,0]){
+	// body
+	if (BottomMount==true){
+		translate([-Servo_x/2,-Servo_w/2,-Servo_h1])cube([Servo_x,Servo_w,Servo_h1+Overlap]);
+	} else{
+		translate([-Servo_Body_l/2,-Servo_w/2,-Servo_h1])cube([Servo_Body_l,Servo_w,Servo_h1+Overlap]);
+	}
+	
+	// top
+	if (BottomMount==true){
+		translate([-Servo_x/2,-Servo_w/2,0])cube([Servo_x,Servo_w,Servo_Deck_h+Overlap]);
+		translate([-Servo_Body_l/2,-Servo_w/2,Servo_Deck_h])cube([Servo_Body_l,Servo_w,Servo_TopStep_h+Overlap]);
+		// gussets
+		hull(){
+			translate([-Servo_x/2,-0.8,Servo_Deck_h])cube([Servo_x,1.6,0.01]);
+			translate([-Servo_Body_l/2,-0.8,Servo_Deck_h+2.4])cube([Servo_Body_l,1.6,0.01]);
+		} // hull
+	} else
+	if (TopAccess==true){
+		translate([-Servo_x/2,-Servo_w/2,0])cube([Servo_x,Servo_w,19]);
+	} else {
+	translate([-Servo_x/2,-Servo_w/2,0])cube([Servo_x,Servo_w,14]);
+	}
+	
+	// Bolt holes
+	translate([-Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
+	translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
+	translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
+	translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
+		
+	if (BottomMount==true){
+		translate([-Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+		translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+		translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+		translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) rotate([180,0,0])Bolt4Hole();
+	} else{
+		translate([-Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
+		translate([-Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
+		translate([Servo_BoltSpace2/2,Servo_BoltSpace/2,0]) Bolt4Hole();
+		translate([Servo_BoltSpace2/2,-Servo_BoltSpace/2,0]) Bolt4Hole();
+	}
+	
+	if (BottomMount==true){
+		// servo wheel
+		translate([Servo_Shaft_Offset,0,Servo_Deck_h+Servo_TopStep_h-Overlap])
+			cylinder(d=21.3,h=Servo_TopOfWheel-Servo_Deck_h-Servo_TopStep_h+Overlap);
+	} else {
+		translate([Servo_Shaft_Offset,0,0]) cylinder(d=21.3,h=19.6);
+	}
+	translate([Servo_Shaft_Offset,0,0]) cylinder(d=9,h=30);
+	translate([Servo_Shaft_Offset,14.5/2,19.6+6]) Bolt4HeadHole();
+	translate([Servo_Shaft_Offset,-14.5/2,19.6+6]) Bolt4HeadHole();
+	}
+} // Servo_DS20KG
+
+//Servo_DS20KG(BottomMount=true,TopAccess=true);
+
+
 module CornerPivotUpperS(Tube_a=10){
 	// This version is for a standard r/c servo
 	Base_h=2;
@@ -405,6 +476,84 @@ module CornerPivotUpperS(Tube_a=10){
 
 //CornerPivotUpperS(Tube_a=10);
 //CornerPivotUpperS(Tube_a=45);
+
+module CornerPivotUpperDS20KG(Tube_a=10){
+	// This version is for a standard r/c servo
+	Base_h=2;
+	nBolts=8;
+	TubeStop_y=25;
+	
+	Motor_d=28;
+	Stop_a=45;
+	Servo_h=18.5;
+	Servo_Deck_h=3.2;
+	
+	translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
+	
+	difference(){
+		union(){
+			
+			translate([0,0,3-Overlap]) cylinder(d1=CP_OD-RaceBoltInset*4,d2=40,h=3+Overlap);
+			//translate([0,0,6-Overlap])cylinder(d=MotorCover_d-2,h=3);
+			
+			// base
+			cylinder(d=CP_OD,h=3);
+			
+			hull(){
+				translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=25.4,h=5);
+				translate([0,0,3]) cylinder(d=55,h=1);
+				
+				// Servo attachment
+				translate([-18.75,-10,0]) #cube([0.1,20.0,Servo_h-Servo_Deck_h]);
+				translate([37.50,-10,0]) #cube([0.1,20.0,Servo_h-Servo_Deck_h]);
+			} // hull
+		} // union
+		
+		// Servo
+		translate([0,0,Servo_h]) rotate([0,180,0]) Servo_DS20KG(BottomMount=true,TopAccess=false);
+		
+		// motor 
+		//translate([0,0,4])cylinder(d=Motor_d,h=5);
+						
+		// Pololu Motor shaft and bolts
+		//translate([0,0,-Overlap])cylinder(d=7+IDXtra,h=30);
+		//translate([8.5,0,-Overlap])rotate([180,0,0])Bolt4ButtonHeadHole();
+		//translate([-8.5,0,-Overlap])rotate([180,0,0])Bolt4ButtonHeadHole();
+		
+		// Outer race bolts
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j+180/nBolts]) translate([(CP_OD)/2-RaceBoltInset,0,6]) 
+			 Bolt4HeadHole();
+		
+		// tube clearance
+		translate([0,TubeStop_y, Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) cylinder(d=Tube_OD+IDXtra*2, h=CornerPivot_bc);
+		
+		// wire path
+		translate([0, TubeStop_y, Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) translate([0,0,-16]) cylinder(d=14, h=CornerPivot_bc);
+		hull(){
+			translate([0,15,-Overlap]) cylinder(d=14,h=13);
+			translate([0,0,-Overlap]) cylinder(d=14,h=13);
+		} // hull
+		
+		// Rotation Stop
+		difference(){
+			translate([0,0,-Overlap]) cylinder(r=CP_ID/2+RaceBoltInset+2.5,h=3);
+			
+			translate([0,0,-Overlap*2]){
+				cylinder(r=CP_ID/2+RaceBoltInset-2.5, h=3+Overlap*2);
+				translate([-(CP_ID/2+RaceBoltInset+2.5+Overlap),0,0])
+					cube([(CP_ID/2+RaceBoltInset+2.5+Overlap)*2, CP_ID/2+RaceBoltInset+2.5+Overlap, 3+Overlap*2]);
+				rotate([0,0,-90-Stop_a-90]) cube([CP_ID/2+RaceBoltInset+2.5+Overlap, CP_ID/2+RaceBoltInset+2.5+Overlap,3+Overlap*2]);
+				rotate([0,0,-90+Stop_a]) cube([CP_ID/2+RaceBoltInset+2.5+Overlap, CP_ID/2+RaceBoltInset+2.5+Overlap,3+Overlap*2]);
+			}
+		} // diff
+		
+		rotate([0,0,-90-Stop_a]) translate([CP_ID/2+RaceBoltInset,0,-Overlap]) cylinder(d=5,h=3);
+		rotate([0,0,-90+Stop_a]) translate([CP_ID/2+RaceBoltInset,0,-Overlap]) cylinder(d=5,h=3);
+	} // diff
+	
+} // CornerPivotUpperDS20KG
+
+CornerPivotUpperDS20KG();
 
 module CornerPivotLower(){
 	Base_h=6;

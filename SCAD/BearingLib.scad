@@ -3,17 +3,20 @@
 // by David M. Flynn
 // Filename: BearingLib.scad
 // Created: 2/2/2018
-// Revision: 1.0.0 2/2/2018
+// Revision: 1.1.0 3/21/2018
 // **********************************************
 // History
+// 1.1.0 3/21/2018 Added InsideRaceBoltPattern,OutideRaceBoltPattern
 // 1.0.0 2/2/2018 First code.
 // **********************************************
 // for STL output (examples)
 //
-// InsideRace(BallCircle_d=60, Race_ID=34, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4ClearHole();
-// InsideRace(BallCircle_d=60, Race_ID=34, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4HeadHole();
-// OutsideRace(BallCircle_d=60, Race_OD=86, Ball_d=9.525, Race_w=7, nBolts=8, myFn=360) Bolt4ClearHole();
-// OutsideRace(BallCircle_d=60, Race_OD=86, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
+// InsideRace(BallCircle_d=60, Race_ID=34, Ball_d=9.525, Race_w=5, nBolts=8, RaceBoltInset=BL_RaceBoltInset, myFn=360) Bolt4ClearHole();
+// InsideRace(BallCircle_d=60, Race_ID=34, Ball_d=9.525, Race_w=5, nBolts=8, RaceBoltInset=BL_RaceBoltInset, myFn=360) Bolt4HeadHole();
+// OutsideRace(BallCircle_d=60, Race_OD=86, Ball_d=9.525, Race_w=7, nBolts=8, RaceBoltInset=BL_RaceBoltInset, myFn=360) Bolt4ClearHole();
+// OutsideRace(BallCircle_d=60, Race_OD=86, Ball_d=9.525, Race_w=5, nBolts=8, RaceBoltInset=BL_RaceBoltInset, myFn=360) Bolt4Hole();
+// InsideRaceBoltPattern(Race_ID=50, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
+// OutideRaceBoltPattern(Race_OD=150, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
@@ -23,6 +26,14 @@ IDXtra=0.2;
 Overlap=0.05;
 
 BL_RaceBoltInset=3.5;
+
+module InsideRaceBoltPattern(Race_ID=50,
+	nBolts=8,
+	RaceBoltInset=BL_RaceBoltInset){
+	
+	for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Race_ID/2+RaceBoltInset,0,0]) children();
+			
+} // InsideRaceBoltPattern
 
 module InsideRace(BallCircle_d=100,
 	Race_ID=50,
@@ -51,6 +62,15 @@ module InsideRace(BallCircle_d=100,
 } // InsideRace
 
 //InsideRace(BallCircle_d=60, Race_ID=34, Ball_d=9.525, Race_w=5, nBolts=8, myFn=90) Bolt4ClearHole();
+
+module OutideRaceBoltPattern(Race_OD=150,
+	nBolts=8,
+	RaceBoltInset=BL_RaceBoltInset){
+	
+	// Bolts
+	for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Race_OD/2-RaceBoltInset,0,0]) children();
+		
+} // OutsideRace
 
 module OutsideRace(BallCircle_d=60,
 	Race_OD=150,
