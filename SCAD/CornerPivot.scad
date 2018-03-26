@@ -22,6 +22,7 @@
 // CornerPivotUpperSTL();
 // translate([-10,0,0]) mirror([1,0,0]) CornerPivotUpperSTL();
 // CornerPivotUpperS();
+// Servo_DS20KG(BottomMount=true,TopAccess=true);
 
 // CornerPivotLowerSTL();
 // translate([10,0,0]) mirror([1,0,0]) CornerPivotLowerSTL();
@@ -553,7 +554,7 @@ module CornerPivotUpperDS20KG(Tube_a=10){
 	
 } // CornerPivotUpperDS20KG
 
-CornerPivotUpperDS20KG();
+//CornerPivotUpperDS20KG();
 
 module CornerPivotLower(){
 	Base_h=6;
