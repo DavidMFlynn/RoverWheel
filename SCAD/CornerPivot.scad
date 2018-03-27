@@ -717,6 +717,44 @@ module DriverS5645(){
 
 //rotate([180,0,0])DriverS5645();
 
+module DriverDS20KG(){
+	// Used with the 25mm gear motor
+	Driver_w=9.5;
+	Driver_l=CP_ID/2-0.5;
+	ServoArm_h=7-6.3;
+	
+	
+	BC=23.5;
+	
+	difference(){
+		union(){
+			hull(){
+				translate([Driver_l-Driver_w/2,0,0])cylinder(d=Driver_w,h=4.5+Overlap);
+				translate([-Driver_l+Driver_w/2,0,0])cylinder(d=Driver_w,h=4.5+Overlap);
+			} // hull
+			translate([0,0,4.5])
+			hull(){
+				translate([Driver_l-Driver_w/2-0.5,0,0])cylinder(d=Driver_w+1,h=ServoArm_h);
+				translate([-Driver_l+Driver_w/2+0.5,0,0])cylinder(d=Driver_w+1,h=ServoArm_h);
+			} // hull
+		} // union
+		
+		translate([BC/2,0,0])rotate([180,0,0])Bolt4HeadHole();
+		translate([-BC/2,0,0])rotate([180,0,0])Bolt4HeadHole();
+		
+		
+		// Servo Arm contour
+		translate([0,0,4.5+ServoArm_h])
+			hull(){
+				cube([8.5,Driver_w+3,1.35*2],center=true);
+				cube([17.5,Driver_w+3,Overlap],center=true);
+		}
+	} // diff
+	
+} // DriverDS20KG
+
+//DriverDS20KG();
+
 module LowerInnerRace(myFn=90){
 	nBolts=8;
 	// Driver width is 9.5 ( 14.5 - 5 )
