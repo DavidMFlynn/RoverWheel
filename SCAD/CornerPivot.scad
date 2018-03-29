@@ -6,7 +6,7 @@
 // Revision: 1.0.6 3/21/2018
 // **********************************************
 // History
-// 1.0.6 3/21/2018 Added a new servo and CornerPivotUpperDS20KG
+// 1.0.6 3/21/2018 Added a new servo and CornerPivotUpperLD20MG
 // 1.0.5 2/14/2018 Stop on any 45 degrees.
 // 1.0.4 2/13/2018 Added CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 // 1.0.3 2/5/2018 Better servo.
@@ -22,7 +22,7 @@
 // CornerPivotUpperSTL();
 // translate([-10,0,0]) mirror([1,0,0]) CornerPivotUpperSTL();
 // CornerPivotUpperS();
-// Servo_DS20KG(BottomMount=true,TopAccess=true);
+// Servo_LD20MG(BottomMount=true,TopAccess=true);
 
 // CornerPivotLowerSTL();
 // translate([10,0,0]) mirror([1,0,0]) CornerPivotLowerSTL();
@@ -330,7 +330,7 @@ module Servo_HS5645MG(BottomMount=true,TopAccess=true){
 
 //Servo_HS5645MG(BottomMount=true,TopAccess=true);
 
-module Servo_DS20KG(BottomMount=true,TopAccess=true){
+module Servo_LD20MG(BottomMount=true,TopAccess=true){
 	Servo_Shaft_Offset=9.85; // this moves double
 	Servo_BoltSpace=10;
 	Servo_BoltSpace2=49.4;
@@ -395,9 +395,9 @@ module Servo_DS20KG(BottomMount=true,TopAccess=true){
 	translate([Servo_Shaft_Offset,14.5/2,19.6+6]) Bolt4HeadHole();
 	translate([Servo_Shaft_Offset,-14.5/2,19.6+6]) Bolt4HeadHole();
 	}
-} // Servo_DS20KG
+} // Servo_LD20MG
 
-//Servo_DS20KG(BottomMount=true,TopAccess=true);
+//Servo_LD20MG(BottomMount=true,TopAccess=true);
 
 
 module CornerPivotUpperS(Tube_a=10){
@@ -478,7 +478,7 @@ module CornerPivotUpperS(Tube_a=10){
 //CornerPivotUpperS(Tube_a=10);
 //CornerPivotUpperS(Tube_a=45);
 
-module CornerPivotUpperDS20KG(Tube_a=10){
+module CornerPivotUpperLD20MG(Tube_a=10){
 	// This version is for a standard r/c servo
 	Base_h=2;
 	nBolts=8;
@@ -486,7 +486,7 @@ module CornerPivotUpperDS20KG(Tube_a=10){
 	
 	Motor_d=28;
 	Stop_a=45;
-	Servo_h=18.5;
+	Servo_h=16.5; // was 18.5 3/29/18
 	Servo_Deck_h=3.2;
 	
 	translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a,0,0]) TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
@@ -505,13 +505,13 @@ module CornerPivotUpperDS20KG(Tube_a=10){
 				translate([0,0,3]) cylinder(d=55,h=1);
 				
 				// Servo attachment
-				translate([-18.75,-10,0]) #cube([0.1,20.0,Servo_h-Servo_Deck_h]);
-				translate([37.50,-10,0]) #cube([0.1,20.0,Servo_h-Servo_Deck_h]);
+				translate([-18.75,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);
+				translate([37.50,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);
 			} // hull
 		} // union
 		
 		// Servo
-		translate([0,0,Servo_h]) rotate([0,180,0]) Servo_DS20KG(BottomMount=true,TopAccess=false);
+		translate([0,0,Servo_h]) rotate([0,180,0]) Servo_LD20MG(BottomMount=true,TopAccess=false);
 		
 		// motor 
 		//translate([0,0,4])cylinder(d=Motor_d,h=5);
@@ -552,9 +552,9 @@ module CornerPivotUpperDS20KG(Tube_a=10){
 		rotate([0,0,-90+Stop_a]) translate([CP_ID/2+RaceBoltInset,0,-Overlap]) cylinder(d=5,h=3);
 	} // diff
 	
-} // CornerPivotUpperDS20KG
+} // CornerPivotUpperLD20MG
 
-//CornerPivotUpperDS20KG();
+CornerPivotUpperLD20MG();
 
 module CornerPivotLower(){
 	Base_h=6;
@@ -717,7 +717,7 @@ module DriverS5645(){
 
 //rotate([180,0,0])DriverS5645();
 
-module DriverDS20KG(){
+module DriverLD20MG(){
 	// Used with the 25mm gear motor
 	Driver_w=9.5;
 	Driver_l=CP_ID/2-0.5;
@@ -751,9 +751,9 @@ module DriverDS20KG(){
 		}
 	} // diff
 	
-} // DriverDS20KG
+} // DriverLD20MG
 
-//DriverDS20KG();
+//DriverLD20MG();
 
 module LowerInnerRace(myFn=90){
 	nBolts=8;
