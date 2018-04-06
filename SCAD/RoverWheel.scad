@@ -835,7 +835,7 @@ module RoundRect(X=1,Y=1,H=0.2,R=0.2){
 } //RoundRect
 
 module JackStand(){
-	JS_h=50;
+	JS_h=55; // was 50, 4/6/2018
 	JS_w=40;
 	JS_t=8;
 	difference(){
@@ -1097,8 +1097,7 @@ translate([0,0,tire_w])rotate([180,0,0]){
 /**/
 
 
-module ShowMyBalls(){
-	nBalls=12;
+module ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12){
 	for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d-Overlap*2);
 } // ShowMyBalls
 
