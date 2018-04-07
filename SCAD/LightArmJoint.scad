@@ -52,6 +52,7 @@ Ball_d=9.525; // 0.375"
 RaceBoltInset=3.5;
 BallCircle_d=114;
 Race_OD=BallCircle_d+26;
+echo(Race_OD=Race_OD);
 Race_ID=88;
 
 
