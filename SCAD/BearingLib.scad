@@ -3,9 +3,11 @@
 // by David M. Flynn
 // Filename: BearingLib.scad
 // Created: 2/2/2018
-// Revision: 1.1.0 3/21/2018
+// Revision: 1.2.0 4/7/2018
 // **********************************************
 // History
+ echo("BearingLib 1.2.0");
+// 1.2.0 4/7/2018 Added BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12);
 // 1.1.0 3/21/2018 Added InsideRaceBoltPattern,OutideRaceBoltPattern
 // 1.0.0 2/2/2018 First code.
 // **********************************************
@@ -17,6 +19,12 @@
 // OutsideRace(BallCircle_d=60, Race_OD=86, Ball_d=9.525, Race_w=5, nBolts=8, RaceBoltInset=BL_RaceBoltInset, myFn=360) Bolt4Hole();
 // InsideRaceBoltPattern(Race_ID=50, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
 // OutideRaceBoltPattern(Race_OD=150, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
+// BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12);
+// **********************************************
+// Routines
+// InsideRaceBoltPattern(Race_ID=50,nBolts=8,RaceBoltInset=BL_RaceBoltInset) children();
+// OutideRaceBoltPattern(Race_OD=150,nBolts=8,RaceBoltInset=BL_RaceBoltInset) children();
+// BallTrack(BallCircle_d=100, Ball_d=9.525, myFn=360);
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
@@ -27,6 +35,20 @@ Overlap=0.05;
 
 BL_RaceBoltInset=3.5;
 
+module BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12){
+	Race_w=Ball_d+3.5;
+	
+	difference(){
+		cylinder(d=BallCircle_d+Ball_d*0.4,h=Race_w,center=true);
+		
+		cylinder(d=BallCircle_d-Ball_d*0.4,h=Race_w+Overlap*2,center=true);
+		for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d+IDXtra*2);
+			
+	} // diff
+} // BallSpacer
+
+//BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12);
+
 module InsideRaceBoltPattern(Race_ID=50,
 	nBolts=8,
 	RaceBoltInset=BL_RaceBoltInset){
@@ -34,6 +56,13 @@ module InsideRaceBoltPattern(Race_ID=50,
 	for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Race_ID/2+RaceBoltInset,0,0]) children();
 			
 } // InsideRaceBoltPattern
+
+module BallTrack(BallCircle_d=100, Ball_d=9.525, myFn=360){
+	rotate_extrude(convexity = 10,$fn=myFn)
+			translate([BallCircle_d/2, 0, 0]) circle(d = Ball_d);
+} // BallTrack
+
+//BallTrack();
 
 module InsideRace(BallCircle_d=100,
 	Race_ID=50,
@@ -50,11 +79,10 @@ module InsideRace(BallCircle_d=100,
 		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
 		
 		// ball track
-		translate([0,0,Race_w])
-		rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) circle(d = Ball_d);
+		translate([0,0,Race_w]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
 		
 		// Bolts
+		if (nBolts!=0)
 		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Race_ID/2+RaceBoltInset,0,0])
 			rotate([180,0,0]) children();
 			
