@@ -20,6 +20,7 @@
 // InsideRaceBoltPattern(Race_ID=50, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
 // OutideRaceBoltPattern(Race_OD=150, nBolts=8, RaceBoltInset=BL_RaceBoltInset) Bolt4HeadHole();
 // BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12);
+// TwoPartBallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=10);
 // **********************************************
 // Routines
 // InsideRaceBoltPattern(Race_ID=50,nBolts=8,RaceBoltInset=BL_RaceBoltInset) children();
@@ -34,6 +35,32 @@ IDXtra=0.2;
 Overlap=0.05;
 
 BL_RaceBoltInset=3.5;
+
+module TwoPartBallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=10){
+	// nBalls must be even
+	Race_w=Ball_d+3.5;
+	
+	difference(){
+		translate([0,0,-Race_w/2])cylinder(d=BallCircle_d+Ball_d*0.4,h=Race_w/2);
+		
+		cylinder(d=BallCircle_d-Ball_d*0.4,h=Race_w+Overlap*2,center=true);
+		for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d+IDXtra*2);
+			
+		for (j=[0:2:nBalls-1]) rotate([0,0,360/nBalls*j+180/nBalls]) translate([BallCircle_d/2+Ball_d*0.2,0,-1.2]) cylinder(d=3+IDXtra*2,h=2);
+	} // diff
+	
+	difference(){
+		for (j=[0:2:nBalls-1]) rotate([0,0,360/nBalls*j-180/nBalls]) translate([BallCircle_d/2+Ball_d*0.2,0,-Overlap]) cylinder(d=3,h=1);
+			
+		difference(){
+			cylinder(d=BallCircle_d+Ball_d*0.4+4,h=Race_w, center=true);
+			
+			cylinder(d=BallCircle_d+Ball_d*0.4,h=Race_w, center=true);
+		} // diff
+	} // diff
+} // TwoPartBallSpacer
+
+//TwoPartBallSpacer();
 
 module BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12){
 	Race_w=Ball_d+3.5;
@@ -59,10 +86,53 @@ module InsideRaceBoltPattern(Race_ID=50,
 
 module BallTrack(BallCircle_d=100, Ball_d=9.525, myFn=360){
 	rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) circle(d = Ball_d);
+			translate([BallCircle_d/2, 0, 0]) scale([1.03,1.00])circle(d = Ball_d);
 } // BallTrack
 
 //BallTrack();
+
+module OnePieceInnerRace(BallCircle_d=100,
+	Race_ID=50,
+	Ball_d=9.525,
+	Race_w=10,
+	myFn=360){
+		
+	difference(){
+		cylinder(d=BallCircle_d-7,h=Race_w,$fn=myFn);
+		
+		// center hole
+		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
+		
+		// ball track
+		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
+			
+	} // diff
+} // OnePieceInnerRace
+	
+//OnePieceInnerRace(BallCircle_d=60,Race_ID=44,Ball_d=9.525,Race_w=10,myFn=90);
+//OnePieceInnerRace(BallCircle_d=60,Race_ID=44,Ball_d=9.525,Race_w=10,myFn=360);
+
+module OnePieceOuterRace(BallCircle_d=60,
+	Race_OD=75,
+	Ball_d=9.525,
+	Race_w=10,
+	myFn=360){
+	
+	difference(){
+		cylinder(d=Race_OD,h=Race_w);
+		
+		// center hole
+		translate([0,0,-Overlap]) cylinder(d=BallCircle_d+7,h=Race_w+Overlap*2,$fn=myFn);
+		
+		
+		// ball track
+		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
+		
+	} // diff
+} // OnePieceOuterRace
+
+//OnePieceOuterRace(BallCircle_d=60,Race_OD=78,myFn=90);
+//OnePieceOuterRace(BallCircle_d=60,Race_OD=78,myFn=360);
 
 module InsideRace(BallCircle_d=100,
 	Race_ID=50,
