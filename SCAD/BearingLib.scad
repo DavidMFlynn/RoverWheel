@@ -34,6 +34,7 @@ $fn=90;
 IDXtra=0.2;
 Overlap=0.05;
 
+kEL=1.04;
 BL_RaceBoltInset=3.5;
 
 module TwoPartBallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=10){
@@ -85,8 +86,10 @@ module InsideRaceBoltPattern(Race_ID=50,
 } // InsideRaceBoltPattern
 
 module BallTrack(BallCircle_d=100, Ball_d=9.525, myFn=360){
+	
+	
 	rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) scale([1.03,1.00])circle(d = Ball_d);
+			translate([BallCircle_d/2, 0, 0]) scale([kEL,1.00])circle(d = Ball_d);
 } // BallTrack
 
 //BallTrack();
@@ -95,6 +98,7 @@ module OnePieceInnerRace(BallCircle_d=100,
 	Race_ID=50,
 	Ball_d=9.525,
 	Race_w=10,
+	PreLoadAdj=0.00, // positive increases pre-load
 	myFn=360){
 		
 	difference(){
@@ -104,7 +108,7 @@ module OnePieceInnerRace(BallCircle_d=100,
 		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
 		
 		// ball track
-		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
+		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d+(1-kEL)*Ball_d+PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 			
 	} // diff
 } // OnePieceInnerRace
@@ -116,6 +120,7 @@ module OnePieceOuterRace(BallCircle_d=60,
 	Race_OD=75,
 	Ball_d=9.525,
 	Race_w=10,
+	PreLoadAdj=0.00, // positive increases pre-load
 	myFn=360){
 	
 	difference(){
@@ -126,7 +131,7 @@ module OnePieceOuterRace(BallCircle_d=60,
 		
 		
 		// ball track
-		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
+		translate([0,0,Race_w/2]) BallTrack(BallCircle_d=BallCircle_d-(1-kEL)*Ball_d-PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 		
 	} // diff
 } // OnePieceOuterRace

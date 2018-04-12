@@ -43,12 +43,21 @@ PlanetB_t=24;
 nPlanets=3;
 /**/
 //300:290.3225 = 45:47 = 188:1, 15t 15t 16t, nPlanets=5
-//*
+/*
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
 Pinion_t=15;
 PlanetA_t=15;
 PlanetB_t=16;
+nPlanets=5;
+/**/
+//260:251.0344 = 42:44 = 176:1, 14t 14t 15t, nPlanets=5
+//*
+PlanetaryPitchA=260;
+PlanetaryPitchB=251.0344;
+Pinion_t=14;
+PlanetA_t=14;
+PlanetB_t=15;
 nPlanets=5;
 /**/
 //300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
