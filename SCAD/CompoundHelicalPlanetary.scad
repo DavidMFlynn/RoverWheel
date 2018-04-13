@@ -3,11 +3,12 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.6 2/26/2018
+// Rev: 1.1.7 4/12/2018
 // Units: millimeters
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.6");
+echo("Compound Helical Planetary Library 1.1.7");
+// 1.1.7 4/12/2018 Spling dia. fix.
 // 1.1.6 2/26/2018 Recalculated ratios
 // 1.1.5 2/10/2018 Added 188:1 variant and Spline_a to planet B.
 // 1.1.4 2/2/2018 Went metric on bolts lib.
@@ -651,7 +652,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 				rim_width=0,
 				hub_thickness=Thickness,
 				hub_diameter=0,
-				bore_diameter=10+IDXtra*2,
+				bore_diameter=Spline_Hole_d+IDXtra,
 				circles=0,
 				backlash=BackLash,
 				twist=-twist/nTeethA*2,
@@ -659,7 +660,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 				flat=false);
 		
 		// Index mark
-		translate([root_radiusA-2,0,-Overlap]) cylinder(r=1,h=1);		
+		rotate([0,0,180/nSplines])translate([root_radiusA-2,0,-Overlap]) cylinder(r=1,h=1);		
 	} // diff
 	
 		

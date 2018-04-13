@@ -86,7 +86,7 @@ Shaft_d=7;
 Race_w=5;
 Ball_d=9.525; // 0.375"
 RaceBoltInset=3.5;
-BallCircle_d=100;
+BallCircle_d=84;
 Race_OD=BallCircle_d+26;
 echo(Race_OD=Race_OD);
 Race_ID=88;
@@ -142,8 +142,8 @@ module RingGearA(myFn=90){
 	difference(){
 		cylinder(d=BallCircle_d-Ball_d*0.8,h=GearWidth+5.5);
 		
-		translate([0,0,-Overlap]) cylinder(d=80,h=GearWidth+Overlap*2);
-		translate([0,0,GearWidth]) cylinder(d=88,h=5.5+Overlap*2);
+		translate([0,0,-Overlap]) cylinder(d=68,h=GearWidth+Overlap*2);
+		translate([0,0,GearWidth]) cylinder(d=68,h=5.5+Overlap*2);
 		translate([0,0,GearWidth+0.5])BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=360);
 	}
 	
@@ -173,7 +173,7 @@ module RingGearB(myFn=90){
 		translate([0,0,-5.5])cylinder(d=BallCircle_d+Ball_d*0.8+8,h=GearWidth+5.5);
 		
 		translate([0,0,-5.5-Overlap]) cylinder(d=BallCircle_d+Ball_d*0.8,h=10.5);
-		translate([0,0,-5.5-Overlap]) cylinder(d=86,h=GearWidth+5.5+Overlap*2);
+		translate([0,0,-5.5-Overlap]) cylinder(d=70,h=GearWidth+5.5+Overlap*2);
 		translate([0,0,-0.5])BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=360);
 	} // diff
 	
@@ -209,13 +209,13 @@ module RingGearB(myFn=90){
 module PlanetA(){
 	
 	difference(){
-		CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5);
+		CompoundPlanetGearHelixA(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=14, nSplines=3);
 		
 		// clearance for misaligned ring gears
 		translate([0,0,GearWidth-PlanetClearance])
 		difference(){
 			cylinder(d=30,h=PlanetClearance+Overlap);
-			translate([0,0,-Overlap])cylinder(d=21,h=PlanetClearance+Overlap*4);
+			translate([0,0,-Overlap])cylinder(d=16.8,h=PlanetClearance+Overlap*4);
 		}
 	} // diff
 } // PlanetA
@@ -229,14 +229,14 @@ module PlanetB(nB=0){
 	difference(){
 		
 		//rotate([0,0,RotB])
-		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=15, nSplines=5, Spline_a=-RotB);
+		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=14, nSplines=3, Spline_a=-RotB);
 		
 		
 		// clearance for misaligned ring gears
 		translate([0,0,-Overlap])
 		difference(){
 			cylinder(d=30,h=PlanetClearance+Overlap);
-			translate([0,0,-Overlap])cylinder(d=18.8,h=PlanetClearance+Overlap*4);
+			translate([0,0,-Overlap])cylinder(d=17.7,h=PlanetClearance+Overlap*4);
 		}
 		
 		for (j=[1:nB+1]) rotate([0,0,360/PlanetB_t*j]) translate([PlanetB_t*PlanetaryPitchB/360-3.5,0,GearWidth-0.3]) cylinder(d=0.5,h=2);
@@ -284,15 +284,16 @@ module ShowPlanets(CutAway=true,HideGears=true){
 PlanetCarrierA_t=4;
 
 module PlanetCarrierA(PC_t=PlanetCarrierA_t){
-	PC_r=25;
+	Planet_BC=SunGear_t*PlanetaryPitchA/180 + PlanetA_t*PlanetaryPitchA/180;
+	
 	PC_w=10; // changed from 8 to 10 1/9/18
 	
 	difference(){
-		cylinder(r=PC_r+PC_w/2,h=PC_t);
+		cylinder(d=Planet_BC+PC_w,h=PC_t);
 		
-		translate([0,0,-Overlap]) cylinder(r=PC_r-PC_w/2,h=PC_t+Overlap*2);
+		translate([0,0,-Overlap]) cylinder(d=Planet_BC-PC_w,h=PC_t+Overlap*2);
 			
-		for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([PC_r,0,PC_t]) Bolt4ButtonHeadHole();
+		for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([Planet_BC/2,0,PC_t]) Bolt4ButtonHeadHole();
 	} // diff
 	
 } // PlanetCarrierA
@@ -301,22 +302,22 @@ module PlanetCarrierA(PC_t=PlanetCarrierA_t){
 PlanetShaft_l=19.05; // 3/4"
 
 module PlanetCarrierB(EndRace=true, myFn=90){
-	PC_r=25;
+	Planet_BC=SunGear_t*PlanetaryPitchA/180 + PlanetA_t*PlanetaryPitchA/180;
 	PC_t=Race_w;
 	PC_w=10; // changed from 8 to 10 1/9/18
 	
-	PC_BallCircle_d=PC_r*2+PC_w+Ball_d;
-	PC_Race_ID=PC_r*2+PC_w-Overlap;
+	PC_BallCircle_d=Planet_BC+PC_w+Ball_d+2;
+	PC_Race_ID=Planet_BC+PC_w-Overlap;
 	
 	difference(){
-		cylinder(r=PC_r+PC_w/2,h=PC_t);
+		cylinder(d=Planet_BC+PC_w,h=PC_t);
 		
-		translate([0,0,-Overlap]) cylinder(r=PC_r-PC_w/2,h=PC_t+Overlap*2);
+		translate([0,0,-Overlap]) cylinder(d=Planet_BC-PC_w,h=PC_t+Overlap*2);
 			
 		if (EndRace==false){
-				for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([PC_r,0,PC_t]) Bolt4ClearHole();
+				for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([Planet_BC/2,0,PC_t]) Bolt4ClearHole();
 			} else {
-				for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([PC_r,0,0]) rotate([180,0,0]) Bolt4ButtonHeadHole();
+				for (j=[0:nPlanets-1]) rotate([0,0,360/nPlanets*j]) translate([Planet_BC/2,0,0]) rotate([180,0,0]) Bolt4ButtonHeadHole();
 			}		
 	} // diff
 	
