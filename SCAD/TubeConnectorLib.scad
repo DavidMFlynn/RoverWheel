@@ -2,10 +2,11 @@
 // Tube Connector Library
 // by David M. Flynn
 // Created: 3/4/2018
-// Revision: 1.1.0 3/4/2018
+// Revision: 1.1.1 4/14/2018
 // Units: mm
 // ***************************************************
 // History:
+// 1.1.1 4/14/2018 Added TubeFlange.
 // 1.1.0 3/4/2018  Added TubeSocket.
 // 1.0.3 1/27/2018 Added cone to TubeEnd to make wire threading easier.
 // 1.0.2 1/26/2018 Added GlueAllowance. Added Tube2Pivot, Tube2PivotCover.
@@ -23,6 +24,7 @@
 // Tube2PivotCover(Length=60);
 // TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true);
 // TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=false);
+// TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true);
 
 // ***************************************************
 // Routines
@@ -48,6 +50,24 @@ Bearing_ID=12.7;
 Bearing_OD=28.575;
 Bearing_W=7.938;
 
+module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
+	BoltOffset=4;
+	
+	difference(){
+		cylinder(d=TubeOD+BoltOffset*4, h=FlangeLen);
+			
+		translate([0,0,-Overlap]) cylinder(d=TubeOD-1, h=FlangeLen+Overlap*2);
+		
+		if (Threaded==true){
+				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,10]) Bolt4Hole(depth=13);
+			} else {
+				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,7]) Bolt4HeadHole(depth=13);
+			}
+	} // diff
+} // TubeFlange
+
+//TubeFlange();
+
 module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
 	BoltOffset=4;
 	
@@ -55,7 +75,7 @@ module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
 		hull(){
 			cylinder(d=TubeOD+BoltOffset*4, h=6);
 			cylinder(d=TubeOD+6, h=SocketLen);
-		} // union
+		} // hull
 		
 		translate([0,0,SocketLen/2]) rotate_extrude() translate([TubeOD/2-0.35,0,0]) #circle(d=2);
 		translate([0,0,-Overlap]) cylinder(d=TubeOD-1, h=SocketLen);

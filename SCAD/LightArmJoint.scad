@@ -20,10 +20,11 @@
 // RW_OutsideRace(myFn=360);
 // RW_InsideRace(myFn=360);
 // RingGearA(myFn=360);
-// RingGearB(myFn=360);
+// rotate([180,0,0]) RingGearB(myFn=360);
 // PlanetCarrierA();
 //PlanetCarrierB(EndRace=false, myFn=360);
 //PlanetCarrierB(EndRace=true, myFn=360);
+//PCBOuterRace(myFn=360);
 
 // **************************************************
 // for viewing
@@ -69,6 +70,7 @@ PlanetaryPitchB=251.0344;
 SunGear_t=14;
 PlanetA_t=14;
 PlanetB_t=15;
+PlanetB_a=4.9;
 nPlanets=5;
 
 BackLash=0.5; // 0.3 works but is tight
@@ -158,7 +160,7 @@ module RingGearA(myFn=90){
 
 RingGearB_OD=BallCircle_d+Ball_d*0.8+8;
 
-module RingGearB(myFn=90){
+module RingGearB(ShowGearOnly=false,myFn=90){
 	nBolts=12;
 	
 	SkirtThickness=2;
@@ -166,24 +168,79 @@ module RingGearB(myFn=90){
 	
 	CompoundRingGearHelix(Pitch=PlanetaryPitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false);
 	
+	BoltBoss_r=RingGearB_OD/2-0.5;
 	
+	if (ShowGearOnly==false)
 	difference(){
-		translate([0,0,-5.5])cylinder(d=RingGearB_OD,h=GearWidth+5.5);
+		union(){
+			translate([0,0,-5.5])cylinder(d=RingGearB_OD,h=GearWidth+5.5);
+			translate([0,-RingGearB_OD/2-5,GearWidth+6.2]) rotate([-90,0,0]) TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true);
+			
+			// bolt flanges
+			for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([BoltBoss_r,0,0]){
+				sphere(d=7);
+				cylinder(d=7,h=GearWidth);
+			}
+		} // union
 		
 		// balls and race
 		translate([0,0,-5.5-Overlap]) cylinder(d=BallCircle_d+Ball_d*0.8,h=12.0);
 		// ring gear B
 		translate([0,0,-5.5-Overlap]) cylinder(d=70,h=GearWidth+5.5+Overlap*2);
 		translate([0,0,-0.5])BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=360);
+		
+		// remove extra tube flange
+		translate([0,-RingGearB_OD/2-2,GearWidth]) cylinder(d=50,h=50);
+		
+		// bolts
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([BoltBoss_r,0,GearWidth]) Bolt4Hole(depth=GearWidth);
 	} // diff
 		
-	
 } // RingGearB
 
-//translate([0,0,GearWidth+1])RingGearB(myFn=90);
+//translate([0,0,GearWidth+1])
+//RingGearB(myFn=90);
 //translate([0,0,2])
 //
 //translate([0,0,GearWidth+0.5]) ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12);
+
+module PCBOuterRace(myFn=90){
+	nBolts=12;
+	PCBOuterRace_OD=PC_BallCircle_d+Ball_d*0.8+8;
+	BoltBoss_r=RingGearB_OD/2-0.5;
+	
+	//OutsideRace(BallCircle_d=PC_BallCircle_d, Race_OD=PC_Race_OD, Ball_d=Ball_d, Race_w=PC_t, nBolts=12, myFn=myFn)
+		//	Bolt4ClearHole();
+	
+	OnePieceOuterRace(BallCircle_d=PC_BallCircle_d, Race_OD=PCBOuterRace_OD, Ball_d=Ball_d, Race_w=PC_t*2, PreLoadAdj=0.00, myFn=myFn);
+	
+	difference(){
+		union(){
+			cylinder(d=RingGearB_OD,h=PC_t*2);
+			translate([0,-RingGearB_OD/2-5,6.2]) rotate([-90,0,0]) TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true);
+			
+			// bolt flanges
+				for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([BoltBoss_r,0,0]){
+					//sphere(d=7);
+					cylinder(d=7,h=PC_t*2);
+				}
+		} // union
+		
+		//bearing race
+		translate([0,0,-Overlap]) cylinder(d=PCBOuterRace_OD-Overlap,h=PC_t*2+Overlap*2);
+		//Dish out
+		translate([0,0,2]) cylinder(d=RingGearB_OD-6,h=PC_t*2+Overlap*2);
+		// bolts
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([BoltBoss_r,0,PC_t*2]) Bolt4ClearHole(depth=PC_t*2);
+			
+		translate([0,-RingGearB_OD/2-2,-(GearWidth+0.5+PC_t)]) cylinder(d=50,h=GearWidth+0.5+PC_t);
+		translate([0,-RingGearB_OD/2-2,PC_t*2]) cylinder(d=50,h=50);
+	} // diff
+	
+	
+} // PCBOuterRace
+
+//PCBOuterRace(myFn=90);
 
 module PlanetA(){
 	
@@ -208,7 +265,7 @@ module PlanetB(nB=0){
 	difference(){
 		
 		//rotate([0,0,RotB])
-		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false, Spline_d=14, nSplines=3, Spline_a=-RotB);
+		CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*nB, HB=false, Spline_d=14, nSplines=3, Spline_a=-RotB);
 		
 		
 		// clearance for misaligned ring gears
@@ -224,7 +281,7 @@ module PlanetB(nB=0){
 
 //rotate([180,0,0])PlanetB(4);
 
-module ShowPlanets(CutAway=true,HideGears=true){
+module ShowPlanets(CutAway=true,HideGears=true,HidePC=true){
 	
 	PitchA=PlanetaryPitchA;
 		PitchB=PlanetaryPitchB;
@@ -236,10 +293,12 @@ module ShowPlanets(CutAway=true,HideGears=true){
 		PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
 		OutputRingRA=-360*$t;
 	
-	translate([0,0,0])rotate([180,0,0]) color("Brown")PlanetCarrierA();
-	for (j=[0:nPlanets-1])rotate([0,0,PlanetPosRA+360/nPlanets*j])
-		translate([Planet_BC/2,0,0])color("Red")cylinder(d=6.35,h=PlanetShaft_l);
-	translate([0,0,PlanetShaft_l])color("Brown")PlanetCarrierB();
+	if (HidePC==false){
+		translate([0,0,0]) rotate([180,0,0]) color("Brown") PlanetCarrierA();
+		for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j])
+			translate([Planet_BC/2,0,0]) color("Red") cylinder(d=6.35,h=PlanetShaft_l);
+		translate([0,0,PlanetShaft_l]) color("Brown") PlanetCarrierB();
+	}
 	
 	if (HideGears==false)
 	difference(){
@@ -308,30 +367,7 @@ module PlanetCarrierB(EndRace=true, myFn=90){
 //PlanetCarrierB(EndRace=false, myFn=90);
 //translate([0,0,Race_w*2+Overlap])rotate([180,0,0]) PlanetCarrierB(EndRace=true, myFn=90);
 
-module PCBOuterRace(EndRace=true, myFn=90){
-	
-	PCBOuterRace_OD=PC_BallCircle_d+Ball_d*0.8+8;
-	//OutsideRace(BallCircle_d=PC_BallCircle_d, Race_OD=PC_Race_OD, Ball_d=Ball_d, Race_w=PC_t, nBolts=12, myFn=myFn)
-		//	Bolt4ClearHole();
-	
-	OnePieceOuterRace(BallCircle_d=PC_BallCircle_d, Race_OD=PCBOuterRace_OD, Ball_d=Ball_d, Race_w=PC_t*2, PreLoadAdj=0.00, myFn=myFn);
-	
-	difference(){
-		cylinder(d=RingGearB_OD,h=PC_t*2);
-		
-		//bearing race
-		translate([0,0,-Overlap]) cylinder(d=PCBOuterRace_OD-Overlap,h=PC_t*2+Overlap*2);
-		//Dish out
-		translate([0,0,2]) cylinder(d=RingGearB_OD-6,h=PC_t*2+Overlap*2);
-	} // diff
-	
-	difference(){
-		translate([0,-RingGearB_OD/2-2,6]) rotate([-90,0,0]) TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true);
-		translate([0,-RingGearB_OD/2-2,-(GearWidth+0.5+PC_t)]) cylinder(d=50,h=GearWidth+0.5+PC_t);
-	} // diff
-} // PCBOuterRace
 
-//PCBOuterRace(EndRace=true, myFn=90);
 
 module RW_InsideRace(myFn=360,nBolts=8){
 		InsideRace(BallCircle_d=BallCircle_d, Race_ID=Race_ID, Ball_d=Ball_d, Race_w=Race_w, nBolts=nBolts, myFn=myFn)
@@ -350,26 +386,26 @@ module RW_OutsideRace(myFn=360){
 
 module ShowArmJoint(){
 	//*
-	RingGearA();
+	//RingGearA();
 		
 	/**/
-	translate([0,0,GearWidth+1])RingGearB();
+	translate([0,0,GearWidth+1])RingGearB(ShowGearOnly=true);
 	//translate([0,0,GearWidth+1.4-Race_w]) RW_OutsideRace(myFn=90);
 	
-	//ShowPlanets(CutAway=false,HideGears=true);
+	ShowPlanets(CutAway=false,HideGears=false,HidePC=true);
 	
-	translate([0,0,GearWidth+0.5]) BallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=16);
+	//translate([0,0,GearWidth+0.5]) BallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=16);
 	
-	translate([0,0,GearWidth*2+1+Overlap])PlanetCarrierB(EndRace=false, myFn=90);
-	translate([0,0,GearWidth*2+1+Race_w*2+Overlap*2])rotate([180,0,0]) PlanetCarrierB(EndRace=true, myFn=90);
+	//translate([0,0,GearWidth*2+1+Overlap])PlanetCarrierB(EndRace=false, myFn=90);
+	//translate([0,0,GearWidth*2+1+Race_w*2+Overlap*2])rotate([180,0,0]) PlanetCarrierB(EndRace=true, myFn=90);
 
-	translate([0,0,GearWidth*2+1.0+Overlap]) PCBOuterRace(EndRace=true, myFn=90);
+	//translate([0,0,GearWidth*2+1.0+Overlap]) PCBOuterRace(EndRace=true, myFn=90);
 	//translate([0,0,GearWidth*2+1.0+Race_w*2+Overlap])rotate([180,0,0]) PCBOuterRace(EndRace=true, myFn=90);
 	
 	//translate([0,0,GearWidth])SunGear();
 } // ShowArmJoint
 
-//*
+/*
 difference(){
 	ShowArmJoint();
 	//translate([0,-100,-100]) cube([100,100,200]);

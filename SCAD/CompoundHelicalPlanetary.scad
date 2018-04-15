@@ -59,6 +59,7 @@ PlanetaryPitchB=251.0344;
 Pinion_t=14;
 PlanetA_t=14;
 PlanetB_t=15;
+PlanetB_a=4.9;
 nPlanets=5;
 /**/
 //300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
@@ -92,7 +93,8 @@ nPlanets=3;
 
 
 Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
-
+kSpline_d=12;
+knSplines=3;
 BackLash=0.3;
 //Pinion_t=12;
 Pinion_a=0;
@@ -108,7 +110,7 @@ InputRing_t=PlanetA_t*2 + Pinion_t;
 OutputRing_tc=(PlanetA_t*PlanetaryPitchA/180 + PlanetB_t*PlanetaryPitchB/180 + Pinion_t*PlanetaryPitchA/180)*180/PlanetaryPitchB;
  
 Shaft_d=5;
-PlanetB_a=0;
+//PlanetB_a=0;
 
 OutputRing_t=floor(OutputRing_tc);
 echo(InputRing_t=InputRing_t);
@@ -210,8 +212,8 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	PitchA=PlanetaryPitchA;
 	PitchB=PlanetaryPitchB;
 	Planet_BC=Pinion_t*PitchA/180 + PlanetA_t*PitchA/180;
-	Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/Pinion_t);
-	echo(Ratio=Ratio);
+	//Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/Pinion_t);
+	//echo(Ratio=Ratio);
 	PinionRA=$t*Ratio*360;// 76.5r
 	PlanetPosRA=PinionRA/((InputRing_t/Pinion_t)+(InputRing_t/Pinion_t));//  29.7r /(InputRing_t/Pinion_t); // 2.57 4.5
 	PlanetRA=-PlanetPosRA-PlanetPosRA*((InputRing_t/PlanetA_t));
@@ -223,7 +225,10 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	//OutputRing_t=53; // PlanetA_t*2 + Pinion_t - (PlanetA_t - PlanetB_t*2)
 	//Pinion_t=12;
 	//PlanetB_a=12;
+	//PlanetB_a=360/PlanetB_t/nPlanets; //*((360/nPlanets)/(360/OutputRing_t));
 	
+	//PlanetB_a=4.9; // OutputRing_t = 8.1818°/tooth, 72°/planet, PlanetB_t = 24°/tooth
+	echo(PlanetB_a=PlanetB_a);
 	
 	rotate([0,0,PinionRA+Pinion_a])
 		CompoundDrivePinionHelix(Pitch=PitchA, nTeeth=Pinion_t, Thickness=GearWidth, bEndScrew=0, HB=false);
@@ -584,7 +589,7 @@ module CompoundIdlePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB, nT
 //translate([0,0,GearWidth*2+Overlap])CompoundIdlePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB,nTeeth=Pinion_t,Thickness=GearWidth,HB=false);
 
 module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
-						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=20,nSplines=6){
+						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=kSpline_d,nSplines=knSplines){
 	
 	
 	// Pitch diameter: Diameter of pitch circle.
@@ -673,7 +678,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 
 
 module CompoundPlanetGearHelixB(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
-						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=20,nSplines=6,Spline_a=0){
+						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=kSpline_d,nSplines=knSplines,Spline_a=0){
 	
 	
 	// Pitch diameter: Diameter of pitch circle.
@@ -760,7 +765,7 @@ module CompoundPlanetGearHelixB(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 //CompoundPlanetGearHelixB(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a, HB=false, Spline_d=15, nSplines=5);
 
 module CompoundPlanetGearHelixC(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
-						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false){
+						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=kSpline_d,nSplines=knSplines,Spline_a=0){
 	
 	
 	// Pitch diameter: Diameter of pitch circle.
@@ -833,7 +838,7 @@ module CompoundPlanetGearHelixC(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 				flat=false);
 		
 			translate([0,0,-Overlap])
-		SplineHole(d=20,l=Thickness+Overlap*2,nSplines=6,Spline_w=30,Gap=0.22,Key=true);
+		SplineHole(d=Spline_d,l=Thickness+Overlap*2,nSplines=nSplines,Spline_w=30,Gap=0.22,Key=true);
 	} // diff
 		
 	
