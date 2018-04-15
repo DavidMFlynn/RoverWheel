@@ -3,11 +3,17 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.7 4/12/2018
+// Rev: 1.1.8 4/15/2018
 // Units: millimeters
 // *************************************************
+// Notes:
+//  Pinion_t/nPlanets MUST be an integer.
+//  InputRing_t/nPlanets MUST be an integer.
+//
+// *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.7");
+echo("Compound Helical Planetary Library 1.1.8");
+// 1.1.8 4/15/2018 Math notes.
 // 1.1.7 4/12/2018 Spling dia. fix.
 // 1.1.6 2/26/2018 Recalculated ratios
 // 1.1.5 2/10/2018 Added 188:1 variant and Spline_a to planet B.
@@ -56,11 +62,12 @@ nPlanets=5;
 //*
 PlanetaryPitchA=260;
 PlanetaryPitchB=251.0344;
+kSpline_d=14;
 Pinion_t=14;
 PlanetA_t=14;
 PlanetB_t=15;
-PlanetB_a=4.9;
-nPlanets=5;
+PlanetB_a=0;
+nPlanets=2;
 /**/
 //300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
 /*
@@ -93,7 +100,7 @@ nPlanets=3;
 
 
 Spline_Gap=0.22; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
-kSpline_d=12;
+
 knSplines=3;
 BackLash=0.3;
 //Pinion_t=12;
@@ -208,6 +215,8 @@ Overlap=0.05;
 IDXtra=0.2;
 $t=0.00;
 
+
+
 module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	PitchA=PlanetaryPitchA;
 	PitchB=PlanetaryPitchB;
@@ -224,37 +233,44 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	//InputRing_t=54; // PlanetA_t*2 + Pinion_t
 	//OutputRing_t=53; // PlanetA_t*2 + Pinion_t - (PlanetA_t - PlanetB_t*2)
 	//Pinion_t=12;
-	//PlanetB_a=12;
+	//PlanetB_a=0;
 	//PlanetB_a=360/PlanetB_t/nPlanets; //*((360/nPlanets)/(360/OutputRing_t));
 	
 	//PlanetB_a=4.9; // OutputRing_t = 8.1818°/tooth, 72°/planet, PlanetB_t = 24°/tooth
 	echo(PlanetB_a=PlanetB_a);
+	PlanetA_a=0;
+	//echo(PlanetA_a=PlanetA_a);
+	Pinion_a= ((PlanetA_t/2)!=floor(PlanetA_t/2)) ?  0 : (180/Pinion_t);
+	//Pinion_a=0;
+	echo(Pinion_a=Pinion_a);
 	
-	rotate([0,0,PinionRA+Pinion_a])
+	translate([0,0,GearWidth])rotate([0,0,PinionRA+Pinion_a])
 		CompoundDrivePinionHelix(Pitch=PitchA, nTeeth=Pinion_t, Thickness=GearWidth, bEndScrew=0, HB=false);
 	//translate([0,0,GearWidth*2+Overlap])
 	//	CompoundIdlePinionHelix(Pitch=PitchA, PitchB=PitchB, nTeeth=Pinion_t, Thickness=GearWidth);
 	
 	for (j=[0:nPlanets-1])
-	rotate([0,0,PlanetPosRA+360/nPlanets*j])translate([Planet_BC/2,0,0])rotate([0,0,PlanetRA]){
-	//	CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
+	  rotate([0,0,PlanetPosRA+360/nPlanets*j]) translate([Planet_BC/2,0,0]) rotate([0,0,PlanetRA]){
+		
+		rotate([0,0,PlanetA_a*j])CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false);
 		
 		translate([0,0,GearWidth])
 		CompoundPlanetGearHelixB(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
 		
 		//translate([0,0,GearWidth*2])
 		//CompoundPlanetGearHelixC(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
-	}
+	  }
 	
-	// Top
-	//translate([0,0,GearWidth*2]) rotate([0,0,360/InputRing_t/2])
+	// Ring Gear C
+	//translate([0,0,GearWidth*2]) rotate([0,0,180/InputRing_t])
 	//	CompoundRingGearHelix(Pitch=PitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=twist, HB=false);
 	
-	// middle gear
-	translate([0,0,GearWidth]) rotate([0,0,360/InputRing_t/2+OutputRingRA]) 
+	// Ring Gear B
+	translate([0,0,GearWidth]) rotate([0,0,180/OutputRing_t+OutputRingRA]) 
 		CompoundRingGearHelix(Pitch=PitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false);
 
-	//rotate([0,0,360/InputRing_t/2]) CompoundRingGearHelix(Pitch=PitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=-twist, HB=false);
+	// Ring Gear A
+	rotate([0,0,180/InputRing_t]) CompoundRingGearHelix(Pitch=PitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=-twist, HB=false);
 
 } // ShowAllCompoundDrivePartsHelix
 
@@ -589,7 +605,7 @@ module CompoundIdlePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB, nT
 //translate([0,0,GearWidth*2+Overlap])CompoundIdlePinionHelix(Pitch=PlanetaryPitchA, PitchB=PlanetaryPitchB,nTeeth=Pinion_t,Thickness=GearWidth,HB=false);
 
 module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
-						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=0, HB=false,Spline_d=kSpline_d,nSplines=knSplines){
+						PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false,Spline_d=kSpline_d,nSplines=knSplines){
 	
 	
 	// Pitch diameter: Diameter of pitch circle.
@@ -622,7 +638,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 			rim_width=0,
 			hub_thickness=Thickness/2,
 			hub_diameter=0,
-			bore_diameter=10+IDXtra*2,
+			bore_diameter=Spline_Hole_d,
 			circles=0,
 			backlash=BackLash,
 			twist=-twist/nTeethA,
@@ -639,7 +655,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 			rim_width=0,
 			hub_thickness=Thickness/2,
 			hub_diameter=0,
-			bore_diameter=10+IDXtra*2,
+			bore_diameter=Spline_Hole_d,
 			circles=0,
 			backlash=BackLash,
 			twist=-twist/nTeethA,
@@ -657,7 +673,7 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 				rim_width=0,
 				hub_thickness=Thickness,
 				hub_diameter=0,
-				bore_diameter=Spline_Hole_d+IDXtra,
+				bore_diameter=Spline_Hole_d,
 				circles=0,
 				backlash=BackLash,
 				twist=-twist/nTeethA*2,
@@ -665,12 +681,12 @@ module CompoundPlanetGearHelixA(PitchA=PlanetaryPitchA, nTeethA=PlanetA_t,
 				flat=false);
 		
 		// Index mark
-		rotate([0,0,180/nSplines])translate([root_radiusA-2,0,-Overlap]) cylinder(r=1,h=1);		
+		translate([root_radiusA-2,0,-Overlap]) cylinder(r=1,h=1);		
 	} // diff
 	
 		
 			
-	SplineShaft(d=Spline_d,l=Thickness*PlanetStack,nSplines=nSplines,Spline_w=30,Hole=Spline_Hole_d,Key=true);
+	translate([0,0,Thickness-Overlap])SplineShaft(d=Spline_d,l=Thickness*(PlanetStack-1)+Overlap,nSplines=nSplines,Spline_w=30,Hole=Spline_Hole_d,Key=true);
 	
 } // CompoundPlanetGearHelixA
 
