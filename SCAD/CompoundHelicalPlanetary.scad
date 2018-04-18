@@ -3,7 +3,7 @@
 // David M. Flynn
 // Filename: CompoundHelicalPlanetary.scad
 // Created: 1/1/2018
-// Rev: 1.1.8 4/15/2018
+// Rev: 1.1.9 4/17/2018
 // Units: millimeters
 // *************************************************
 // Notes:
@@ -12,7 +12,8 @@
 //
 // *************************************************
 // History:
-echo("Compound Helical Planetary Library 1.1.8");
+echo("Compound Helical Planetary Library 1.1.9");
+// 1.1.9 4/17/2018 Added RimWidth as a parameter
 // 1.1.8 4/15/2018 Math notes.
 // 1.1.7 4/12/2018 Spling dia. fix.
 // 1.1.6 2/26/2018 Recalculated ratios
@@ -59,7 +60,7 @@ PlanetB_t=16;
 nPlanets=5;
 /**/
 //260:251.0344 = 42:44 = 176:1, 14t 14t 15t, nPlanets=5
-//*
+/*
 PlanetaryPitchA=260;
 PlanetaryPitchB=251.0344;
 kSpline_d=14;
@@ -68,6 +69,17 @@ PlanetA_t=14;
 PlanetB_t=15;
 PlanetB_a=0;
 nPlanets=2;
+/**/
+//260:260 = 36:37 = 74:1, 12t 12t 13t, nPlanets=5
+//*
+PlanetaryPitchA=280;
+PlanetaryPitchB=280;
+kSpline_d=14;
+Pinion_t=12;
+PlanetA_t=12;
+PlanetB_t=13;
+PlanetB_a=0;
+nPlanets=3;
 /**/
 //300:290.3225 = 45:45 = -60:1, 15t 15t 14t, nPlanets=5
 /*
@@ -161,11 +173,11 @@ echo(Ratio=Ratio);
 //CompoundPlanetGearHelixC(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a, HB=true);
 //CompoundPlanetGearHelixC(Pitch=PlanetaryPitchA,nTeethA=PlanetA_t, PitchB=PlanetaryPitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=-PlanetB_a, HB=true);
 
-//CompoundRingGearHelix(Pitch=PlanetaryPitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false);
+//CompoundRingGearHelix(Pitch=PlanetaryPitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false, RimWidth=3.5);
 // Input ring (stationary)
-//CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=-twist, HB=false);
+//CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=-twist, HB=false, RimWidth=3.5);
 // Idle ring (free, alignment only, optional)
-//CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=twist, HB=false);
+//CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=twist, HB=false, RimWidth=3.5);
 
 // *************************************************
 include<ring_gear.scad>
@@ -234,7 +246,7 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	//OutputRing_t=53; // PlanetA_t*2 + Pinion_t - (PlanetA_t - PlanetB_t*2)
 	//Pinion_t=12;
 	//PlanetB_a=0;
-	//PlanetB_a=360/PlanetB_t/nPlanets; //*((360/nPlanets)/(360/OutputRing_t));
+	PlanetB_a=2*360/PlanetB_t/nPlanets; //*((360/nPlanets)/(360/OutputRing_t));
 	
 	//PlanetB_a=4.9; // OutputRing_t = 8.1818°/tooth, 72°/planet, PlanetB_t = 24°/tooth
 	echo(PlanetB_a=PlanetB_a);
@@ -255,7 +267,9 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 		rotate([0,0,PlanetA_a*j])CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false);
 		
 		translate([0,0,GearWidth])
-		CompoundPlanetGearHelixB(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
+		CompoundPlanetGearHelixB(PitchA=PitchA, nTeethA=PlanetA_t,
+								PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j,
+								HB=false,Spline_d=kSpline_d,nSplines=knSplines,Spline_a=-PlanetB_a*j);
 		
 		//translate([0,0,GearWidth*2])
 		//CompoundPlanetGearHelixC(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
@@ -321,9 +335,10 @@ module ShowAllCompoundDrivePartsWheel(GearWidth=GearWidth){
 
 //ShowAllCompoundDrivePartsWheel(GearWidth=GearWidth);
 
-module CompoundRingGearHelix(Pitch=200, nTeeth=54, Thickness=GearWidth, twist=twist, HB=false){
+module CompoundRingGearHelix(Pitch=200, nTeeth=54, Thickness=GearWidth, twist=twist, HB=false, RimWidth=3.5){
 	
 	RingTeeth=nTeeth;
+	
 	
 	echo(RingTeeth=RingTeeth);
 	
@@ -335,7 +350,7 @@ module CompoundRingGearHelix(Pitch=200, nTeeth=54, Thickness=GearWidth, twist=tw
 			clearance = 0.4,
 			gear_thickness=Thickness/2,
 			rim_thickness=Thickness/2,
-			rim_width=3.5,
+			rim_width=RimWidth,
 			backlash=BackLash,
 			twist=twist/nTeeth,
 			involute_facets=0, // 1 = triangle, default is 5
@@ -347,7 +362,7 @@ module CompoundRingGearHelix(Pitch=200, nTeeth=54, Thickness=GearWidth, twist=tw
 			clearance = 0.4,
 			gear_thickness=Thickness/2,
 			rim_thickness=Thickness/2,
-			rim_width=3.5,
+			rim_width=RimWidth,
 			backlash=BackLash,
 			twist=twist/nTeeth,
 			involute_facets=0, // 1 = triangle, default is 5
@@ -359,7 +374,7 @@ module CompoundRingGearHelix(Pitch=200, nTeeth=54, Thickness=GearWidth, twist=tw
 			clearance = 0.4,
 			gear_thickness=Thickness,
 			rim_thickness=Thickness,
-			rim_width=3.5,
+			rim_width=RimWidth,
 			backlash=BackLash,
 			twist=twist/nTeeth*2,
 			involute_facets=0, // 1 = triangle, default is 5
