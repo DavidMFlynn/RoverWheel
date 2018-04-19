@@ -14,17 +14,16 @@
 // **************************************************
 // for STL output
 //  SunGear(myFN=360);
+// rotate([180,0,0]) SunGearRace(myFn=360);
 //  PlanetA();
 //  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j);
-// BallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=16);
-// RW_OutsideRace(myFn=360);
-// RW_InsideRace(myFn=360);
 // RingGearA(myFn=360);
 // rotate([180,0,0]) RingGearB(myFn=360);
 // PlanetCarrierA();
 //PlanetCarrierB(EndRace=false, myFn=360);
 //PlanetCarrierB(EndRace=true, myFn=360);
 //PCBOuterRace(myFn=360);
+//TopCover();
 
 // **************************************************
 // for viewing
@@ -526,7 +525,7 @@ module ShowArmJoint(){
 	translate([0,0,-Overlap]) rotate([0,0,180/OutputRing_t])SunGearRace();
 } // ShowArmJoint
 
-//*
+/*
 difference(){
 	ShowArmJoint();
 	translate([0,-100,-100]) cube([100,100,200]);
