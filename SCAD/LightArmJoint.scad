@@ -28,6 +28,7 @@
 // **************************************************
 // for viewing
 
+include<involute_gears.scad>
 include<TubeConnectorLib.scad>
 include<CompoundHelicalPlanetary.scad>
 include<CommonStuffSAEmm.scad>
@@ -89,6 +90,14 @@ BallCircle_d=72;
 //echo(Race_OD=Race_OD);
 //Race_ID=88;
 
+TwoPartBoltedBallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=15)
+	 {
+		translate([0,0,-1.8]) cylinder(d=4.15+IDXtra,h=1.8+Overlap);
+		translate([0,0,-Ball_d]) cylinder(d=2.5+IDXtra,h=Ball_d+Overlap); // Bolt2PClearHole(depth=Ball_d);
+	}
+//TwoPartBoltedBallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=15)
+//	translate([0,0,-Ball_d]) cylinder(d=1.7+IDXtra,h=Ball_d+Overlap); // // Bolt2Hole(depth=Ball_d);
+
 
 PlanetClearance=1; // cut-away 1mm of teeth
 
@@ -112,6 +121,7 @@ SunGearHub_l=23;
 module SunGear(ShowGearOnly=false,myFN=90){
 	
 	Hub_ID=7;
+	HubGearThickness=6;
 	
 	CompoundDrivePinionHelix(Pitch=PlanetaryPitchA, nTeeth=SunGear_t, Thickness=GearWidth, bEndScrew=0, HB=false,Hub_t=0,Hub_d=0);
 	
@@ -128,7 +138,24 @@ module SunGear(ShowGearOnly=false,myFN=90){
 	} // diff
 	
 	if (ShowGearOnly==false)
-	translate([0,0,-GearWidth-SunGearHub_l]) BeltPulley(Belt_w = 4,Teeth=36,CenterHole_d=Hub_ID,Dish=false);
+		translate([0,0,-GearWidth-SunGearHub_l]) 
+			//BeltPulley(Belt_w = 4,Teeth=36,CenterHole_d=Hub_ID,Dish=false);
+			gear (
+				number_of_teeth=18,
+				circular_pitch=PlanetaryPitchA, diametral_pitch=false,
+				pressure_angle=Pressure_a,
+				clearance = 0.2,
+				gear_thickness=HubGearThickness,
+				rim_thickness=HubGearThickness,
+				rim_width=5,
+				hub_thickness=HubGearThickness,
+				hub_diameter=Hub_ID+3,
+				bore_diameter=Hub_ID,
+				circles=0,
+				backlash=BackLash,
+				twist=0,
+				involute_facets=0,
+				flat=false);
 } // SunGear
 
 //translate([0,0,GearWidth-0.5]) SunGear();
@@ -511,7 +538,9 @@ module ShowArmJoint(){
 	ShowPlanets(CutAway=false,HideGears=false,HidePC=false);
 	
 	//color("Tan")rotate([180,0,0])PlanetCarrierA();
-	translate([0,0,GearWidth-Ball_d/2]) BallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=16);
+	//translate([0,0,GearWidth-Ball_d/2]) BallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=16);
+	translate([0,0,GearWidth-Ball_d/2]) 
+		TwoPartBoltedBallSpacer(BallCircle_d=BallCircle_d,Ball_d=Ball_d,nBalls=15) translate([0,0,-Ball_d]) cylinder(d=1.7,h=Ball_d+Overlap);
 	
 	//translate([0,0,GearWidth*2+1+Overlap]) PlanetCarrierB(EndRace=false, myFn=90);
 	translate([0,0,GearWidth*2+1+Race_w*2+Overlap*2])rotate([180,0,0]) PlanetCarrierB(EndRace=true, myFn=90);

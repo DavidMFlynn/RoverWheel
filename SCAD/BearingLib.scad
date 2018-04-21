@@ -39,7 +39,7 @@ Overlap=0.05;
 kEL=1.04;
 BL_RaceBoltInset=3.5;
 
-module TwoPartBallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=10){
+module TwoPartBallSpacer(BallCircle_d=72,Ball_d=7.9375,nBalls=15){ // 9.525
 	// nBalls must be even
 	Race_w=Ball_d+3.5;
 	
@@ -64,6 +64,26 @@ module TwoPartBallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=10){
 } // TwoPartBallSpacer
 
 //TwoPartBallSpacer();
+
+module TwoPartBoltedBallSpacer(BallCircle_d=72,Ball_d=7.9375,nBalls=15){ // 9.525
+	// nBalls must be even
+	Race_w=Ball_d+3.5;
+	Race_depth=Ball_d*0.6;
+	
+	difference(){
+		translate([0,0,-Race_w/2])cylinder(d=BallCircle_d+Race_depth,h=Race_w/2);
+		
+		cylinder(d=BallCircle_d-Race_depth,h=Race_w+Overlap*2,center=true);
+		for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d+IDXtra*2);
+			
+		// Bolt holes
+		for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j+180/nBalls]) translate([BallCircle_d/2,0,-Race_w/2]) rotate([180,0,0]) children();
+	} // diff
+	
+	
+} // TwoPartBoltedBallSpacer
+
+//TwoPartBoltedBallSpacer() translate([0,0,-10])cylinder(d=2.5,h=10+Overlap);
 
 module BallSpacer(BallCircle_d=60,Ball_d=9.525,nBalls=12){
 	Race_w=Ball_d+3.5;
