@@ -14,20 +14,20 @@
 // 4/22/2018 To Do: Add Gear cover to SunGearRace, Tighten up main bearing.
 // **************************************************
 // for STL output
-//  SunGear(myFN=360);
-// rotate([180,0,0]) SunGearRace(myFn=360);
-//  PlanetA();
-//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j);
+//  SunGear(myFN=360); // FC1
+// rotate([180,0,0]) SunGearRace(myFn=360); // FC1
+//  PlanetA(); // FC1
+//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j); // FC1
 // RingGearA(myFn=360);
 // rotate([180,0,0]) RingGearB(myFn=360);
 // PlanetCarrierA();
 //PlanetCarrierB(EndRace=false, myFn=360);
 //PlanetCarrierB(EndRace=true, myFn=360);
-//PCBOuterRace(myFn=360); // FC1
+//PCBOuterRace(myFn=360); // FC2
 // TopCover(); // FC1
-// TubeSocket(TubeOD=Tube_d, SocketLen=16, Threaded=false);
-// rotate([180,0,0]) DriveGear();
-// rotate([180,0,0]) BottomCover();
+// TubeSocket(TubeOD=Tube_d, SocketLen=16, Threaded=false); // good
+// rotate([180,0,0]) DriveGear(); // needs work
+// rotate([180,0,0]) BottomCover(); // FC1
 // **************************************************
 // for viewing
 
@@ -182,22 +182,30 @@ module RingAFlangeTube(){
 } // RingBFlangeBase
 
 module RingGearA(myFn=90){
-
+	kPreLoad=0.1;
 	SunGearBall_cl=-Race_w-Ball_d/2-2;
 	
 	CompoundRingGearHelix(Pitch=PlanetaryPitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=-twist, HB=false,RimWidth=2);
-	
 	
 	translate([0,0,-Ball_d/2-2]) rotate([180,0,0])
 	OutsideRace(BallCircle_d=Hub_BC, Race_OD=Hub_BC+26, Ball_d=Ball_d, Race_w=Race_w, nBolts=6, RaceBoltInset=BL_RaceBoltInset, myFn=myFn) Bolt4Hole();
 	
 	difference(){
 		union(){
+			translate([0,0,SunGearBall_cl]) cylinder(d=RingGearA_OD,h=GearWidth-SunGearBall_cl);
+			// race
+			translate([0,0,SunGearBall_cl+GearWidth]) cylinder(d1=RingGearA_OD,d2=BallCircle_d-Ball_d*0.7,h=2);
+			translate([0,0,SunGearBall_cl+GearWidth+2]) cylinder(d=BallCircle_d-Ball_d*0.7,h=Ball_d,$fn=myFn);
 			
-			translate([0,0,SunGearBall_cl]) cylinder(d=RingGearA_OD,h=GearWidth-SunGearBall_cl,$fn=myFn);
-			//translate([0,0,-5.5]) cylinder(d=RingGearA_OD,h=5.5+Overlap);
 			RingAFlange();
 		}
+		
+		//Ball insert groove
+		translate([BallCircle_d/2+0.3,0,SunGearBall_cl+GearWidth+2+Ball_d/2]) 
+		hull(){
+			sphere(d=Ball_d);
+			translate([0,0,-Ball_d])sphere(d=Ball_d);
+		} // hull
 		
 		translate([0,0,SunGearBall_cl-Overlap]) cylinder(d=Hub_BC+25,h=Race_w);
 		// center hole
@@ -206,12 +214,10 @@ module RingGearA(myFn=90){
 		// the ring gear goes here
 		cylinder(d=61,h=GearWidth+Overlap);
 		
-		translate([0,0,GearWidth-Ball_d/2]) BallTrack(BallCircle_d=BallCircle_d, Ball_d=Ball_d, myFn=myFn);
+		translate([0,0,GearWidth-Ball_d/2]) BallTrack(BallCircle_d=BallCircle_d+kPreLoad, Ball_d=Ball_d, myFn=myFn);
 		
 		// remove extra tube flange 
 		translate([0,-RingGearA_OD/2-5,SunGearBall_cl]) rotate([180,0,0])cylinder(d=50,h=50);
-		
-		
 	}
 	
 } // RingGearA
@@ -305,15 +311,13 @@ module ServoSG90(){
 //ServoSG90();
 
 module BottomCover(){
-	BottomCover_h=10;
+	BottomCover_h=7;
 	BottomCover_t=3;
 	BoltBoss_r=RingGearA_OD/2+0.5;
 	nBolts=8;
 	
 	BottomOfCover_z=-Race_w*2-2-SunGearRace_h-BottomCover_h;
-	
-	//translate([24.2,0,-23.5])
-	
+		
 	difference(){
 		union(){
 			RingAFlange();
@@ -330,8 +334,10 @@ module BottomCover(){
 			} // hull
 			
 			// bolt flanges
-			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,BottomOfCover_z+BottomCover_h])	
-				rotate([180,0,0])cylinder(d=7,h=7);
+			for (j=[0,1,2,3,4,6]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,BottomOfCover_z+BottomCover_h])	
+				rotate([180,0,0])cylinder(d=7,h=BottomCover_h-3);
+			rotate([0,0,360/nBolts*(5+1)]) translate([BoltBoss_r,0,BottomOfCover_z+BottomCover_h])	
+				rotate([180,0,0])cylinder(d=7,h=10);
 			
 			// Gear cover
 			translate([24.2,0,BottomOfCover_z]) cylinder(d=28,h=BottomCover_h);
@@ -346,10 +352,8 @@ module BottomCover(){
 		translate([24.2,0,-35]) rotate([0,0,120]) ServoSG90();
 		
 		// bolt flanges
-			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,BottomOfCover_z+BottomCover_h-7]){
-				//translate([0,0,SunGearRace_h-3.5])sphere(d=7);
-				rotate([180,0,0])cylinder(d=7,h=6);
-			}
+			for (j=[0,1,2,3,4,6]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,BottomOfCover_z+3])
+				rotate([180,0,0])cylinder(d=7,h=4);
 			
 		// carv out inside
 		translate([0,0,BottomOfCover_z+BottomCover_t+4]) cylinder(d=RingGearA_OD-4,h=BottomCover_h-4+Overlap);
@@ -359,16 +363,16 @@ module BottomCover(){
 		//Encoder shaft
 		translate([0,0,BottomOfCover_z-Overlap]) cylinder(d=6.35+IDXtra,h=BottomCover_h+Overlap*2);
 		//Encoder mount
-		translate([0,0,BottomOfCover_z-Overlap]) cylinder(d=23+IDXtra,h=1);
+		translate([0,0,BottomOfCover_z+1]) rotate([180,0,0])cylinder(d=23+IDXtra,h=10);
 		translate([8.5,0,BottomOfCover_z]) rotate([180,0,0])Bolt2Hole();
 		translate([-8.5,0,BottomOfCover_z]) rotate([180,0,0])Bolt2Hole();
 		
 		// remove extra tube flange (Top)
-		translate([0,-RingGearA_OD/2-5,-Race_w-Ball_d/2-2-0.03-SunGearRace_h]) cylinder(d=100,h=50);
+		translate([0,0,-Race_w-Ball_d/2-2-0.03-SunGearRace_h]) cylinder(d=100,h=50);
 		
 		// bolts
-		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,-Race_w*2-1-SunGearRace_h-BottomCover_h+Overlap]) 
-			rotate([180,0,0])Bolt4ClearHole(depth=SunGearRace_h);
+		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,-Race_w*2-2-SunGearRace_h-BottomCover_h+Overlap]) 
+			rotate([180,0,0])Bolt4HeadHole(depth=BottomCover_h,lHead=20);
 	} // diff
 } // BottomCover
 
@@ -450,8 +454,15 @@ module RingGearB(ShowGearOnly=false,myFn=90){
 			}
 		} // union
 		
+		//Ball insert groove
+		translate([BallCircle_d/2-0.1,0,-1-Ball_d/2-Overlap]) 
+		hull(){
+			sphere(d=Ball_d);
+			translate([0,0,-Ball_d])sphere(d=Ball_d);
+		} // hull
+		
 		// balls and race
-		translate([0,0,-1-Ball_d-Overlap]) cylinder(d=BallCircle_d+Ball_d*0.8,h=GearWidth+1+Ball_d-2);
+		translate([0,0,-1-Ball_d-Overlap]) cylinder(d=BallCircle_d+Ball_d*0.7,h=GearWidth+1+Ball_d-2);
 		// ring gear B
 		translate([0,0,-5.5-Overlap]) cylinder(d=66,h=GearWidth+5.5+Overlap*2);
 		
@@ -473,15 +484,12 @@ module RingGearB(ShowGearOnly=false,myFn=90){
 //
 //translate([0,0,GearWidth+0.5]) ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12);
 PCBOuterRace_h=3;
+
 module PCBOuterRace(myFn=90){
 	nBolts=12;
 	PCBOuterRace_OD=PC_BallCircle_d+Ball_d*0.8+8;
 	BoltBoss_r=RingGearB_OD/2-0.5;
-	
-	
-	//OutsideRace(BallCircle_d=PC_BallCircle_d, Race_OD=PC_Race_OD, Ball_d=Ball_d, Race_w=PC_t, nBolts=12, myFn=myFn)
-		//	Bolt4ClearHole();
-	
+		
 	OnePieceOuterRace(BallCircle_d=PC_BallCircle_d, Race_OD=PCBOuterRace_OD, Ball_d=Ball_d, Race_w=PC_t*2, PreLoadAdj=0.00, myFn=myFn);
 	
 	difference(){
@@ -617,7 +625,6 @@ module ShowPlanets(CutAway=true,HideGears=true,HidePC=true){
 	PitchA=PlanetaryPitchA;
 	PitchB=PlanetaryPitchB;
 	Planet_BC=SunGear_t*PitchA/180 + PlanetA_t*PitchA/180;
-	//	Ratio=OutputRing_t*PitchB/180/((InputRing_t*PitchA/180  / (PlanetA_t*PitchA/180) * (PlanetB_t*PitchB/180)-OutputRing_t*PitchB/180))*(InputRing_t/SunGear_t);
 		
 		SunGearRA=$t*Ratio*360;
 		PlanetPosRA=SunGearRA/((InputRing_t/SunGear_t)+(InputRing_t/SunGear_t));//  29.7r /(InputRing_t/SunGear_t); // 2.57 4.5
@@ -630,10 +637,7 @@ module ShowPlanets(CutAway=true,HideGears=true,HidePC=true){
 			translate([Planet_BC/2,0,0]) color("Red") cylinder(d=6.35,h=PlanetShaft_l);
 		translate([0,0,PlanetShaft_l]) color("Brown") PlanetCarrierB();
 	}
-	
-	//echo(PlanetPosRA=PlanetPosRA);
-	//echo("******");
-	
+		
 	if (HideGears==false)
 	difference(){
 			for (j=[0:nPlanets-1])
@@ -646,7 +650,7 @@ module ShowPlanets(CutAway=true,HideGears=true,HidePC=true){
 				if (CutAway==true)
 			translate([0,-Planet_BC,-Overlap])cube([Planet_BC,Planet_BC,PlanetShaft_l]);
 		} // diff
-			/**/
+	
 } // ShowPlanets
 
 //ShowPlanets(CutAway=true,HideGears=false);
