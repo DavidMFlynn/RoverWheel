@@ -378,6 +378,21 @@ module BottomCover(){
 
 //BottomCover();
 
+module SG90ServoWheel(){
+	hull(){
+			translate([0,0,-Overlap]) cylinder(d=7,h=1.6);
+			translate([0,15.1,-Overlap]) cylinder(d=4,h=1.6);
+			translate([0,-15.1,-Overlap]) cylinder(d=4,h=1.6);
+		} // hull
+		
+		hull(){
+			translate([-6,0,-Overlap]) cylinder(d=3.7,h=1.6);
+			translate([6,0,-Overlap]) cylinder(d=3.7,h=1.6);
+		} // hull
+} // SG90ServoWheel
+
+SG90ServoWheel();
+
 // Drive Gear
 module DriveGear(){
 	
@@ -398,16 +413,7 @@ module DriveGear(){
 				involute_facets=0,
 				flat=false);
 		
-		hull(){
-			translate([0,0,-Overlap]) cylinder(d=7,h=1.6);
-			translate([0,15.1,-Overlap]) cylinder(d=4,h=1.6);
-			translate([0,-15.1,-Overlap]) cylinder(d=4,h=1.6);
-		} // hull
-		
-		hull(){
-			translate([-6,0,-Overlap]) cylinder(d=3.7,h=1.6);
-			translate([6,0,-Overlap]) cylinder(d=3.7,h=1.6);
-		} // hull
+		SG90ServoWheel();
 		
 	} // diff
 } // DriveGear
