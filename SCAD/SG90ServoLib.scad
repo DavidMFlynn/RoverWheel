@@ -3,11 +3,12 @@
 // David M. Flynn
 // Filename: SG90ServoLib.scad
 // Created: 4/28/2018
-// Rev: 1.0 4/28/2018
+// Rev: 1.0.1 5/1/2018
 // Units: millimeters
 // **************************************************
 // History:
-	echo("SG90ServoLib 1.0");
+	echo("SG90ServoLib 1.0.1");
+// 1.0.1 5/1/2018 Adjusted SG90ServoWheel for better fit.
 // 1.0 4/28/2018 Coppied from LightArmJoint 
 // **************************************************
 // Notes:
@@ -58,14 +59,18 @@ module ServoSG90(){
 
 module SG90ServoWheel(){
 	hull(){
-			translate([0,0,-Overlap]) cylinder(d=7,h=1.6);
-			translate([0,15.1,-Overlap]) cylinder(d=4,h=1.6);
-			translate([0,-15.1,-Overlap]) cylinder(d=4,h=1.6);
+			translate([0,0,-Overlap]) cylinder(d=7.2,h=1.6);
+			translate([0,16.15,-Overlap]) cylinder(d=4.2,h=1.6);
 		} // hull
 		
 		hull(){
-			translate([-6,0,-Overlap]) cylinder(d=3.7,h=1.6);
-			translate([6,0,-Overlap]) cylinder(d=3.7,h=1.6);
+			translate([0,0,-Overlap]) cylinder(d=7.2,h=1.6);
+			translate([0,-14.35,-Overlap]) cylinder(d=4.2,h=1.6);
+		} // hull
+		
+		hull(){
+			translate([-7.05,0,-Overlap]) cylinder(d=4.0,h=1.6);
+			translate([7.05,0,-Overlap]) cylinder(d=4.0,h=1.6);
 		} // hull
 } // SG90ServoWheel
 

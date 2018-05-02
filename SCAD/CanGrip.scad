@@ -81,31 +81,33 @@ module TopMount(Servo=true){
 			rotate([0,0,22.5]) TubeFlange(TubeOD=kTubeOD,FlangeLen=10,Threaded=true);
 			
 			hull(){
-				translate([0,0,kClaw_h/2]) cylinder(d=20,h=5);
+				translate([0,0,-kClaw_h/2-5]) cylinder(d=20,h=kClaw_h+10);
 				translate([0,-LClawGearPR-5,0]) rotate([90,0,0]) cylinder(d=35,h=5);
 			}
 		} // union
 		
 		// Pivot bolt hole #10-32 Nylon?
-		cylinder(d=5,h=25);
+		translate([0,0,-kClaw_h/2-10]) cylinder(d=5,h=kClaw_h+20);
 		
 		// Clearance for mechanism
 		difference(){
 			translate([0,0,kClaw_h/2+0.5]) rotate([180,0,0])
-				cylinder(r=LClawGearPR+10,h=50);
+				cylinder(r=LClawGearPR+10.7,h=kClaw_h+1);
 			translate([0,0,kClaw_h/2]) 
-				cylinder(d=20,h=10);
+				cylinder(d=20,h=2);
+			translate([0,0,-kClaw_h/2-1]) 
+				cylinder(d=20,h=1.0);
 		}
 		
 		if (Servo==true) translate([0,-kServoCL,kClaw_h/2+14])
 			rotate([180,0,90])ServoSG90();
 		
 		// trim flange
-		translate([0,-LClawGearPR-10,0]) rotate([180,0,0]) cylinder(d=50,h=50);
+		//translate([0,-LClawGearPR-10,0]) rotate([180,0,0]) cylinder(d=50,h=50);
 	} // diff
 } // TopMount
 
-//TopMount();
+//rotate([90,0,0])TopMount();
 //rotate([0,180,0])TopMount();
 
 module ClawBack(){
