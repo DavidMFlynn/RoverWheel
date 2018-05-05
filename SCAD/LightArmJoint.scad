@@ -3,34 +3,35 @@
 // David M. Flynn
 // Filename: LightArmJoint.scad
 // Created: 4/6/2018
-// Rev: 1.0.1 4/22/2018
+// Rev: 1.0.2 5/5/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.2 5/5/2018 2mm shorter sun gear, 0.2 preload on planet carrier B, etc.
 // 1.0.1 4/22/2018 First working version.
 // 1.0.0 4/6/2018 First code
 // **************************************************
 // Notes:
 // 4/22/2018 To Do: Add Gear cover to SunGearRace, Tighten up main bearing.
 // **************************************************
-// for STL output
-//  SunGear(myFN=360); // FC1
-// rotate([180,0,0]) SunGearRace(myFn=360); // FC1
-//  PlanetA(); // FC1
-//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j); // FC1
+// ***** for STL output *****
+// SunGear(myFN=360); // FC2
+// rotate([180,0,0]) SunGearRace(myFn=360); // FC2
+// PlanetA(); // Good
+// for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j); // Good
 // RingGearA(myFn=360);
 // rotate([180,0,0]) RingGearB(myFn=360);
-// PlanetCarrierA();
-//PlanetCarrierB(EndRace=false, myFn=360);
-//PlanetCarrierB(EndRace=true, myFn=360);
-//PCBOuterRace(myFn=360); // FC2
+// PlanetCarrierA(); // Good
+// PlanetCarrierB(EndRace=false, myFn=360); // FC2
+// PlanetCarrierB(EndRace=true, myFn=360); // FC2
+// PCBOuterRace(myFn=360); // FC3
 // TopCover(); // FC1
 // TubeSocket(TubeOD=Tube_d, SocketLen=16, Threaded=false); // good
-// rotate([180,0,0]) DriveGear(); // needs work
-// rotate([180,0,0]) BottomCover(); // FC1
+// rotate([180,0,0]) DriveGear(); // FC1
+// rotate([180,0,0]) BottomCover(); // Good
 // **************************************************
 // for viewing
-
+include<SG90ServoLib.scad>
 include<involute_gears.scad>
 include<TubeConnectorLib.scad>
 include<CompoundHelicalPlanetary.scad>
@@ -122,7 +123,7 @@ module ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12){
 
 Hub_d=24;
 Hub_BC=Hub_d+Ball_d*0.8;
-SunGearHub_l=23;
+SunGearHub_l=21; // changed from 23 to 21 5/5/2018
 
 module SunGear(ShowGearOnly=false,myFN=90){
 	
@@ -234,7 +235,7 @@ module SunGearRace(myFn=90){
 	
 	translate([0,0,-Race_w*2-Ball_d/2-2-Overlap]) 
 		OutsideRace(BallCircle_d=Hub_BC, Race_OD=Hub_BC+26, Ball_d=Ball_d, Race_w=Race_w, nBolts=6,
-			RaceBoltInset=BL_RaceBoltInset, PreLoadAdj=0.2, myFn=myFn) Bolt4ClearHole();
+			RaceBoltInset=BL_RaceBoltInset, PreLoadAdj=0.2, myFn=myFn) Bolt4ButtonHeadHole();
 	
 	difference(){
 		union(){
@@ -249,7 +250,8 @@ module SunGearRace(myFn=90){
 			
 			// Gear cover
 			translate([24.2,0,SunGearRaceBottom]) cylinder(d=28,h=SunGearRace_h);
-		}
+		} // union
+		
 		// Drive Gear clearance
 		translate([24.2,0,-22.5]) cylinder(d=24,h=8);
 		
@@ -272,43 +274,6 @@ module SunGearRace(myFn=90){
 
 //SunGearRace();
 //translate([0,0,-Race_w*2-2]) ShowMyBalls(BallCircle_d=Hub_BC, nBalls=11);
-
-module ServoSG90(){
-	kDeck_x=32.4;
-	kDeck_z=2.5;
-	kWheel_z=14.2;
-	kWheelOffset=5; // body CL to wheel CL
-	kBoltCl=28.2;
-	kWidth=12.4;
-	
-	kBody_h=16;
-	kBody_l=23;
-	
-	kTopBox_h=4.5;
-	
-	translate([kWheelOffset,0,0]){
-		translate([-kDeck_x/2,-kWidth/2,0]) cube([kDeck_x,kWidth,kDeck_z]);
-		translate([-kBody_l/2,-kWidth/2,kDeck_z]) cube([kBody_l,kWidth,kTopBox_h]);
-		translate([-kBody_l/2,-kWidth/2,-kBody_h]) cube([kBody_l,kWidth,kBody_h]);
-		
-		translate([-kBoltCl/2,0,0]) Bolt2Hole();
-		translate([kBoltCl/2,0,0]) Bolt2Hole();
-		translate([-kBoltCl/2,0,0]) rotate([180,0,0])Bolt2Hole();
-		translate([kBoltCl/2,0,0]) rotate([180,0,0])Bolt2Hole();
-		
-		
-	}
-	cylinder(d=kWidth,h=kWheel_z);
-	hull(){
-		cylinder(d=6.35,h=11.5);
-		translate([7,0,0])cylinder(d=6.35,h=11.5);
-	}
-	
-	//Gear
-	translate([0,0,kWheel_z]) cylinder(d=24,h=5);
-} // ServoSG90
-
-//ServoSG90();
 
 module BottomCover(){
 	BottomCover_h=7;
@@ -378,21 +343,6 @@ module BottomCover(){
 
 //BottomCover();
 
-module SG90ServoWheel(){
-	hull(){
-			translate([0,0,-Overlap]) cylinder(d=7,h=1.6);
-			translate([0,15.1,-Overlap]) cylinder(d=4,h=1.6);
-			translate([0,-15.1,-Overlap]) cylinder(d=4,h=1.6);
-		} // hull
-		
-		hull(){
-			translate([-6,0,-Overlap]) cylinder(d=3.7,h=1.6);
-			translate([6,0,-Overlap]) cylinder(d=3.7,h=1.6);
-		} // hull
-} // SG90ServoWheel
-
-SG90ServoWheel();
-
 // Drive Gear
 module DriveGear(){
 	
@@ -413,13 +363,16 @@ module DriveGear(){
 				involute_facets=0,
 				flat=false);
 		
-		SG90ServoWheel();
+		intersection(){
+			SG90ServoWheel();
+			
+			translate([0,0,-Overlap]) cylinder(d=PlanetaryPitchA*13/180-5.4,h=2);
+		} // intersection
 		
 	} // diff
 } // DriveGear
 
-//translate([24.2,0,-23.5])
-//DriveGear();
+//translate([24.2,0,-23.5])DriveGear();
 
 
 RingGearB_OD=BallCircle_d+Ball_d*0.8+8;
@@ -493,10 +446,11 @@ PCBOuterRace_h=3;
 
 module PCBOuterRace(myFn=90){
 	nBolts=12;
+	PCBOuterRace_PreLoad=0.2;
 	PCBOuterRace_OD=PC_BallCircle_d+Ball_d*0.8+8;
 	BoltBoss_r=RingGearB_OD/2-0.5;
 		
-	OnePieceOuterRace(BallCircle_d=PC_BallCircle_d, Race_OD=PCBOuterRace_OD, Ball_d=Ball_d, Race_w=PC_t*2, PreLoadAdj=0.00, myFn=myFn);
+	OnePieceOuterRace(BallCircle_d=PC_BallCircle_d, Race_OD=PCBOuterRace_OD, Ball_d=Ball_d, Race_w=PC_t*2, PreLoadAdj=PCBOuterRace_PreLoad, myFn=myFn);
 	
 	difference(){
 		union(){
@@ -690,6 +644,7 @@ PC_Race_OD=PC_BallCircle_d+26;
 PC_t=Race_w;
 
 module PlanetCarrierB(EndRace=true, myFn=90){
+	PC_B_PreLoad=0.2;
 	
 	difference(){
 		cylinder(d=Planet_BC+PC_w,h=PC_t);
@@ -703,7 +658,7 @@ module PlanetCarrierB(EndRace=true, myFn=90){
 			}		
 	} // diff
 	
-	InsideRace(BallCircle_d=PC_BallCircle_d, Race_ID=PC_Race_ID, Ball_d=Ball_d, Race_w=PC_t, nBolts=0, myFn=myFn)
+	InsideRace(BallCircle_d=PC_BallCircle_d, Race_ID=PC_Race_ID, Ball_d=Ball_d, Race_w=PC_t, nBolts=0, RaceBoltInset=0, PreLoadAdj=PC_B_PreLoad, myFn=myFn)
 			Bolt4Hole();
 	
 } // PlanetCarrierB

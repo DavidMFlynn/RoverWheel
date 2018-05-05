@@ -2,7 +2,7 @@
 // Soda Can Gripper
 // Filename: CanGrip.scad
 // Created: 4/26/2018
-// Revision: 1.0d1 4/27/2018
+// Revision: 1.0d2 5/3/2018
 // Units: mm
 // **************************************************
 // Notes:
@@ -14,7 +14,7 @@
 // 1.0d1 4/26/2018 First code.
 // **************************************************
 // ***** for STL output *****
-//TopMount(Servo=true);
+//rotate([90,0,0]) TopMount(Servo=true);
 //rotate([0,180,0])TopMount(Servo=false);
 //rotate([180,0,0])	PinionGear();
 //rotate([180,0,0])LeftClaw();
@@ -93,12 +93,18 @@ module TopMount(Servo=true){
 		difference(){
 			translate([0,0,kClaw_h/2+0.5]) rotate([180,0,0])
 				cylinder(r=LClawGearPR+10.7,h=kClaw_h+1);
+			
 			translate([0,0,kClaw_h/2]) 
 				cylinder(d=20,h=2);
 			translate([0,0,-kClaw_h/2-1]) 
 				cylinder(d=20,h=1.0);
+			// Pinion Gear Boss
+			translate([0,-kServoCL,-kClaw_h/2-1]) cylinder(d=10,h=1.0);
 		}
 		
+		// Pinin Gear Shaft
+		translate([0,-kServoCL,-kClaw_h/2-15]) cylinder(d=5,h=16.0);
+			
 		if (Servo==true) translate([0,-kServoCL,kClaw_h/2+14])
 			rotate([180,0,90])ServoSG90();
 		
