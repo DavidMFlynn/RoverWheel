@@ -23,9 +23,9 @@
 // RingGearA(myFn=360);
 // rotate([180,0,0]) RingGearB(myFn=360);
 // PlanetCarrierA(); // Good
-// PlanetCarrierB(EndRace=false, myFn=360); // FC2
-// PlanetCarrierB(EndRace=true, myFn=360); // FC2
-// PCBOuterRace(myFn=360); // FC4
+// PlanetCarrierB(EndRace=false, myFn=360); // Good
+// PlanetCarrierB(EndRace=true, myFn=360); // Good
+// PCBOuterRace(myFn=360); // Good
 // TopCover(); // FC1
 // TubeSocket(TubeOD=Tube_d, SocketLen=16, Threaded=false); // good
 // rotate([180,0,0]) DriveGear(); // FC1
