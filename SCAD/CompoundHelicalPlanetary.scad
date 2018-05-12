@@ -28,7 +28,7 @@ echo("Compound Helical Planetary Library 1.1.9");
 // 1.0.0 6/16/2017 Copied from PlanetDrive.scad Rev 1.1.0
 // *************************************************
 // *** for Viewing ***
-//ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth);
+ShowAllCompoundDrivePartsHelix(ShowB=true,GearWidth=GearWidth);
 
 //PlanetaryPitchA=280;
 //PlanetaryPitchB=308;
@@ -71,7 +71,7 @@ PlanetB_a=0;
 nPlanets=2;
 /**/
 //260:260 = 36:37 = 74:1, 12t 12t 13t, nPlanets=5
-//*
+/*
 PlanetaryPitchA=280;
 PlanetaryPitchB=280;
 kSpline_d=14;
@@ -90,6 +90,18 @@ PlanetA_t=15;
 PlanetB_t=14;
 nPlanets=5;
 /**/
+
+//260:260 = 51:55 = 16.7391:1, 23t 14t 18t, nPlanets=5
+//*
+PlanetaryPitchA=260;
+PlanetaryPitchB=260;
+Pinion_t=16;
+PlanetA_t=14;
+PlanetB_t=18;
+nPlanets=4;
+kSpline_d=15;
+/**/
+
 //300:330 = 54:51 = 53.9:1, 12t 21t 21t,Pinion_a=0,nPlanets=3
 /*
 PlanetaryPitchA=280;
@@ -128,6 +140,7 @@ InputRing_t=PlanetA_t*2 + Pinion_t;
 // PlanetA_t*2 + Pinion_t - (PlanetA_t - PlanetB_t*2) 53
 OutputRing_tc=(PlanetA_t*PlanetaryPitchA/180 + PlanetB_t*PlanetaryPitchB/180 + Pinion_t*PlanetaryPitchA/180)*180/PlanetaryPitchB;
  
+
 Shaft_d=5;
 //PlanetB_a=0;
 
@@ -135,6 +148,17 @@ OutputRing_t=floor(OutputRing_tc);
 echo(InputRing_t=InputRing_t);
 echo(OutputRing_tc=OutputRing_tc);
 echo(OutputRing_t=OutputRing_t);
+
+Sun_Pd=Pinion_t*PlanetaryPitchA/180;
+echo(Sun_Pd=Sun_Pd);
+PlanetA_Pd=PlanetA_t*PlanetaryPitchA/180;
+echo(PlanetA_Pd=PlanetA_Pd);
+RingA_Pd=InputRing_t*PlanetaryPitchA/180;
+echo(RingA_Pd=RingA_Pd);
+PlanetB_Pd=PlanetB_t*PlanetaryPitchB/180;
+echo(PlanetB_Pd=PlanetB_Pd);
+RingB_Pd=OutputRing_t*PlanetaryPitchB/180;
+echo(RingB_Pd=RingB_Pd);
 
 //OutputRing_t=floor(OutputRing_t);
 
@@ -229,7 +253,7 @@ $t=0.00;
 
 
 
-module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
+module ShowAllCompoundDrivePartsHelix(ShowB=false,GearWidth=GearWidth){
 	PitchA=PlanetaryPitchA;
 	PitchB=PlanetaryPitchB;
 	Planet_BC=Pinion_t*PitchA/180 + PlanetA_t*PitchA/180;
@@ -266,11 +290,15 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 		
 		rotate([0,0,PlanetA_a*j])CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false);
 		
+		 if (ShowB==true){
+			 RotB=2*360/PlanetB_t/nPlanets*j;
 		translate([0,0,GearWidth])
 		CompoundPlanetGearHelixB(PitchA=PitchA, nTeethA=PlanetA_t,
-								PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j,
-								HB=false,Spline_d=kSpline_d,nSplines=knSplines,Spline_a=-PlanetB_a*j);
-		
+								PitchB=PitchB, nTeethB=PlanetB_t, 
+								Thickness=GearWidth, Offset_a=PlanetB_a*j,
+								HB=false,Spline_d=kSpline_d,
+								nSplines=knSplines,Spline_a=-RotB);
+		 }
 		//translate([0,0,GearWidth*2])
 		//CompoundPlanetGearHelixC(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
 	  }
@@ -280,6 +308,7 @@ module ShowAllCompoundDrivePartsHelix(GearWidth=GearWidth){
 	//	CompoundRingGearHelix(Pitch=PitchA, nTeeth=InputRing_t, Thickness=GearWidth, twist=twist, HB=false);
 	
 	// Ring Gear B
+	if (ShowB==true)
 	translate([0,0,GearWidth]) rotate([0,0,180/OutputRing_t+OutputRingRA]) 
 		CompoundRingGearHelix(Pitch=PitchB, nTeeth=OutputRing_t, Thickness=GearWidth, twist=twist, HB=false);
 
