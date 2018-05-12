@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: LightArmJoint.scad
 // Created: 4/6/2018
-// Rev: 1.1.0 5/6/2018
+// Rev: 1.1.1 5/7/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.1.1 5/7/2018 fixed DriveGear5245
 // 1.1.0 5/6/2018 Added bottom cover w/ HS-5245MG, tighter planet carrier bearing.
 // 1.0.2 5/5/2018 2mm shorter sun gear, 0.2 preload on planet carrier B, etc.
 // 1.0.1 4/22/2018 First working version.
@@ -443,7 +444,7 @@ module DriveGear5245(){
 		intersection(){
 			HS5245MGServoWheel();
 			
-			translate([0,0,-Overlap]) cylinder(d=PlanetaryPitchA*13/180-5.4,h=2);
+			translate([0,0,-Overlap]) cylinder(d=PlanetaryPitchA*13/180-5.4,h=10);
 		} // intersection
 		
 	} // diff
