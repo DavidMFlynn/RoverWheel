@@ -2,10 +2,11 @@
 // Tube Connector Library
 // by David M. Flynn
 // Created: 3/4/2018
-// Revision: 1.1.1 4/14/2018
+// Revision: 1.1.2 5/14/2018
 // Units: mm
 // ***************************************************
 // History:
+// 1.1.2 5/14/2018 Added DoubleBoltFlange.
 // 1.1.1 4/14/2018 Added TubeFlange.
 // 1.1.0 3/4/2018  Added TubeSocket.
 // 1.0.3 1/27/2018 Added cone to TubeEnd to make wire threading easier.
@@ -25,6 +26,8 @@
 // TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true);
 // TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=false);
 // TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true);
+// rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=false);
+// rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=true);
 
 // ***************************************************
 // Routines
@@ -67,6 +70,36 @@ module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 } // TubeFlange
 
 //TubeFlange();
+
+module DoubleBoltFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
+	BoltOffset=4;
+	
+	difference(){
+		union(){
+			cylinder(d=TubeOD+BoltOffset*4, h=FlangeLen);
+			
+			translate([0,0,FlangeLen-4])cylinder(d=TubeOD+BoltOffset*8, h=4);
+		} // union
+			
+		translate([0,0,-Overlap]) cylinder(d=TubeOD-1, h=FlangeLen+Overlap*2);
+		
+		//translate([0,0,FlangeLen/2]) rotate_extrude() translate([TubeOD/2-0.35,0,0]) circle(d=2);
+		//translate([0,0,-Overlap]) cylinder(d=TubeOD-1, h=SocketLen+Overlap*2);
+		//translate([0,0,1]) cylinder(d=TubeOD+IDXtra, h=SocketLen);
+
+
+		for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,7]) Bolt4HeadHole(depth=13);
+			
+		if (Threaded==true){
+				for (j=[0:7]) rotate([0,0,360/8*j+22.5]) translate([TubeOD/2+BoltOffset*3,0,10]) Bolt4Hole(depth=13);
+			} else {
+				for (j=[0:7]) rotate([0,0,360/8*j+22.5]) translate([TubeOD/2+BoltOffset*3,0,7]) Bolt4ClearHole(depth=13);
+			}
+	} // diff
+} // DoubleBoltFlange
+
+//rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=false);
+//rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=true);
 
 module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
 	BoltOffset=4;
