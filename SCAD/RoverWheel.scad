@@ -85,19 +85,35 @@ Overlap=0.05;
 Spline_Hole_d=6.35+IDXtra; // for a 1/4" standoff
 Spline_Gap=0.20; // 0.22 loose fit, 0.20 snug fit, 0.15 press fit
 
+//44:48 = 21:1, 16t 14t 18t, nPlanets=4
+//*
+PlanetaryPitchA=290;
+PlanetaryPitchB=290;
+SunGear_t=16;
+PlanetA_t=14;
+PlanetB_t=18;
+nPlanets=4;
+kSpline_d=15;
+/**/
+
+/*
 PlanetaryPitchA=300;
 PlanetaryPitchB=290.3225;
-BackLash=0.5; // 0.3 works but is tight
 SunGear_t=15;
-SunGear_a=0;
 PlanetA_t=15;
 //PlanetB_t=14; // -60:1 ratio
 PlanetB_t=16; // 188:1 ratio
-PlanetStack=2; // number of gears 2 or 3
 nPlanets=5;
+kSpline_d=15;
+/**/
+BackLash=0.5; // 0.3 works but is tight
+SunGear_a=0;
+
+PlanetStack=2; // number of gears 2 or 3
+
 Pressure_a=24; //22.5;
 GearWidth=12;
-twist=200; // set to 0 for straight gears, 200 for helical gears
+twist=0; // set to 0 for straight gears, 200 for helical gears
 
 bead_d=97.8; // 3.8"
 bead_h=7;

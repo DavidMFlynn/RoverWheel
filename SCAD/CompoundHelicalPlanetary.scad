@@ -28,7 +28,7 @@ echo("Compound Helical Planetary Library 1.1.9");
 // 1.0.0 6/16/2017 Copied from PlanetDrive.scad Rev 1.1.0
 // *************************************************
 // *** for Viewing ***
-ShowAllCompoundDrivePartsHelix(ShowB=true,GearWidth=GearWidth);
+//ShowAllCompoundDrivePartsHelix(ShowB=true,GearWidth=GearWidth);
 
 //PlanetaryPitchA=280;
 //PlanetaryPitchB=308;
@@ -91,10 +91,10 @@ PlanetB_t=14;
 nPlanets=5;
 /**/
 
-//260:260 = 51:55 = 16.7391:1, 23t 14t 18t, nPlanets=5
+//44:48 = 21:1, 16t 14t 18t, nPlanets=4
 //*
-PlanetaryPitchA=260;
-PlanetaryPitchB=260;
+PlanetaryPitchA=300;
+PlanetaryPitchB=300;
 Pinion_t=16;
 PlanetA_t=14;
 PlanetB_t=18;
@@ -286,18 +286,18 @@ module ShowAllCompoundDrivePartsHelix(ShowB=false,GearWidth=GearWidth){
 	//	CompoundIdlePinionHelix(Pitch=PitchA, PitchB=PitchB, nTeeth=Pinion_t, Thickness=GearWidth);
 	
 	for (j=[0:nPlanets-1])
-	  rotate([0,0,PlanetPosRA+360/nPlanets*j]) translate([Planet_BC/2,0,0]) rotate([0,0,PlanetRA]){
+	  rotate([0,0,PlanetPosRA+360/nPlanets*j]) translate([Planet_BC/2,0,0]) {
 		
-		rotate([0,0,PlanetA_a*j])CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false);
+		CompoundPlanetGearHelixA(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, HB=false);
 		
-		 if (ShowB==true){
-			 RotB=2*360/PlanetB_t/nPlanets*j;
-		translate([0,0,GearWidth])
-		CompoundPlanetGearHelixB(PitchA=PitchA, nTeethA=PlanetA_t,
+		if (ShowB==true){
+			RotB=180/OutputRing_t*(OutputRing_t/nPlanets*j);
+			translate([0,0,GearWidth]) //rotate([0,0,360/nPlanets*j])
+				CompoundPlanetGearHelixB(PitchA=PitchA, nTeethA=PlanetA_t,
 								PitchB=PitchB, nTeethB=PlanetB_t, 
-								Thickness=GearWidth, Offset_a=PlanetB_a*j,
+								Thickness=GearWidth, Offset_a=0,
 								HB=false,Spline_d=kSpline_d,
-								nSplines=knSplines,Spline_a=-RotB);
+								nSplines=knSplines,Spline_a=0);
 		 }
 		//translate([0,0,GearWidth*2])
 		//CompoundPlanetGearHelixC(Pitch=PitchA,nTeethA=PlanetA_t, PitchB=PitchB, nTeethB=PlanetB_t, Thickness=GearWidth, Offset_a=PlanetB_a*j, HB=false);
