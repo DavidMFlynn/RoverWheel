@@ -57,7 +57,7 @@
 //  ShowWheel();
 //  ShowCutAwayView(a=+50);
 //  ShowWheelExploded();
-// ShowWheel(Pa=false, Pb=true, IRG=false, DRG=true, HC=false, OPC=false, IPC=false, SO=false, SG=false, InnerRace=false, Balls=false, OuterRace=false, AR=false, IR=false, WM=false, Mo=false);
+// ShowWheel(Pa=true, Pb=true, IRG=true, DRG=true, HC=true, OPC=true, IPC=true, SO=true, SG=true, InnerRace=true, Balls=false, OuterRace=false, AR=false, IR=false, WM=false, Mo=false);
 
 //  ShowWheel(Pa=true, Pb=true, IRG=false, DRG=true, HC=false, OPC=false, IPC=false, SO=false, SG=false, InnerRace=false, Balls=false, OuterRace=false, AR=false, IR=false, WM=false, Mo=false);
 // **************************************************
@@ -442,7 +442,7 @@ module PlanetA(){
 		translate([0,0,GearWidth-PlanetClearance])
 		difference(){
 			cylinder(d=30,h=PlanetClearance+Overlap);
-			translate([0,0,-Overlap])cylinder(d=21,h=PlanetClearance+Overlap*4);
+			translate([0,0,-Overlap])cylinder(d=18,h=PlanetClearance+Overlap*4);
 		}
 	} // diff
 } // PlanetA
@@ -480,7 +480,7 @@ module PlanetB(nB=0){
 		// clearance for misaligned ring gears
 		translate([0,0,-Overlap])
 		difference(){
-			cylinder(d=30,h=PlanetClearance+Overlap);
+			cylinder(d=40,h=PlanetClearance+Overlap);
 			translate([0,0,-Overlap])cylinder(d=18.8,h=PlanetClearance+Overlap*4);
 		}
 		
@@ -488,7 +488,7 @@ module PlanetB(nB=0){
 	} // diff
 } // PlanetB
 
-//rotate([180,0,0])PlanetB(4);
+//rotate([180,0,0])PlanetB();
 
 module OuterPlanetCarrier(){
 	// Added Stiffenner 1/9/18
@@ -612,10 +612,10 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 				
 	if (Pb==true) translate([0,0,GearWidth*2+bead_h+3.2]) rotate([180,0,0])
 			for (j=[0:nPlanets-1]) rotate([0,0,PlanetPosRA+360/nPlanets*j]){
-				RotB=180/OutputRing_t*(OutputRing_t/nPlanets*j);
+				//RotB=180/OutputRing_t*(OutputRing_t/nPlanets*j);
 				
-				translate([Planet_BC/2,0,0]) rotate([0,0,RotB])
-					translate([0,0,GearWidth]) PlanetB(nB=j);
+				translate([Planet_BC/2,0,0]) //rotate([0,0,RotB])
+					translate([0,0,GearWidth]) PlanetB(nB=0);
 			}
 			
 		
@@ -631,7 +631,8 @@ module ShowWheel(Pa=true,Pb=true,IRG=true,DRG=true,HC=true,OPC=true,IPC=true,SO=
 		// drive ring
 		translate([0,0,bead_h+3.1]) {
 			
-			if (DRG==true) color("Tan") rotate([0,0,180/OutputRing_t*1.25]) DriveRingGear();
+			if (DRG==true) color("Tan") rotate([0,0,180/OutputRing_t])
+				DriveRingGear();
 				
 			translate([0,0,InnerSleve_l]) {
 				if (Balls==true) translate([0,0,Race_w])color("Pink")ShowMyBalls();
@@ -1038,9 +1039,9 @@ module InputRingGear(){
 		Skirt_h=MotorInset-(GearWidth+GearSlop)+MotorPlate_t;
 		cylinder(d=InputGear_d,h=Skirt_h);
 		
-		translate([0,0,-Overlap])cylinder(d1=InputGear_d-14,d2=InputGear_d-4,h=10+Overlap*2);
+		translate([0,0,-Overlap])cylinder(d1=InputGear_d-17.5,d2=InputGear_d-4,h=8+Overlap*2);
 		
-		translate([0,0,10])cylinder(d=InputGear_d-4,h=MotorInset-GearWidth+MotorPlate_t+Overlap*2);
+		translate([0,0,8])cylinder(d=InputGear_d-4,h=MotorInset-GearWidth+MotorPlate_t+Overlap*2);
 		
 		// Set screw access
 		for (j=[0:4]) rotate([0,0,360/5*j]) translate([InputGear_d/2-10,0,2]) hull(){
