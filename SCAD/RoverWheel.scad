@@ -108,7 +108,8 @@ kSpline_d=15;
 /**/
 BackLash=0.5; // 0.3 works but is tight
 SunGear_a=0;
-
+PC_r=SunGear_t*PlanetaryPitchA/360+PlanetA_t*PlanetaryPitchA/360; // Planet Carrier Radius
+echo(PC_r=PC_r);
 PlanetStack=2; // number of gears 2 or 3
 
 Pressure_a=24; //22.5;
@@ -492,7 +493,7 @@ module PlanetB(nB=0){
 
 module OuterPlanetCarrier(){
 	// Added Stiffenner 1/9/18
-	PC_r=25;
+	
 	PC_t=3;
 	difference(){
 		union(){
@@ -522,7 +523,6 @@ module OuterPlanetCarrier(){
 //OuterPlanetCarrier();
 
 module InnerPlanetCarrier(){
-	PC_r=25;
 	PC_t=4;
 	PC_w=10; // changed from 8 to 10 1/9/18
 	
