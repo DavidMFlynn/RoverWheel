@@ -95,6 +95,8 @@ module OnePartWheel(){
 	Spoke();
 } // OnePartWheel
 
+OnePartWheel();
+
 module Rim(){
 difference(){
 	scale([3,1,1]) sphere(d=Tire_d,$fn=360);

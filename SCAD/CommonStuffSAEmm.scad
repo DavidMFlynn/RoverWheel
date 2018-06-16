@@ -1,7 +1,7 @@
 // *************************************************
 // filename: CommondStuffSAE.scad
 //  by Dave Flynn 2015, GPL v2
-// Rev: 0.9.5 1/27/2018 Adjusted #4 hole
+// Rev: 0.9.6 6/9/2018 Adjusted #2 hole
 // Some hole sizes have not been tested.
 //
 // This file contains constants and some common routines
@@ -45,7 +45,8 @@
 // Size17Stepper();
 // *************************************************
 // History
-echo("CommonStuffSAEmm 0.9.5");
+echo("CommonStuffSAEmm 0.9.6");
+// 0.9.6 6/9/2018 Adjusted #2 hole
 // 0.9.5 1/27/2018 Adjusted #4 hole
 // 0.9.4 1/26/2018  Metric version
 // 0.9.3 11/23/2017 Added Bolt4FlatHeadHole
@@ -63,7 +64,7 @@ ID_Xtra=0.2;	// Added to ID to compensate for printing DMF3D
 
 //ID_Xtra=0.008;	// Added to ID to compensate for printing Bukobot 1
 
-Bolt2_r=0.038*25.4;
+Bolt2_r=0.034*25.4;
 Bolt2_Head_h=0.090*25.4;
 Bolt2_Head_r=0.060*25.4;
 Bolt2_BtnHead_r=0.090*25.4;

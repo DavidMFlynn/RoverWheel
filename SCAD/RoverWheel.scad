@@ -26,7 +26,8 @@
 //	rotate([180,0,0]) InnerRim(); // used w/ Traxxas tire, Print 2
 //  OuterPlanetCarrier();
 //  PlanetA();
-//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) PlanetB(nB=j);
+//  for (j=[0:nPlanets-1]) rotate([180,0,360/nPlanets*j]) translate([30,0,0]) 
+//	rotate([180,0,0]) PlanetB(nB=0);
 //  InnerPlanetCarrier();
 //	SunGear();
 //  DriveRingGear();
@@ -48,7 +49,7 @@
 //  JackStand();
 //
 // 	Spoke(); // print 16
-//  HubCap2();
+  HubCap2(SolidFace=true);
 //  OuterRim2();
 // **************************************************
 // for viewing
@@ -469,6 +470,7 @@ module PlanetA_DrillingFixture(){
 
 
 module PlanetB(nB=0){
+	//RotB=0; 
 	RotB=180/OutputRing_t*(OutputRing_t/nPlanets*nB); //*(PlanetA_t/PlanetB_t);
 	echo(RotB=RotB);
 	
@@ -1421,7 +1423,7 @@ module OuterRim2(){
 
 //OuterRim2();
 
-module HubCap2(){
+module HubCap2(SolidFace=false){
 	
 	nSpokes=8;
 	Connector_a=12;
@@ -1448,6 +1450,8 @@ module HubCap2(){
 		// planet carrier bearing
 		translate([0,0,2]) cylinder(d=15+IDXtra,h=6);
 	} // diff
+	
+	if (SolidFace==true) cylinder(d=Hub_OD-18,h=0.9);
 } // HubCap2
 
 //HubCap2();
