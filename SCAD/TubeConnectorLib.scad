@@ -69,7 +69,7 @@ module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 	} // diff
 } // TubeFlange
 
-//TubeFlange();
+//TubeFlange(TubeOD=19.05,FlangeLen=10,Threaded=false);
 
 module DoubleBoltFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 	BoltOffset=4;

@@ -36,6 +36,8 @@
 // rotate([180,0,0]) BottomCover(); // for SG90 servo, Good
 // rotate([180,0,0]) BottomCover5245(HasSideFlange=false);
 // TableMount();  // Clamp to table for testing.
+// BigBase(); // Big heavy rubber footed base, Armatron4 ?
+// TopConnector(); // connects TopCover(HasSideFlange=false) to BottomCover5245(HasSideFlange=true)
 // **************************************************
 // ***** for viewing *****
 // ShowJointCutAway();
@@ -398,7 +400,7 @@ module BigBase(){
 				cylinder(d=5,h=16);
 	// bolts
 		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*(j+1)]) translate([BoltBoss_r,0,BB_h]) 
-			 Bolt4Hole();
+			 Bolt4ClearHole();
 		
 					// Gear cover
 			translate([38,0,BB_h-18]) cylinder(d=38,h=36);
@@ -675,6 +677,25 @@ module PCBOuterRace(HasSideFlange=true,myFn=90){
 //translate([0,0,GearWidth*2+1])PCBOuterRace(HasSideFlange=false,myFn=90);
 
 TopFlange_BC=RingGearB_OD-10-7;
+
+module TopConnector(){
+	TopFlange_OD=RingGearB_OD-10;
+	nBolts=12;
+	
+	translate([0,0,13])rotate([180,0,0])TubeFlange(TubeOD=19.05,FlangeLen=13,Threaded=false);
+	
+	difference(){
+		
+		cylinder(d=TopFlange_OD,h=3);
+		
+		translate([0,0,-Overlap])cylinder(d=34,h=3+Overlap*2);
+		
+		// bolts
+		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([TopFlange_BC/2,0,3.5]) Bolt4ButtonHeadHole();
+	} // diff
+} // TopConnector
+
+//TopConnector();
 
 module TopCover(HasSideFlange=true){
 	nBolts=12;
