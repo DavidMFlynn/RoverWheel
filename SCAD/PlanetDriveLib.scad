@@ -261,7 +261,7 @@ module PinionPlate(Pitch=200, nTeeth=15, nTeethPinion=15, Thickness=GearWidth){
 function DrivePlateBC(Pitch=200,nTeeth=13, nTeethPinion=15) = Pitch*nTeeth/180 + Pitch*nTeethPinion/180;
 
 module DrivePlateBolts(Pitch=200,nTeeth=13, nTeethPinion=15){
-	PlanetPos_r=DrivePlateBC(Pitch=200,nTeeth=13, nTeethPinion=15)/2;
+	PlanetPos_r=DrivePlateBC(Pitch=Pitch,nTeeth=nTeeth, nTeethPinion=nTeethPinion)/2;
 
 	for (j=[0:2]) rotate([0,0,j*120]) translate([PlanetPos_r,0,0]) children();
 } // DrivePlateBolts
