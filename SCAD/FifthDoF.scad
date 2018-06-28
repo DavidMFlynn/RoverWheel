@@ -15,13 +15,15 @@
 // OutputTubeBearing(myFn=360);
 // OuterRacePart2(myFn=360);
 // OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=6, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=360) Bolt4ClearHole();
-// rotate([180,0,0])TheRing(myFn=360);
+// rotate([180,0,0]) TheRing(myFn=360);
 // PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 // PinionPlate2();
 // SunGear();
+// rotate([180,0,0]) BasePlate();
+// rotate([180,0,0]) DriveGear();
 // **************************************************
 // ***** for Viewing *****
-// ShowFifthDoF();
+ ShowFifthDoF();
 // **************************************************
 
 include<SG90ServoLib.scad>
@@ -58,8 +60,11 @@ RingGear_h=GearWidth*2+5+1;
 echo(Tube_BC=Tube_BC);
 echo(SmallRace_d=SmallRace_d);
 
+ServoOffset=9.39+17.34;
+Servo_a=-55;
+
 module CutAway(){
-	translate([0,-100,-50]) cube([100,100,100]);
+	rotate([0,0,-60]) translate([0,-100,-50]) cube([100,100,100]);
 } // CutAway
 
 module ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12){
@@ -93,6 +98,16 @@ module ShowFifthDoF(){
 	} // diff
 	/**/
 	
+	//*
+	difference(){
+		translate([0,0,-RingGear_h-Overlap]) color("Pink")BasePlate();
+		CutAway();
+	} // diff
+	
+	translate([0,0,-RingGear_h-Overlap-BottomCover_h-0.5]) color("Red") EncoderMount();
+	rotate([0,0,Servo_a]) translate([ServoOffset,0,-RingGear_h-Overlap-21]) rotate([0,0,120]) color("Red") ServoSG90();
+	/**/
+	
 	difference(){
 		translate([0,0,-RingGear_h])TheRing();
 		CutAway();
@@ -112,6 +127,8 @@ module ShowFifthDoF(){
 	translate([0,0,-GearWidth-5-0.5]) color("Green") PinionPlate2();
 	
 	translate([0,0,-GearWidth*2-5-1]) color("Orange")SunGear();
+	
+	rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])rotate([0,0,360/12*0.3])color("LightBlue")DriveGear();
 	
 } // ShowFifthDoF
 
@@ -183,7 +200,16 @@ module OutputTubeBearing(myFN=90){
 			cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+8,h=5);
 			cylinder(d=Tube_d+8,h=InnerRace_l);
 			translate([0,0,InnerRace_l-Overlap])cylinder(d1=Tube_d+8,d2=Tube_d+3,h=4);
+			
+			// Key
+			intersection(){
+				rotate([0,0,-160])
+					translate([DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2+3,-2,0])cube([4,4,5]);
+				cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+14,h=5);
+			}
 		} // union
+		
+		
 		
 		// center hole
 		translate([0,0,5]) cylinder(d=Tube_d+IDXtra*2,h=InnerRace_l+4);
@@ -227,7 +253,7 @@ module EncoderMount(){
 		//Encoder shaft
 		translate([0,0,-Overlap]) cylinder(d=6.35+IDXtra,h=10+Overlap*2);
 		//Encoder mount
-		translate([0,0,1]) rotate([180,0,0])cylinder(d=23+IDXtra,h=10);
+		translate([0,0,1]) rotate([180,0,0])cylinder(d=23+IDXtra,h=19);
 		translate([8.5,0,0]) rotate([180,0,0])Bolt2Hole();
 		translate([-8.5,0,0]) rotate([180,0,0])Bolt2Hole();
 } // EncoderMount
@@ -262,14 +288,13 @@ module DriveGear(){
 	} // diff
 } // DriveGear
 
-ServoOffset=9.39+17.34;
-Servo_a=-55;
 
- rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])DriveGear();
 
+ //rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])DriveGear();
+BottomCover_h=12;
 module BasePlate(){
 	nBolts=8;
-	BottomCover_h=12;
+	
 	BottomCover_t=3;
 	
 	difference(){
@@ -306,7 +331,11 @@ module BasePlate(){
 	} // diff
 } // BasePlate
 
-translate([0,0,-RingGear_h])BasePlate();
+//translate([0,0,-RingGear_h])BasePlate();
+
+//translate([0,0,-BottomCover_h-0.5]) color("Red") EncoderMount();
+//rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) color("Red") ServoSG90();
+//translate([0,0,-BottomCover_h-25]) rotate([180,0,0]) TubeSocket(TubeOD=Tube_d, SocketLen=16, Threaded=false);
 
 
 
@@ -325,7 +354,7 @@ module TheRing(myFn=90){
 			 translate([0,0,-Overlap])cylinder(d=LargeRace_d-5,h=RingGear_h+6.5+Overlap*2);
 		 } // diff
 		 
-		 
+		
 		 
 		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,0]) 
 			{
@@ -334,6 +363,9 @@ module TheRing(myFn=90){
 			} // union
 			
 		} // union
+		
+		//Key sweeps thru here
+		translate([0,0,RingGear_h-0.5])cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+15,h=6.5);
 		
 		// top bolt holes
 		translate([0,0,RingGear_h+0.5-Overlap])
@@ -345,6 +377,29 @@ module TheRing(myFn=90){
 			rotate([180,0,0]) Bolt4Hole(depth=8);
 		
 	} // diff
+	
+	//Tube connection
+	rotate([0,0,22.5])translate([42,0,15])rotate([180,0,0]) TubeEnd(TubeOD=Tube_d,Wall_t=0.84,Hole_d=6.35, Stop_l=1, GlueAllowance=0.40);
+	
+	
+	 // Gear cover
+	difference(){
+		union(){
+			rotate([0,0,Servo_a]) translate([ServoOffset,0,0]) cylinder(d=28,h=1+Overlap);
+			//translate([0,0,1])rotate([0,0,Servo_a]) translate([ServoOffset,0,0]) cylinder(d1=28,d2=8,h=12);
+		} // union
+		translate([0,0,-Overlap]) cylinder(d=LargeRace_d-1,h=20);
+	}// diff
+	
+	// Key
+	difference(){
+	rotate([0,0,-55])
+				translate([DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2+4,-2,RingGear_h+0.5])cube([4,4,7]);
+		translate([0,0,RingGear_h])cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+9,h=8);
+	} // diff
+	
+	
+
 } // TheRing
 
 //translate([0,0,-RingGear_h])TheRing();
