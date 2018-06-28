@@ -12,16 +12,16 @@
 // Notes:
 // **************************************************
 // ***** for STL output *****
-//OutputTubeBearing();
-// OuterRacePart2();
-//OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=6, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=360) Bolt4ClearHole();
-//rotate([180,0,0])TheRing();
+// OutputTubeBearing(myFn=360);
+// OuterRacePart2(myFn=360);
+// OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=6, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=360) Bolt4ClearHole();
+// rotate([180,0,0])TheRing(myFn=360);
 // PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
-//PinionPlate2();
-//SunGear();
+// PinionPlate2();
+// SunGear();
 // **************************************************
 // ***** for Viewing *****
-//
+// ShowFifthDoF();
 // **************************************************
 
 include<SG90ServoLib.scad>
@@ -61,6 +61,10 @@ echo(SmallRace_d=SmallRace_d);
 module CutAway(){
 	translate([0,-100,-50]) cube([100,100,100]);
 } // CutAway
+
+module ShowMyBalls(BallCircle_d=BallCircle_d, nBalls=12){
+	for (j=[0:nBalls-1]) rotate([0,0,360/nBalls*j]) translate([BallCircle_d/2,0,0]) sphere(d=Ball_d-Overlap*2);
+} // ShowMyBalls
 
 module ShowFifthDoF(){
 	
@@ -111,7 +115,7 @@ module ShowFifthDoF(){
 	
 } // ShowFifthDoF
 
-ShowFifthDoF();
+//ShowFifthDoF();
 
 //PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 
@@ -219,22 +223,98 @@ module OuterRacePart2(myFn=90){
 
 //translate([0,0,6+Overlap]) OuterRacePart2();
 
+module EncoderMount(){
+		//Encoder shaft
+		translate([0,0,-Overlap]) cylinder(d=6.35+IDXtra,h=10+Overlap*2);
+		//Encoder mount
+		translate([0,0,1]) rotate([180,0,0])cylinder(d=23+IDXtra,h=10);
+		translate([8.5,0,0]) rotate([180,0,0])Bolt2Hole();
+		translate([-8.5,0,0]) rotate([180,0,0])Bolt2Hole();
+} // EncoderMount
+
+//EncoderMount();
+
+module DriveGear(){
+	nTeeth=13;
+	difference(){
+			gear(number_of_teeth=nTeeth,
+				circular_pitch=PlanetaryPitch, diametral_pitch=false,
+				pressure_angle=Pressure_a,
+				clearance = 0.2,
+				gear_thickness=5,
+				rim_thickness=5,
+				rim_width=5,
+				hub_thickness=5,
+				hub_diameter=7,
+				bore_diameter=5,
+				circles=0,
+				backlash=BackLash,
+				twist=0,
+				involute_facets=0,
+				flat=false);
+		
+		intersection(){
+			SG90ServoWheel();
+			
+			translate([0,0,-Overlap]) cylinder(d=PlanetaryPitch*nTeeth/180-5.4,h=2);
+		} // intersection
+		
+	} // diff
+} // DriveGear
+
+ServoOffset=9.39+17.34;
+Servo_a=-55;
+
+ rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])DriveGear();
+
+module BasePlate(){
+	nBolts=8;
+	BottomCover_h=12;
+	BottomCover_t=3;
+	
+	difference(){
+		union(){
+			translate([0,0,-BottomCover_h+4]) cylinder(d=LargeRace_d,h=BottomCover_h-4);
+			translate([0,0,-BottomCover_h]) cylinder(d=LargeRace_d-8,h=BottomCover_h);
+			translate([0,0,-BottomCover_h+4])rotate_extrude() translate([LargeRace_d/2-4,0]) circle(r=4);
+			
+			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,-3]) 
+				cylinder(d=7,h=3);
+	
+			// Gear cover
+			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h]) cylinder(d=28,h=BottomCover_h);
+			
+			// Servo boss
+			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h-6.5]) rotate([0,0,120]) translate([-11.5,-7,0])cube([33,14,10]);
+		} // union
+		
+		// carv out inside
+		translate([0,0,-BottomCover_h+BottomCover_t+4]) cylinder(d=LargeRace_d-BottomCover_t*2,h=BottomCover_h-4+Overlap);
+		translate([0,0,-BottomCover_h+BottomCover_t]) cylinder(d=LargeRace_d-8-BottomCover_t*2,h=BottomCover_h-BottomCover_t+Overlap);
+		translate([0,0,-BottomCover_h+4+BottomCover_t]) rotate_extrude() translate([LargeRace_d/2-4-BottomCover_t,0]) circle(r=4);
+		
+		// bolt holes
+			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,-5.95]) 
+				rotate([180,0,0]) Bolt4HeadHole(depth=8);
+			
+		translate([0,0,-BottomCover_h-0.5]) EncoderMount();
+			
+		rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) ServoSG90();
+			
+		// Drive Gear clearance
+		rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h+2]) cylinder(d=24,h=BottomCover_h-2+Overlap);
+	} // diff
+} // BasePlate
+
+translate([0,0,-RingGear_h])BasePlate();
+
+
+
 module TheRing(myFn=90){
 	
 	translate([0,0,RingGear_h+6])
 		OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=4, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=myFn) Bolt4Hole();
 	
-	/*
-	difference(){
-		translate([0,0,RingGear_h+0.5-Overlap]) cylinder(d=LargeRace_d,h=5.5+Overlap*2);
-		
-		translate([0,0,RingGear_h+0.5-Overlap*2]) cylinder(d=LargeRace_d-6,h=5.5+Overlap*4);
-		
-		translate([0,0,RingGear_h+0.5-Overlap])
-			OutideRaceBoltPattern(Race_OD=LargeRace_d,nBolts=8,RaceBoltInset=RaceBoltInset)
-				rotate([180,0,0]) Bolt4Hole();
-	} // diff
-	*/
 	nBolts=8;
 	difference(){
 	 union(){
@@ -247,7 +327,7 @@ module TheRing(myFn=90){
 		 
 		 
 		 
-		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,0]) 
+		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,0]) 
 			{
 				cylinder(d=7,h=8);
 				translate([0,0,8]) sphere(d=7);
@@ -261,7 +341,7 @@ module TheRing(myFn=90){
 				rotate([180,0,0]) Bolt4Hole();
 		
 		// bottom bolt holes
-		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,0]) 
+		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,0]) 
 			rotate([180,0,0]) Bolt4Hole(depth=8);
 		
 	} // diff
