@@ -23,7 +23,7 @@
 // rotate([180,0,0]) DriveGear();
 // **************************************************
 // ***** for Viewing *****
- ShowFifthDoF();
+// ShowFifthDoF();
 // **************************************************
 
 include<SG90ServoLib.scad>
@@ -310,7 +310,7 @@ module BasePlate(){
 			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h]) cylinder(d=28,h=BottomCover_h);
 			
 			// Servo boss
-			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h-6.5]) rotate([0,0,120]) translate([-11.5,-7,0])cube([33,14,10]);
+			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h-6.5+Overlap]) rotate([0,0,120]) translate([-11.5,-7,0])cube([33,14,10]);
 		} // union
 		
 		// carv out inside
@@ -329,9 +329,13 @@ module BasePlate(){
 		// Drive Gear clearance
 		rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h+2]) cylinder(d=24,h=BottomCover_h-2+Overlap);
 	} // diff
+	
+	//Base Mounting Option
+	
 } // BasePlate
 
-//translate([0,0,-RingGear_h])BasePlate();
+//translate([0,0,-RingGear_h])
+BasePlate();
 
 //translate([0,0,-BottomCover_h-0.5]) color("Red") EncoderMount();
 //rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) color("Red") ServoSG90();
@@ -339,7 +343,7 @@ module BasePlate(){
 
 
 
-module TheRing(myFn=90){
+module TheRing(SideMount=false, myFn=90){
 	
 	translate([0,0,RingGear_h+6])
 		OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=4, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=myFn) Bolt4Hole();
@@ -379,14 +383,26 @@ module TheRing(myFn=90){
 	} // diff
 	
 	//Tube connection
-	rotate([0,0,22.5])translate([42,0,15])rotate([180,0,0]) TubeEnd(TubeOD=Tube_d,Wall_t=0.84,Hole_d=6.35, Stop_l=1, GlueAllowance=0.40);
+	if (SideMount==true){
+		TubeConn_h=10;
+		rotate([0,0,22.5])translate([LargeRace_d/2+Tube_d/2+IDXtra,0,TubeConn_h]) rotate([180,0,0]) 
+			TubeEnd(TubeOD=Tube_d,Wall_t=0.84,Hole_d=12, Stop_l=1, GlueAllowance=0.40);
+		difference(){
+			hull(){
+				rotate([0,0,22.5])translate([LargeRace_d/2+Tube_d/2+IDXtra,0,TubeConn_h]) cylinder(d=Tube_d,h=1);
+				rotate([0,0,22.5]) translate([LargeRace_d/2-10,0,TubeConn_h]) cylinder(d=20,h=22);
+			}
+			
+			translate([0,0,14]) cylinder(d=LargeRace_d-1,h=24);
+		} // diff
+	}
 	
 	
 	 // Gear cover
 	difference(){
 		union(){
 			rotate([0,0,Servo_a]) translate([ServoOffset,0,0]) cylinder(d=28,h=1+Overlap);
-			//translate([0,0,1])rotate([0,0,Servo_a]) translate([ServoOffset,0,0]) cylinder(d1=28,d2=8,h=12);
+			translate([0,0,1])rotate([0,0,Servo_a]) translate([ServoOffset,0,0]) cylinder(d1=28,d2=8,h=14);
 		} // union
 		translate([0,0,-Overlap]) cylinder(d=LargeRace_d-1,h=20);
 	}// diff
