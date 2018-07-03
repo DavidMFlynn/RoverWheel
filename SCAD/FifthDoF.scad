@@ -15,7 +15,7 @@
 // OutputTubeBearing(myFn=360);
 // OuterRacePart2(myFn=360);
 // OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=6, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=360) Bolt4ClearHole();
-// rotate([180,0,0]) TheRing(myFn=360);
+// rotate([180,0,0]) TheRing(SideMount=false, myFn=360);
 // PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 // PinionPlate2();
 // SunGear();
@@ -314,11 +314,14 @@ module BasePlate(){
 		} // union
 		
 		// carv out inside
-		translate([0,0,-BottomCover_h+BottomCover_t+4]) cylinder(d=LargeRace_d-BottomCover_t*2,h=BottomCover_h-4+Overlap);
+		translate([0,0,-BottomCover_h+BottomCover_t+4]) cylinder(d=LargeRace_d-10,h=BottomCover_h-BottomCover_t-4+Overlap);
 		translate([0,0,-BottomCover_h+BottomCover_t]) cylinder(d=LargeRace_d-8-BottomCover_t*2,h=BottomCover_h-BottomCover_t+Overlap);
-		translate([0,0,-BottomCover_h+4+BottomCover_t]) rotate_extrude() translate([LargeRace_d/2-4-BottomCover_t,0]) circle(r=4);
+		translate([0,0,-BottomCover_h+4+BottomCover_t]) rotate_extrude() translate([LargeRace_d/2-4-5,0]) circle(r=4);
 		
 		// bolt holes
+		for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,-3]) rotate([180,0,0])
+				cylinder(d=7,h=10);
+		
 			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,-5.95]) 
 				rotate([180,0,0]) Bolt4HeadHole(depth=8);
 			
@@ -328,14 +331,27 @@ module BasePlate(){
 			
 		// Drive Gear clearance
 		rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h+2]) cylinder(d=24,h=BottomCover_h-2+Overlap);
+			
 	} // diff
 	
+	/*
+	MR_h=26;
+	MR_d=TubeFlageOD(TubeOD=25.4);
 	//Base Mounting Option
-	
+	if (HasMountRing==true)
+		difference(){
+			translate([0,0,-BottomCover_h-MR_h]) cylinder(d=MR_d,h=MR_h+Overlap);
+			
+			translate([0,0,-BottomCover_h-MR_h-Overlap]) cylinder(d=MR_d-16,h=MR_h+Overlap*2);
+			translate([0,0,-BottomCover_h-MR_h]) rotate([0,0,-10]) TubeSocketBolts(TubeOD=Tube_d) rotate([180,0,0]) Bolt4Hole();
+			// Servo
+			rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h-MR_h-Overlap]) rotate([0,0,120]) translate([-11.5,-6.5,0])cube([33,20,MR_h+1]);
+		}
+	*/
 } // BasePlate
 
 //translate([0,0,-RingGear_h])
-BasePlate();
+//BasePlate(HasMountRing=true);
 
 //translate([0,0,-BottomCover_h-0.5]) color("Red") EncoderMount();
 //rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) color("Red") ServoSG90();

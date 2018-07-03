@@ -1,11 +1,14 @@
 // ***************************************************
 // Tube Connector Library
+// Filename: TubeConnectorLib.scad
 // by David M. Flynn
 // Created: 3/4/2018
-// Revision: 1.1.2 5/14/2018
+// Revision: 1.1.3 7/2/2018
 // Units: mm
 // ***************************************************
 // History:
+echo(str("TubeConnectorLib 1.1.3"))
+// 1.1.3 7/2/2018  Added TubeSocketBolts
 // 1.1.2 5/14/2018 Added DoubleBoltFlange.
 // 1.1.1 4/14/2018 Added TubeFlange.
 // 1.1.0 3/4/2018  Added TubeSocket.
@@ -37,6 +40,8 @@
 // TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // Tube2Pivot(TubeAngle=180,Length=50,WireExit=0, GlueAllowance=0.40);
 // Tube2PivotCover(Length=60);
+// TubeSocketBolts(TubeOD=25.4) children();
+// function TubeFlageOD(TubeOD=25.4) = TubeOD+BoltOffset*4;
 // ***************************************************
 
 include<CommonStuffSAEmm.scad>
@@ -49,13 +54,15 @@ IDXtra=0.2;
 TubeStop_l=2;
 TubeGrip_l=0.5; //x TubeOD (default 0.375)
 Tube_OD=25.4;
+BoltOffset=4;
 Bearing_ID=12.7;
 Bearing_OD=28.575;
 Bearing_W=7.938;
 
+function TubeFlageOD(TubeOD=25.4) = TubeOD+BoltOffset*4;
+
 module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
-	BoltOffset=4;
-	
+		
 	difference(){
 		cylinder(d=TubeOD+BoltOffset*4, h=FlangeLen);
 			
@@ -72,8 +79,7 @@ module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 //TubeFlange(TubeOD=19.05,FlangeLen=10,Threaded=false);
 
 module DoubleBoltFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
-	BoltOffset=4;
-	
+		
 	difference(){
 		union(){
 			cylinder(d=TubeOD+BoltOffset*4, h=FlangeLen);
@@ -101,9 +107,13 @@ module DoubleBoltFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 //rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=false);
 //rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=true);
 
+module TubeSocketBolts(TubeOD=25.4){
+	for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,0]) children();
+} // TubeSocketBolts
+
+
 module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
-	BoltOffset=4;
-	
+		
 	difference(){
 		hull(){
 			cylinder(d=TubeOD+BoltOffset*4, h=6);
@@ -115,9 +125,9 @@ module TubeSocket(TubeOD=25.4, SocketLen=16, Threaded=true){
 		translate([0,0,1]) cylinder(d=TubeOD+IDXtra, h=SocketLen);
 		
 		if (Threaded==true){
-				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,10]) Bolt4Hole(depth=13);
+				translate([0,0,10]) TubeSocketBolts(TubeOD=TubeOD) Bolt4Hole(depth=13);
 			} else {
-				for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,7]) Bolt4HeadHole(depth=13);
+				translate([0,0,10]) TubeSocketBolts(TubeOD=TubeOD) #Bolt4HeadHole(depth=13);
 			}
 	} // diff
 } // TubeSocket
@@ -228,9 +238,6 @@ module Tube2Pivot(TubeAngle=180,Length=50,WireExit=0, GlueAllowance=0.40){
 } // Tube2Pivot
 
 //rotate([0,-90,0])Tube2Pivot(TubeAngle=150,Length=60,WireExit=-105, GlueAllowance=0.2);
-
-
-
 
 module Tube2PivotCover(Length=50){
 	nBolts=6;
