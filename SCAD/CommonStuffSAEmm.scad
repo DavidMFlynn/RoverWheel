@@ -1,7 +1,7 @@
 // *************************************************
 // filename: CommondStuffSAE.scad
 //  by Dave Flynn 2015, GPL v2
-// Rev: 0.9.6 6/9/2018 Adjusted #2 hole
+// Rev: 0.9.7 7/5/2018 Adjusted #6 hole
 // Some hole sizes have not been tested.
 //
 // This file contains constants and some common routines
@@ -45,7 +45,8 @@
 // Size17Stepper();
 // *************************************************
 // History
-echo("CommonStuffSAEmm 0.9.6");
+echo("CommonStuffSAEmm 0.9.7");
+// 0.9.7 7/5/2018 Adjusted #6 hole
 // 0.9.6 6/9/2018 Adjusted #2 hole
 // 0.9.5 1/27/2018 Adjusted #4 hole
 // 0.9.4 1/26/2018  Metric version
@@ -81,7 +82,7 @@ Bolt4_FlatHd_d=0.255*25.4;
 Bolt4_FlatHd_h=0.083*25.4;
 Bolt4_Clear_r=0.063*25.4;
 
-Bolt6_r=0.058*25.4;
+Bolt6_r=0.052*25.4; // was 0.058
 Bolt6TapHole_r=0.055*25.4;
 Bolt6_Head_r=0.125*25.4;
 Bolt6_Head_h=0.140*25.4;

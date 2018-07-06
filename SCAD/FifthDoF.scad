@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: FifthDoF.scad
 // Created: 6/26/2018
-// Rev: 1.0d1 6/25/2018
+// Rev: 1.0d2 7/5/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0d2 7/5/2018 Added BearingPreload=0.2;
 // 1.0d1 6/25/2018 First code.
 // **************************************************
 // Notes:
@@ -14,8 +15,9 @@
 // ***** for STL output *****
 // OutputTubeBearing(myFn=360);
 // OuterRacePart2(myFn=360);
-// OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=6, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=360) Bolt4ClearHole();
+// OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=5, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=BearingPreload, myFn=360) Bolt4ClearHole();
 // rotate([180,0,0]) TheRing(SideMount=false, myFn=360);
+// rotate([180,0,0]) TheRing(SideMount=true, myFn=360); // side mount version
 // PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 // PinionPlate2();
 // SunGear();
@@ -53,9 +55,11 @@ nPlanetTeeth=12;
 nSunTeeth=12;
 SmallRace_d=Tube_BC+Ball_d+2+RaceBoltInset*4;
 
+ShoulderBolt_l=9.5;
 LargeRace_d=63;
 InnerRace_l=Ball_d*3+6;
-RingGear_h=GearWidth*2+5+1;
+RingGear_h=ShoulderBolt_l*2+5;
+BearingPreload=0.2;
 
 echo(Tube_BC=Tube_BC);
 echo(SmallRace_d=SmallRace_d);
@@ -78,7 +82,7 @@ module ShowFifthDoF(){
 		translate([0,0,Ball_d/2+6+Ball_d*2+5+Overlap*2])
 			rotate([180,0,22.5])
 				color("Brown")OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, 
-							Race_w=5, nBolts=8,RaceBoltInset=RaceBoltInset,PreLoadAdj=0.00, myFn=90)
+							Race_w=5, nBolts=8,RaceBoltInset=RaceBoltInset,PreLoadAdj=BearingPreload, myFn=90)
 					Bolt4ClearHole();
 		CutAway();
 	} // diff
@@ -118,15 +122,16 @@ module ShowFifthDoF(){
 		translate([DrivePlateBC(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2,0,0])
 			rotate([180,0,180/nPlanetTeeth])PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 	
+	
 	color("Blue")
-	translate([0,0,-GearWidth-5-0.6])
+	translate([0,0,-ShoulderBolt_l-5-0.5])
 	for (j=[0:2]) rotate([0,0,120*j])
 		translate([DrivePlateBC(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2,0,0])
-			rotate([180,0,180/nPlanetTeeth])PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
+			rotate([180,0,180/nPlanetTeeth]) PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 	
-	translate([0,0,-GearWidth-5-0.5]) color("Green") PinionPlate2();
+	translate([0,0,-ShoulderBolt_l-5]) color("Green") PinionPlate2();
 	
-	translate([0,0,-GearWidth*2-5-1]) color("Orange")SunGear();
+	translate([0,0,-ShoulderBolt_l*2-5]) color("Orange")SunGear();
 	
 	rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])rotate([0,0,360/12*0.3])color("LightBlue")DriveGear();
 	
@@ -198,7 +203,7 @@ module OutputTubeBearing(myFN=90){
 	difference(){
 		union(){
 			cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+8,h=5);
-			cylinder(d=Tube_d+8,h=InnerRace_l);
+			cylinder(d=Tube_d+8+BearingPreload,h=InnerRace_l);
 			translate([0,0,InnerRace_l-Overlap])cylinder(d1=Tube_d+8,d2=Tube_d+3,h=4);
 			
 			// Key
@@ -215,8 +220,8 @@ module OutputTubeBearing(myFN=90){
 		translate([0,0,5]) cylinder(d=Tube_d+IDXtra*2,h=InnerRace_l+4);
 		translate([0,0,-Overlap]) cylinder(d=6.35,h=6);
 		
-		translate([0,0,Ball_d/2+6]) BallTrack(BallCircle_d=Tube_BC, Ball_d=Ball_d, myFn=myFN);
-		translate([0,0,Ball_d/2+6+Ball_d*2]) BallTrack(BallCircle_d=Tube_BC, Ball_d=Ball_d, myFn=myFN);
+		translate([0,0,Ball_d/2+6]) BallTrack(BallCircle_d=Tube_BC+BearingPreload, Ball_d=Ball_d, myFn=myFN);
+		translate([0,0,Ball_d/2+6+Ball_d*2]) BallTrack(BallCircle_d=Tube_BC+BearingPreload, Ball_d=Ball_d, myFn=myFN);
 		
 	    translate([0,0,5]) DrivePlateBolts(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth) Bolt6Hole();
 		
@@ -239,11 +244,11 @@ module OuterRacePart2(myFn=90){
 	
 	translate([0,0,Ball_d/2+Ball_d*2-10]) difference(){
 		rotate([0,0,22.5])
-		OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=10, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=myFn)		 Bolt4Hole();
+		OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, Race_w=10, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=BearingPreload, myFn=myFn)		 Bolt4Hole();
 		OutideRaceBoltPattern(Race_OD=LargeRace_d,nBolts=8,RaceBoltInset=RaceBoltInset) translate([0,0,2])Bolt4HeadHole();
 	}
 	
-	translate([0,0,Ball_d/2+6])rotate([180,0,0])OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=6, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=myFn) Bolt4HeadHole();
+	translate([0,0,Ball_d/2+6])rotate([180,0,0])OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=6, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=BearingPreload, myFn=myFn) Bolt4HeadHole();
 	
 } // OuterRacePart2
 
@@ -362,7 +367,7 @@ module BasePlate(){
 module TheRing(SideMount=false, myFn=90){
 	
 	translate([0,0,RingGear_h+6])
-		OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=4, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=0.00, myFn=myFn) Bolt4Hole();
+		OutsideRace(BallCircle_d=Tube_BC, Race_OD=LargeRace_d, Ball_d=Ball_d, Race_w=4, nBolts=8, RaceBoltInset=RaceBoltInset, PreLoadAdj=BearingPreload, myFn=myFn) Bolt4Hole();
 	
 	nBolts=8;
 	difference(){
@@ -409,7 +414,7 @@ module TheRing(SideMount=false, myFn=90){
 				rotate([0,0,22.5]) translate([LargeRace_d/2-10,0,TubeConn_h]) cylinder(d=20,h=22);
 			}
 			
-			translate([0,0,14]) cylinder(d=LargeRace_d-1,h=24);
+			translate([0,0,TubeConn_h-Overlap]) cylinder(d=LargeRace_d-1,h=24);
 		} // diff
 	}
 	
@@ -426,7 +431,7 @@ module TheRing(SideMount=false, myFn=90){
 	// Key
 	difference(){
 	rotate([0,0,-55])
-				translate([DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2+4,-2,RingGear_h+0.5])cube([4,4,7]);
+				translate([DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2+4,-2,RingGear_h+0.5])cube([10,4,7]);
 		translate([0,0,RingGear_h])cylinder(d=DrivePlateBC(Pitch=PlanetaryPitch,nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)+9,h=8);
 	} // diff
 	
@@ -434,7 +439,7 @@ module TheRing(SideMount=false, myFn=90){
 
 } // TheRing
 
-//translate([0,0,-RingGear_h])TheRing();
+//translate([0,0,-RingGear_h])TheRing(SideMount=true);
 
 
 
