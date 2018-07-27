@@ -3,14 +3,16 @@
 // David M. Flynn
 // Filename: FifthDoF.scad
 // Created: 6/26/2018
-// Rev: 1.0d2 7/5/2018
+// Rev: 1.0d3 7/25/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0d3 7/25/2018 Changed BackLash=0.2; was 0.4, BearingPreload=0.4; was 0.2
 // 1.0d2 7/5/2018 Added BearingPreload=0.2;
 // 1.0d1 6/25/2018 First code.
 // **************************************************
 // Notes:
+// Encoder shaft length 50mm long x 6.35mm dia + 8.5mm long x 6mm dia.
 // **************************************************
 // ***** for STL output *****
 // OutputTubeBearing(myFn=360);
@@ -25,7 +27,7 @@
 // rotate([180,0,0]) DriveGear();
 // **************************************************
 // ***** for Viewing *****
-// ShowFifthDoF();
+ShowFifthDoF();
 // **************************************************
 
 include<SG90ServoLib.scad>
@@ -46,7 +48,7 @@ Tube_d=19.05; // 3/4"
 Tube_BC=Tube_d+6+Ball_d; // Ball Circle of bearings
 
 PlanetaryPitch=260;
-BackLash=0.4;
+BackLash=0.2;
 Pressure_a=24;
 GearWidth=8;
 DrivePlateXtra_d=10;
@@ -59,7 +61,7 @@ ShoulderBolt_l=9.5;
 LargeRace_d=63;
 InnerRace_l=Ball_d*3+6;
 RingGear_h=ShoulderBolt_l*2+5;
-BearingPreload=0.2;
+BearingPreload=0.4;
 
 echo(Tube_BC=Tube_BC);
 echo(SmallRace_d=SmallRace_d);
@@ -81,7 +83,7 @@ module ShowFifthDoF(){
 	difference(){
 		translate([0,0,Ball_d/2+6+Ball_d*2+5+Overlap*2])
 			rotate([180,0,22.5])
-				color("Brown")OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, 
+				color("Brown") OutsideRace(BallCircle_d=Tube_BC, Race_OD=SmallRace_d, Ball_d=Ball_d, 
 							Race_w=5, nBolts=8,RaceBoltInset=RaceBoltInset,PreLoadAdj=BearingPreload, myFn=90)
 					Bolt4ClearHole();
 		CutAway();
@@ -90,7 +92,7 @@ module ShowFifthDoF(){
 	
 	//*
 	difference(){
-		color("Tan")OutputTubeBearing();
+		color("Tan") OutputTubeBearing();
 		CutAway();
 	} // diff
 	/**/
@@ -104,7 +106,7 @@ module ShowFifthDoF(){
 	
 	//*
 	difference(){
-		translate([0,0,-RingGear_h-Overlap]) color("Pink")BasePlate();
+		translate([0,0,-RingGear_h-Overlap]) color("Pink") BasePlate();
 		CutAway();
 	} // diff
 	
@@ -120,7 +122,7 @@ module ShowFifthDoF(){
 	color("Blue")
 	for (j=[0:2]) rotate([0,0,120*j])
 		translate([DrivePlateBC(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, nTeethPinion=nSunTeeth)/2,0,0])
-			rotate([180,0,180/nPlanetTeeth])PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
+			rotate([180,0,180/nPlanetTeeth]) PlanetGear(Pitch=PlanetaryPitch, nTeeth=nPlanetTeeth, Thickness=GearWidth, SholderBolt=1);
 	
 	
 	color("Blue")
@@ -134,6 +136,12 @@ module ShowFifthDoF(){
 	translate([0,0,-ShoulderBolt_l*2-5]) color("Orange")SunGear();
 	
 	rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])rotate([0,0,360/12*0.3])color("LightBlue")DriveGear();
+	
+	// Encoder shaft
+	translate([0,0,-RingGear_h-BottomCover_h-8.5]) color("Red"){
+		cylinder(d=6,h=8.5+Overlap);
+		translate([0,0,8.5]) cylinder(d=6.35,h=50);
+	}
 	
 } // ShowFifthDoF
 
