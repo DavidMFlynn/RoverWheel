@@ -3,9 +3,11 @@
 // by David M. Flynn
 // Filename: CornerPivotPD.scad
 // Created: 7/16/2018
-// Revision: 1.0.0 7/16/2018
+// Revision: 1.1.1 8/2/2018
 // **********************************************
 // History
+// 1.1.1 8/2/2018 Outer race to RingGearWidth, BackLash=0.0
+// 1.1.0 7/30/2018 Made it smaller 110mm OD
 // 1.0.0 7/16/2018 Copied from CornerPivot.scad 1.0.6.
 // **********************************************
 // for STL output
@@ -17,7 +19,7 @@
 //
 // CP_OuterRace(myFn=360);
 //
-//CornerPivotUpperLD20MG(Tube_a=10, Flanged=false);
+//CornerPivotUpperLD20MG(Tube_a=10, Flanged=true);
 //
 //rotate([180,0,0]) CornerPivotLower();
 //
@@ -30,28 +32,12 @@
 // **********************************************
 // for Viewing
 // CornerPivotS(UpperTubeAngle=10,LowerRot=90);
-// Show_CP();
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
 
 include<LD-20MGServoLib.scad>
 include<PlanetDriveLib.scad>
-// overrides
-PlanetaryPitch=300;
-BackLash=0.2;
-Pressure_a=20;
-GearWidth=9;
-DriveGearWidth=8;
-DrivePlateXtra_d=12;
-ShoulderBoltHeadClearance_d=9;
-SunGearTeeth=15;
-PinionGearTeeth=21;
-DriveGearTeeth=13;
-PlanetGearTeeth=15;
-RingPitch_diameter  =  (PlanetGearTeeth * PlanetaryPitch / 180) * 2 + SunGearTeeth * PlanetaryPitch / 180;
-RingTeeth=RingPitch_diameter * 180 / PlanetaryPitch;
-
 include<BearingLib.scad>
 
 include<TubeConnectorLib.scad>
@@ -59,6 +45,50 @@ include<TubeConnectorLib.scad>
 // TubeSection(TubeOD=25.4,Wall_t=0.84, Length=100, Stop_l=TubeStop_l);
 // TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 // TubeEll(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
+// overrides
+
+// It's too big
+/*
+PlanetaryPitch=300;
+DrivePlateXtra_d=12;
+SunGearTeeth=15;
+PinionGearTeeth=21;
+DriveGearTeeth=13;
+PlanetGearTeeth=15;
+RingPitch_diameter  =  (PlanetGearTeeth * PlanetaryPitch / 180) * 2 + SunGearTeeth * PlanetaryPitch / 180;
+RingTeeth=RingPitch_diameter * 180 / PlanetaryPitch;
+CornerPivot_bc=104; // ball circle
+CP_OD=CornerPivot_bc+26;
+CP_ID=CornerPivot_bc-26;
+Ball_d=9.525;
+nTopBolts=12;
+nBottomBolts=16;
+/**/
+
+// a smaller one
+PlanetaryPitch=260;
+DrivePlateXtra_d=12;
+SunGearTeeth=15;
+PinionGearTeeth=17;
+DriveGearTeeth=15;
+PlanetGearTeeth=12;
+RingPitch_diameter  =  (PlanetGearTeeth * PlanetaryPitch / 180) * 2 + SunGearTeeth * PlanetaryPitch / 180;
+RingTeeth=RingPitch_diameter * 180 / PlanetaryPitch;
+CornerPivot_bc=86; // ball circle
+CP_OD=CornerPivot_bc+24;
+CP_ID=CornerPivot_bc-24;
+RingClearance=62;
+Ball_d=7.9375; // 9.525;
+nTopBolts=8;
+nBottomBolts=12;
+
+BackLash=0.0;
+Pressure_a=20;
+GearWidth=9.5; // shoulder bolt height
+DriveGearWidth=8;
+
+ShoulderBoltHeadClearance_d=9;
+RingGearWidth=(GearWidth>Ball_d+1)? GearWidth:Ball_d+1;
 
 $fn=90;
 IDXtra=0.2;
@@ -66,16 +96,15 @@ Overlap=0.05;
 
 Tube_OD=25.4;
 RaceBoltInset=3.5;
-CornerPivot_bc=104; // ball circle
-CP_OD=CornerPivot_bc+26;
-CP_ID=CornerPivot_bc-26;
+
 MotorCover_d=32;
-Ball_d=9.525;
-BearingPreLoad=0.2;
-nTopBolts=12;
-nBottomBolts=16;
+
+BearingPreLoad=0.6;
+ServoPos_a=-90;
 
 
+
+echo(str("Joint OD = ",CP_OD));
 
 module ShowPlanetGears(){
 for (j=[0:2]) rotate([0,0,120*j]) translate([PlanetaryPitch*PlanetGearTeeth/360+PlanetaryPitch*SunGearTeeth/360,0,0])
@@ -84,6 +113,26 @@ PlanetGear(Pitch=PlanetaryPitch, nTeeth=PlanetGearTeeth, Thickness=GearWidth, Sh
 } // ShowPlanetGears
 
 //ShowPlanetGears();
+
+module CornerPivotS(UpperTubeAngle=10,LowerRot=90){
+	translate([0,0,RingGearWidth+Overlap]) CornerPivotUpperLD20MG(Tube_a=UpperTubeAngle, Flanged=true);
+	translate([0,0,1]) rotate([0,0,180/SunGearTeeth]) CP_SunGear();
+	rotate([0,0,ServoPos_a]) 
+		translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,Ball_d+2])
+			rotate([0,0,180/DriveGearTeeth*0.7]) CP_DriveGear();
+	translate([0,0,0]) rotate([0,0,180/nTopBolts]) CP_RingGear();
+	/*
+	translate([0,0,0]) rotate([0,0,-30]) ShowPlanetGears();
+	
+	
+	
+	rotate([180,0,0]) translate([0,0,-Ball_d-0.5]) CP_OuterRace();
+	
+	translate([0,0,-0.5-Overlap]) rotate([0,0,LowerRot]) CornerPivotLower();
+	/**/
+} // CornerPivotS
+
+//CornerPivotS(UpperTubeAngle=10,LowerRot=90);
 
 module CP_DriveGear(){
 	nBolts=4;
@@ -157,19 +206,20 @@ module CP_SunGear(){
 
 module CP_RingGear(myFn=90){
 	
+	
 	difference(){
 		union(){
-			RingGear(Pitch=PlanetaryPitch, nTeeth=PlanetGearTeeth, nTeethPinion=SunGearTeeth, Thickness=Ball_d+1);
+			RingGear(Pitch=PlanetaryPitch, nTeeth=PlanetGearTeeth, nTeethPinion=SunGearTeeth, Thickness=RingGearWidth);
 			difference(){
-				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CornerPivot_bc-Ball_d,h=0.5+Overlap);
-				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=82,h=0.5+Overlap*4);
+				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CornerPivot_bc-Ball_d,h=RingGearWidth-(Ball_d+0.5)+Overlap);
+				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=RingClearance,h=RingGearWidth-(Ball_d+0.5)+Overlap*4);
 			} // diff
-			OnePieceInnerRace(BallCircle_d=CornerPivot_bc,	Race_ID=82,	Ball_d=Ball_d, Race_w=Ball_d+0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
+			OnePieceInnerRace(BallCircle_d=CornerPivot_bc,	Race_ID=RingClearance,	Ball_d=Ball_d, Race_w=RingGearWidth-0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
 		}// union
 		
 		// Bolt holes
 		for (j=[0:nTopBolts-1]) rotate([0,0,360/nTopBolts*j])
-			translate([CornerPivot_bc/2-Ball_d/2-RaceBoltInset,0,Ball_d+1]) Bolt4Hole();
+			translate([CornerPivot_bc/2-Ball_d/2-RaceBoltInset,0,RingGearWidth]) Bolt4Hole();
 		
 		// ball insertion cut
 		rotate([0,0,180/nTopBolts]) translate([CornerPivot_bc/2,0,(Ball_d+0.5)/2]) hull(){
@@ -186,16 +236,16 @@ module CP_OuterRace(myFn=90){
 	
 	difference(){
 		union(){
-			OnePieceOuterRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=Ball_d, Race_w=Ball_d+0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
+			OnePieceOuterRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=Ball_d, Race_w=RingGearWidth-0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
 			difference(){
-				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CP_OD,h=0.5+Overlap);
-				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=CornerPivot_bc+Ball_d,h=0.5+Overlap*4);
+				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CP_OD,h=RingGearWidth-(Ball_d+0.5)+Overlap);
+				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=CornerPivot_bc+Ball_d,h=RingGearWidth-(Ball_d+0.5)+Overlap*4);
 			} // diff
 		} // union
 		
 		// Bolt holes
 		for (j=[0:nBottomBolts-1]) rotate([0,0,360/nBottomBolts*j])
-			translate([CP_OD/2-RaceBoltInset,0,Ball_d+1]) Bolt4Hole();
+			translate([CP_OD/2-RaceBoltInset,0,RingGearWidth+0.5]) Bolt4Hole();
 		
 		// ball insertion cut
 		rotate([0,0,180/nTopBolts]) translate([CornerPivot_bc/2,0,-(Ball_d+0.5)/2]) hull(){
@@ -207,20 +257,7 @@ module CP_OuterRace(myFn=90){
 	
 } // CP_OuterRace
 
-//rotate([180,0,0]) translate([0,0,-Ball_d-0.5]) CP_OuterRace();
-
-module CornerPivotS(UpperTubeAngle=10,LowerRot=90){
-	CornerPivotUpperLD20MG(Tube_a=UpperTubeAngle);
-	
-	translate([0,0,-Overlap]) rotate([180,0,22.5]) OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=90) Bolt4ClearHole();
-	translate([0,0,-7-5-Overlap*2]) rotate([0,0,22.5]) OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=360) Bolt4Hole();
-	
-	translate([0,0,-7-5-Overlap*2]) rotate([0,0,LowerRot]) CornerPivotLower();
-} // CornerPivotS
-
-//CornerPivotS(UpperTubeAngle=10,LowerRot=90);
-
-
+//translate([0,0,RingGearWidth-0.5]) rotate([180,0,0]) CP_OuterRace();
 
 module CornerPivotUpperSTL(Left=true){
 	
@@ -249,10 +286,10 @@ module EncoderMount(){
 
 //EncoderMount();
 
-module CornerPivotUpperLD20MG(Tube_a=10, Flanged=true){
+module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 	// This version is for a standard r/c servo
 	Base_h=2;
-	TubeStop_y=25;
+	TubeStop_y=18; //25;
 	
 	Motor_d=28;
 	Stop_a=45;
@@ -274,7 +311,9 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=true){
 			cylinder(d=CP_OD,h=1);
 			
 			// Drive Gear Cover
-			translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0]) cylinder(d=DriveGearTeeth*PlanetaryPitch/180+12,h=13);
+			rotate([0,0,ServoPos_a])
+				translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0]) 
+					cylinder(d=DriveGearTeeth*PlanetaryPitch/180+12,h=13);
 			
 			hull(){
 				if (Flanged==true){
@@ -285,28 +324,30 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=true){
 				translate([0,0,3]) cylinder(d=55,h=6);
 				
 				// Servo attachment
+				rotate([0,0,ServoPos_a]){
 				translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0]) rotate([0,0,-90]){
-				translate([-18.75,-10,0]) cube([0.1,22.0,Servo_h-Servo_Deck_h]);
-				translate([37.50,-10,0]) cube([0.1,22.0,Servo_h-Servo_Deck_h]);}
+				translate([-17.75,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);
+				translate([37.00,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);}}
 			} // hull
 		} // union
 		// encoder
 		translate([0,0,14]) rotate([180,0,0]) EncoderMount();
 		// Servo
+		rotate([0,0,ServoPos_a]){
 		translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,Servo_h])rotate([0,0,-90])
-			rotate([0,180,0]) Servo_LD20MG(BottomMount=true,TopAccess=false);
+			rotate([0,180,0]) Servo_LD20MG(BottomMount=true,TopAccess=false);}
 		
 		// Ring Gear bolts
 		for (j=[0:nTopBolts-1]) rotate([0,0,360/nTopBolts*(j+0.5)]) translate([CornerPivot_bc/2-Ball_d/2-RaceBoltInset,0,6])
 			
 		//translate([(CP_OD)/2-RaceBoltInset,0,6]) 
-			 Bolt4HeadHole(depth=8,lHead=24);
+			 Bolt4HeadHole(depth=8,lHead=30);
 		
 		if (Flanged==true){
 			translate([0,TubeStop_y, Tube_OD/2+BoltOffset*1.42+Base_h]) rotate([-90+Tube_a,0,0]){
 				translate([0,0,10-Overlap]) cylinder(d=Tube_OD+BoltOffset*4+IDXtra*2, h=CornerPivot_bc);
 				translate([0,0,2]) cylinder(d=Tube_OD+BoltOffset*2+4, h=CornerPivot_bc);
-				translate([0,0,-15]) cylinder(d=Tube_OD, h=40);
+				translate([0,0,-8]) cylinder(d=Tube_OD, h=20);
 				
 			}
 		} else {
@@ -317,8 +358,8 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=true){
 		//Gear clearance
 		translate([0,0,-Overlap]) hull(){
 			cylinder(d=PinionGearTeeth*PlanetaryPitch/180+8,h=10);
-			translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0])
-				cylinder(d=DriveGearTeeth*PlanetaryPitch/180+8,h=10);
+			rotate([0,0,ServoPos_a]) translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0])
+				cylinder(d=DriveGearTeeth*PlanetaryPitch/180+6,h=10);
 		} // hull
 		
 		// Rotation Stop
@@ -341,7 +382,8 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=true){
 	
 } // CornerPivotUpperLD20MG
 
-//translate([0,0,Ball_d+1+Overlap]) CornerPivotUpperLD20MG();
+//translate([0,0,Ball_d+1+Overlap]) 
+//CornerPivotUpperLD20MG();
 
 module CornerPivotLower(){
 	Base_h=6;
@@ -408,26 +450,5 @@ module CornerPivotLowerSTL(Left=true){
 //CornerPivotLowerSTL();
 //translate([10,0,0])mirror([1,0,0])CornerPivotLowerSTL();
 
-
-
-
-module Show_CP(){
-	nBolts=8;
-	
-	//translate([0,0,-Overlap])CornerPivotLower();
-	rotate([0,0,180/nBolts*7]) LowerInnerRace();
-	//rotate([0,0,180/nBolts*9]) translate([0,0,10+Overlap*2]) rotate([180,0,0]) UpperInnerRace(myFn=90);
-
-
-	//translate([0,0,12+Overlap])rotate([180,0,0])
-	//	OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=7, nBolts=8, myFn=360) Bolt4ClearHole();
-	
-	//OutsideRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=9.525, Race_w=5, nBolts=8, myFn=90) Bolt4Hole();
-	
-	translate([0,0,12+Overlap*3]) CornerPivotUpperS();
-	
-} // Show_CP
-
-//Show_CP();
 
 
