@@ -3,9 +3,10 @@
 // by David M. Flynn
 // Filename: CornerPivotPD.scad
 // Created: 7/16/2018
-// Revision: 1.1.1 8/2/2018
+// Revision: 1.2.0 8/3/2018
 // **********************************************
 // History
+// 1.2.0 8/3/2018 Added Rotation Stop and VOffset.
 // 1.1.1 8/2/2018 Outer race to RingGearWidth, BackLash=0.0
 // 1.1.0 7/30/2018 Made it smaller 110mm OD
 // 1.0.0 7/16/2018 Copied from CornerPivot.scad 1.0.6.
@@ -19,9 +20,9 @@
 //
 // CP_OuterRace(myFn=360);
 //
-//CornerPivotUpperLD20MG(Tube_a=10, Flanged=true);
+// CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360);
 //
-//rotate([180,0,0]) CornerPivotLower();
+//rotate([180,0,0]) CornerPivotLower(myFn=360);
 //
 // CornerPivotUpperSTL(Left=true);
 // CornerPivotUpperSTL(Left=false);
@@ -39,6 +40,7 @@ include<CommonStuffSAEmm.scad>
 include<LD-20MGServoLib.scad>
 include<PlanetDriveLib.scad>
 include<BearingLib.scad>
+include<AbsEncLib.scad>
 
 include<TubeConnectorLib.scad>
 // TubeEll_STL(TubeOD=25.4,Wall_t=0.84,Hole_d=14);
@@ -101,7 +103,7 @@ MotorCover_d=32;
 
 BearingPreLoad=0.6;
 ServoPos_a=-90;
-
+VOffset=0.25;
 
 
 echo(str("Joint OD = ",CP_OD));
@@ -121,14 +123,14 @@ module CornerPivotS(UpperTubeAngle=10,LowerRot=90){
 		translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,Ball_d+2])
 			rotate([0,0,180/DriveGearTeeth*0.7]) CP_DriveGear();
 	translate([0,0,0]) rotate([0,0,180/nTopBolts]) CP_RingGear();
-	/*
+	//*
 	translate([0,0,0]) rotate([0,0,-30]) ShowPlanetGears();
 	
 	
 	
-	rotate([180,0,0]) translate([0,0,-Ball_d-0.5]) CP_OuterRace();
+	translate([0,0,-VOffset*2]) CP_OuterRace();
 	
-	translate([0,0,-0.5-Overlap]) rotate([0,0,LowerRot]) CornerPivotLower();
+	translate([0,0,-VOffset*2-Overlap]) rotate([0,0,LowerRot]) CornerPivotLower();
 	/**/
 } // CornerPivotS
 
@@ -210,11 +212,15 @@ module CP_RingGear(myFn=90){
 	difference(){
 		union(){
 			RingGear(Pitch=PlanetaryPitch, nTeeth=PlanetGearTeeth, nTeethPinion=SunGearTeeth, Thickness=RingGearWidth);
-			difference(){
-				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CornerPivot_bc-Ball_d,h=RingGearWidth-(Ball_d+0.5)+Overlap);
-				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=RingClearance,h=RingGearWidth-(Ball_d+0.5)+Overlap*4);
-			} // diff
-			OnePieceInnerRace(BallCircle_d=CornerPivot_bc,	Race_ID=RingClearance,	Ball_d=Ball_d, Race_w=RingGearWidth-0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
+			//difference(){
+			//	translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CornerPivot_bc-Ball_d,h=RingGearWidth-(Ball_d+0.5)+Overlap);
+			//	translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=RingClearance,h=RingGearWidth-(Ball_d+0.5)+Overlap*4);
+			//} // diff
+			OnePieceInnerRace(BallCircle_d=CornerPivot_bc,	Race_ID=RingClearance,	Ball_d=Ball_d,
+				Race_w=RingGearWidth,
+				PreLoadAdj=BearingPreLoad,
+				VOffset=-VOffset,
+				myFn=myFn);
 		}// union
 		
 		// Bolt holes
@@ -232,26 +238,52 @@ module CP_RingGear(myFn=90){
 
 //rotate([0,0,180/nTopBolts]) CP_RingGear();
 
+
 module CP_OuterRace(myFn=90){
+	Stop_a=6;
+	Stop_w=3.5;
+	Stop_h=3;
+	
+	
 	
 	difference(){
-		union(){
-			OnePieceOuterRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=Ball_d, Race_w=RingGearWidth-0.5, PreLoadAdj=BearingPreLoad, myFn=myFn);
-			difference(){
-				translate([0,0,Ball_d+0.5-Overlap]) cylinder(d=CP_OD,h=RingGearWidth-(Ball_d+0.5)+Overlap);
-				translate([0,0,Ball_d+0.5-Overlap*2]) cylinder(d=CornerPivot_bc+Ball_d,h=RingGearWidth-(Ball_d+0.5)+Overlap*4);
-			} // diff
-		} // union
+		
+		OnePieceOuterRace(BallCircle_d=CornerPivot_bc, Race_OD=CP_OD, Ball_d=Ball_d, Race_w=RingGearWidth,
+				PreLoadAdj=BearingPreLoad,
+				VOffset=VOffset,
+				myFn=myFn);
+			
 		
 		// Bolt holes
 		for (j=[0:nBottomBolts-1]) rotate([0,0,360/nBottomBolts*j])
 			translate([CP_OD/2-RaceBoltInset,0,RingGearWidth+0.5]) Bolt4Hole();
 		
 		// ball insertion cut
-		rotate([0,0,180/nTopBolts]) translate([CornerPivot_bc/2,0,-(Ball_d+0.5)/2]) hull(){
+		rotate([0,0,180/nTopBolts]) translate([CornerPivot_bc/2,0,RingGearWidth/2+VOffset]) hull(){
 			sphere(d=Ball_d-BearingPreLoad);
 			translate([0,0,Ball_d]) sphere(d=Ball_d-BearingPreLoad);
 		}
+		
+		// Rotation Stop
+		translate([0,0,RingGearWidth-Stop_h]){
+		difference(){
+			cylinder(r=CP_OD/2-RaceBoltInset+Stop_w/2,h=Stop_h+Overlap);
+			
+			translate([0,0,-Overlap]){
+				
+				cylinder(r=CP_OD/2-RaceBoltInset-Stop_w/2,h=Stop_h+Overlap*2);
+				
+				rotate([0,0,180/nBottomBolts])translate([-3,CP_OD/2-RaceBoltInset-Stop_w/2-Overlap,-Overlap*2])cube([6,Stop_w+Overlap*2,Stop_h+Overlap*4]);
+				//translate([-(CP_OD/2-RaceBoltInset+2.5+Overlap),0,0])
+					//#cube([(CP_OD/2-RaceBoltInset+2.5+Overlap)*2,CP_OD/2-RaceBoltInset+2.5+Overlap,Stop_h+Overlap*2]);
+				//rotate([0,0,-90-Stop_a-90]) cube([CP_OD/2-RaceBoltInset+2.5+Overlap,CP_OD/2-RaceBoltInset+2.5+Overlap,Stop_h+Overlap*2]);
+				//rotate([0,0,-90+Stop_a]) cube([CP_OD/2-RaceBoltInset+2.5+Overlap,CP_OD/2-RaceBoltInset+2.5+Overlap,Stop_h+Overlap*2]);
+			}
+		} // diff
+		
+		rotate([0,0,-Stop_a/2+180/nBottomBolts]) translate([0,CP_OD/2-RaceBoltInset,0]) cylinder(d=Stop_w,h=Stop_h+Overlap);
+		rotate([0,0,Stop_a/2+180/nBottomBolts]) translate([0,CP_OD/2-RaceBoltInset,0]) cylinder(d=Stop_w,h=Stop_h+Overlap);
+	}
 		
 	} // diff
 	
@@ -275,18 +307,7 @@ module CornerPivotUpperSTL(Left=true){
 //translate([-10,0,0])mirror([1,0,0])CornerPivotUpperSTL();
 //translate([0,0,-10.1])rotate([0,0,22.5])Show_CP();
 
-module EncoderMount(){
-		//Encoder shaft
-		translate([0,0,-Overlap]) cylinder(d=6.35+IDXtra,h=20+Overlap*2);
-		//Encoder mount
-		translate([0,0,1]) rotate([180,0,0])cylinder(d=23+IDXtra,h=29);
-		translate([8.5,0,0]) rotate([180,0,0])Bolt2Hole();
-		translate([-8.5,0,0]) rotate([180,0,0])Bolt2Hole();
-} // EncoderMount
-
-//EncoderMount();
-
-module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
+module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false, myFn=90){
 	// This version is for a standard r/c servo
 	Base_h=2;
 	TubeStop_y=18; //25;
@@ -305,10 +326,16 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 	
 	difference(){
 		union(){
-			translate([0,0,1-Overlap]) cylinder(d1=CP_OD-RaceBoltInset*4,d2=40,h=10+Overlap);
+			translate([0,0,1-Overlap]) cylinder(d1=CP_OD-RaceBoltInset*4,d2=40,h=10+Overlap,$fn=myFn);
+			
+			// Stop Boss
+			hull(){
+				translate([-CP_OD/2+RaceBoltInset,0,0]) cylinder(r=RaceBoltInset,h=4);
+				translate([-CP_OD/2+20,0,0]) cylinder(r=RaceBoltInset,h=4);
+			} // hull
 			
 			// base
-			cylinder(d=CP_OD,h=1);
+			cylinder(d=CP_OD,h=1,$fn=myFn);
 			
 			// Drive Gear Cover
 			rotate([0,0,ServoPos_a])
@@ -317,11 +344,11 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 			
 			hull(){
 				if (Flanged==true){
-					translate([0,TubeStop_y,Tube_OD/2+BoltOffset*1.42+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=Tube_OD+BoltOffset*4,h=0.1);
+					translate([0,TubeStop_y,Tube_OD/2+BoltOffset*1.42+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=Tube_OD+BoltOffset*4,h=0.1,$fn=myFn);
 				} else {
-					translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=Tube_OD,h=5);
+					translate([0,TubeStop_y,Tube_OD/2+Base_h]) rotate([-90+Tube_a+180,0,0]) cylinder(d=Tube_OD,h=5,$fn=myFn);
 				}
-				translate([0,0,3]) cylinder(d=55,h=6);
+				translate([0,0,3]) cylinder(d=55,h=6,$fn=myFn);
 				
 				// Servo attachment
 				rotate([0,0,ServoPos_a]){
@@ -330,8 +357,12 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 				translate([37.00,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);}}
 			} // hull
 		} // union
+		
+		// Stop bolt
+		translate([-CP_OD/2+RaceBoltInset,0,4]) Bolt4Hole();
+		
 		// encoder
-		translate([0,0,14]) rotate([180,0,0]) EncoderMount();
+		translate([0,0,14]) EncoderMount();
 		// Servo
 		rotate([0,0,ServoPos_a]){
 		translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,Servo_h])rotate([0,0,-90])
@@ -347,7 +378,8 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 			translate([0,TubeStop_y, Tube_OD/2+BoltOffset*1.42+Base_h]) rotate([-90+Tube_a,0,0]){
 				translate([0,0,10-Overlap]) cylinder(d=Tube_OD+BoltOffset*4+IDXtra*2, h=CornerPivot_bc);
 				translate([0,0,2]) cylinder(d=Tube_OD+BoltOffset*2+4, h=CornerPivot_bc);
-				translate([0,0,-8]) cylinder(d=Tube_OD, h=20);
+				translate([0,0,-2]) cylinder(d=Tube_OD, h=20);
+				translate([0,-Tube_OD/2+5,-8]) cylinder(d=10, h=20);
 				
 			}
 		} else {
@@ -382,22 +414,21 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false){
 	
 } // CornerPivotUpperLD20MG
 
-//translate([0,0,Ball_d+1+Overlap]) 
-//CornerPivotUpperLD20MG();
+//translate([0,0,Ball_d+1+Overlap]) CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360);
 
-module CornerPivotLower(){
+module CornerPivotLower(myFn=90){
 	Base_h=6;
 	TubeConn_y=20;
 
 	difference(){
 		union(){
-			translate([0,0,-3-Overlap]) cylinder(d=CP_OD,h=3+Overlap);
-			translate([0,0,-Base_h]) cylinder(d1=CornerPivot_bc-10,d2=CornerPivot_bc+12,h=Base_h-1);
-			translate([0,0,-2-Overlap]) cylinder(d=CornerPivot_bc+12,h=1);
+			translate([0,0,-3-Overlap]) cylinder(d=CP_OD,h=3+Overlap,$fn=myFn);
+			translate([0,0,-Base_h]) cylinder(d1=CornerPivot_bc-10,d2=CornerPivot_bc+12,h=Base_h-1,$fn=myFn);
+			//translate([0,0,-2-Overlap]) cylinder(d=CornerPivot_bc+12,h=1);
 			
 			hull(){
-				translate([0,0,-Base_h]) cylinder(d=CornerPivot_bc-10,h=0.1);
-				translate([0,TubeConn_y,-Tube_OD/2-Base_h])rotate([90,0,0]) cylinder(d=Tube_OD,h=4);
+				translate([0,0,-Base_h]) cylinder(d=CornerPivot_bc-10,h=0.1,$fn=myFn);
+				translate([0,TubeConn_y,-Tube_OD/2-Base_h])rotate([90,0,0]) cylinder(d=Tube_OD,h=4,$fn=myFn);
 			} // hull
 		} // union
 		
@@ -406,7 +437,7 @@ module CornerPivotLower(){
 			Bolt4ClearHole(depth=8);
 		
 		// Encoder shaft
-		translate([0,0,-10]) cylinder(d=6.35,h=10+Overlap);
+		translate([0,0,-25.4]) cylinder(d=6.35,h=25.4+Overlap);
 		
 		//Planet bolts
 		for (j=[0:2]) rotate([0,0,120*j]) translate([PlanetaryPitch*PlanetGearTeeth/360+PlanetaryPitch*SunGearTeeth/360,0,0]) Bolt6Hole(depth=10);
@@ -433,7 +464,7 @@ module CornerPivotLower(){
 	translate([0,TubeConn_y,-Tube_OD/2-Base_h])rotate([-90,0,0])TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 } // CornerPivotLower
 
-//CornerPivotLower();
+//CornerPivotLower(myFn=180);
 
 module CornerPivotLowerSTL(Left=true){
 	
