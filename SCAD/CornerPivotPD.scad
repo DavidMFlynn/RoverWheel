@@ -21,8 +21,7 @@
 // CP_OuterRace(myFn=360);
 //
 // CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360);
-//
-//rotate([180,0,0]) CornerPivotLower(myFn=360);
+// rotate([180,0,0]) CornerPivotLower(myFn=360);
 //
 // CornerPivotUpperSTL(Left=true);
 // CornerPivotUpperSTL(Left=false);
@@ -418,7 +417,7 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false, myFn=90){
 
 module CornerPivotLower(myFn=90){
 	Base_h=6;
-	TubeConn_y=20;
+	TubeConn_y=17; // Use 30mm of 1" tube.
 
 	difference(){
 		union(){
@@ -437,10 +436,10 @@ module CornerPivotLower(myFn=90){
 			Bolt4ClearHole(depth=8);
 		
 		// Encoder shaft
-		translate([0,0,-25.4]) cylinder(d=6.35,h=25.4+Overlap);
+		translate([0,0,Overlap]) rotate([180,0,0]) cylinder(d=6.35,h=40);
 		
 		//Planet bolts
-		for (j=[0:2]) rotate([0,0,120*j]) translate([PlanetaryPitch*PlanetGearTeeth/360+PlanetaryPitch*SunGearTeeth/360,0,0]) Bolt6Hole(depth=10);
+		for (j=[0:2]) rotate([0,0,120*j+15]) translate([PlanetaryPitch*PlanetGearTeeth/360+PlanetaryPitch*SunGearTeeth/360,0,0]) Bolt6Hole(depth=10);
 		
 		// tube clearance
 		translate([0,TubeConn_y,-Tube_OD/2-Base_h])rotate([-90,0,0])cylinder(d=Tube_OD+IDXtra*2,h=CornerPivot_bc);
@@ -464,7 +463,7 @@ module CornerPivotLower(myFn=90){
 	translate([0,TubeConn_y,-Tube_OD/2-Base_h])rotate([-90,0,0])TubeEnd(TubeOD=25.4,Wall_t=0.84,Hole_d=14, GlueAllowance=0.40);
 } // CornerPivotLower
 
-//CornerPivotLower(myFn=180);
+//CornerPivotLower(myFn=90);
 
 module CornerPivotLowerSTL(Left=true){
 	
