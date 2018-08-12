@@ -7,7 +7,7 @@
 // Units: mm
 // ***************************************************
 // History:
-echo(str("TubeConnectorLib 1.1.3"))
+echo(str("TubeConnectorLib 1.1.3"));
 // 1.1.3 7/2/2018  Added TubeSocketBolts
 // 1.1.2 5/14/2018 Added DoubleBoltFlange.
 // 1.1.1 4/14/2018 Added TubeFlange.

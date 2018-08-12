@@ -10,7 +10,7 @@
 // for Viewing
 // PhantomWheel();
 // OneCorner();
-OneCornerFL();
+// OneCornerFL();
 // **********************************************
 
 include<CommonStuffSAEmm.scad>
@@ -99,7 +99,7 @@ module OneCornerFL(){
 } // OneCornerFL
 
 
-translate([-43,200,TubeOffset_Z+93+45.5])rotate([0,90,0])translate([0,0,2])rotate([0,0,10])RockerArmConnector();
+//translate([-43,200,TubeOffset_Z+93+45.5])rotate([0,90,0])translate([0,0,2])rotate([0,0,10])RockerArmConnector();
 
 
 

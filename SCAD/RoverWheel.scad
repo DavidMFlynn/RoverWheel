@@ -49,7 +49,7 @@
 //  JackStand();
 //
 // 	Spoke(); // print 16
-  HubCap2(SolidFace=true);
+//  HubCap2(SolidFace=true);
 //  OuterRim2();
 // **************************************************
 // for viewing

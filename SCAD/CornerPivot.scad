@@ -554,7 +554,7 @@ module CornerPivotUpperLD20MG(Tube_a=10){
 	
 } // CornerPivotUpperLD20MG
 
-CornerPivotUpperLD20MG();
+//CornerPivotUpperLD20MG();
 
 module CornerPivotLower(){
 	Base_h=6;
