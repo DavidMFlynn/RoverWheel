@@ -9,7 +9,7 @@
 // 1.0.0 3/21/2018 first code
 // **********************************************
 // for STL output
-// RockerArmConnector2Flange(myFn=360); // for 4 wheel rover
+ RockerArmConnector2Flange(myFn=360); // for 4 wheel rover
 //
 // rotate([180,0,0])RockerArmConnector();
 // InsideInnerRace(myFn=360);
@@ -88,33 +88,35 @@ module RockerArmConnector2Flange(myFn=90){
 	
 	difference(){
 		union(){
-			cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD)); //20+6+Overlap
+			cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD),$fn=myFn); //20+6+Overlap
 			
+			//*
 			// Flange1
 			rotate([0,0,10]){
-			translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2]) rotate([80,0,0]) TubeFlange(TubeOD=Tube_OD, FlangeLen=10, Threaded=true);
-			hull(){
-				difference(){
-					cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD));
+				translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2]) rotate([80,0,0]) TubeFlange(TubeOD=Tube_OD, FlangeLen=10, Threaded=true);
+				hull(){
+					//difference(){
+						cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD),$fn=myFn);
 				
-					translate([0,0,-Overlap]) cylinder(d=RP_OD-1,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
-				} // diff
-				translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2])rotate([80,0,0]) cylinder(d=TubeFlageOD(TubeOD=Tube_OD),h=0.01);
-			} // hull
-		}
+						//translate([0,0,-Overlap]) cylinder(d=RP_OD-3,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
+					//} // diff
+					translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2])rotate([80,0,0]) cylinder(d=TubeFlageOD(TubeOD=Tube_OD),h=0.01,$fn=myFn);
+				} // hull
+			}
 			
 			// Flange2
 			rotate([0,0,170]){
 			translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2]) rotate([80,0,0]) TubeFlange(TubeOD=Tube_OD, FlangeLen=10, Threaded=true);
 			hull(){
-				difference(){
-					cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD));
+				//difference(){
+					cylinder(d=RP_OD,h=TubeFlageOD(TubeOD=Tube_OD),$fn=myFn);
 					
-					translate([0,0,-Overlap]) cylinder(d=RP_OD-1,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
-				} // diff
-				translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2])rotate([80,0,0]) cylinder(d=TubeFlageOD(TubeOD=Tube_OD),h=0.01);
+					//translate([0,0,-Overlap]) cylinder(d=RP_OD-1,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
+				//} // diff
+				translate([0,-RP_OD/2-3,TubeFlageOD(TubeOD=Tube_OD)/2])rotate([80,0,0]) cylinder(d=TubeFlageOD(TubeOD=Tube_OD),h=0.01,$fn=myFn);
 			} // hull
 			} // rotate
+			/**/
 			
 			// Horn
 			hull(){
@@ -128,21 +130,21 @@ module RockerArmConnector2Flange(myFn=90){
 			
 		} // union
 			
-		translate([0,0,-Overlap]) cylinder(d=RP_OD-2,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
+		translate([0,0,-Overlap]) cylinder(d=RP_OD-3,h=TubeFlageOD(TubeOD=Tube_OD)+Overlap*2);
 		
 		// horn bolt
 		translate([-Horn_l,0,6]) Bolt6Hole();
 	} // diff
 	
-	OnePieceOuterRace(BallCircle_d=RockerPivot_bc, Race_OD=RockerPivot_bc+Ball_d+6, Ball_d=Ball_d, Race_w=12, PreLoadAdj=BearingPreload, VOffset=0.00, myFn=myFn);
+	OnePieceOuterRace(BallCircle_d=RockerPivot_bc, Race_OD=RP_OD-1, Ball_d=Ball_d, Race_w=12, PreLoadAdj=BearingPreload, VOffset=0.00, myFn=myFn);
 	
 	difference(){
-		translate([0,0,12-Overlap]) cylinder(d=RP_OD-1,h=BearingDist-12+Overlap*2);
+		translate([0,0,12-Overlap]) cylinder(d=RP_OD-3-Overlap,h=BearingDist-12+Overlap*2);
 		translate([0,0,12-Overlap*2]) cylinder(d=RockerPivot_bc+Ball_d*0.7,h=BearingDist-12+Overlap*4);
 	} // diff
 		
 	translate([0,0,BearingDist]) 
-		OnePieceOuterRace(BallCircle_d=RockerPivot_bc, Race_OD=RockerPivot_bc+Ball_d+6, Ball_d=Ball_d, Race_w=12, PreLoadAdj=BearingPreload, VOffset=0.00, myFn=myFn);
+		OnePieceOuterRace(BallCircle_d=RockerPivot_bc, Race_OD=RP_OD-1, Ball_d=Ball_d, Race_w=12, PreLoadAdj=BearingPreload, VOffset=0.00, myFn=myFn);
 } // RockerArmConnector2Flange
 
 //translate([0,0,2])
