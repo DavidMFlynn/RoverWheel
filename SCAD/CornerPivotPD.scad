@@ -3,9 +3,10 @@
 // by David M. Flynn
 // Filename: CornerPivotPD.scad
 // Created: 7/16/2018
-// Revision: 1.2.0 8/3/2018
+// Revision: 1.2.1 8/14/2018
 // **********************************************
 // History
+// 1.2.1 8/14/2018 Right side version (mirror X top), cover up opening to gears.
 // 1.2.0 8/3/2018 Added Rotation Stop and VOffset.
 // 1.1.1 8/2/2018 Outer race to RingGearWidth, BackLash=0.0
 // 1.1.0 7/30/2018 Made it smaller 110mm OD
@@ -20,7 +21,8 @@
 //
 // CP_OuterRace(myFn=360);
 //
-// CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360);
+// CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360); // Left Front & Right Rear
+// mirror([1,0,0]) CornerPivotUpperLD20MG(Tube_a=10, Flanged=true, myFn=360);  // Right Front & Left Rear
 // rotate([180,0,0]) CornerPivotLower(myFn=360);
 //
 // CornerPivotUpperSTL(Left=true);
@@ -352,8 +354,8 @@ module CornerPivotUpperLD20MG(Tube_a=10, Flanged=false, myFn=90){
 				// Servo attachment
 				rotate([0,0,ServoPos_a]){
 				translate([PlanetaryPitch*PinionGearTeeth/360+PlanetaryPitch*DriveGearTeeth/360,0,0]) rotate([0,0,-90]){
-				translate([-17.75,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);
-				translate([37.00,-10,0]) cube([0.1,20.0,Servo_h-Servo_Deck_h]);}}
+				translate([-17.75,-10,0]) cube([0.1,24.0,Servo_h-Servo_Deck_h]);
+				translate([37.00,-10,0]) cube([0.1,24.0,Servo_h-Servo_Deck_h]);}}
 			} // hull
 		} // union
 		
