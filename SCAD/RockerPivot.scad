@@ -9,7 +9,12 @@
 // 1.0.0 3/21/2018 first code
 // **********************************************
 // for STL output
- RockerArmConnector2Flange(myFn=360); // for 4 wheel rover
+// RockerArmConnector2Flange(myFn=360); // for 4 wheel rover
+// translate([30,30,0]) RAC2Bearing1(myFn=360);
+// translate([30,-30,0]) RAC2Bearing2(myFn=360);
+// translate([-30,-30,0]) RAC2Bearing3(myFn=360);
+// translate([-30,30,5]) RAC2Bearing4(myFn=360);
+//
 //
 // rotate([180,0,0])RockerArmConnector();
 // InsideInnerRace(myFn=360);
@@ -78,9 +83,86 @@ module RockerArmConnector(){
 	rotate([0,0,160])translate([0,-(RP_OD+6)/2,13])rotate([90,0,0])TubeEnd(TubeOD=Tube_OD, Wall_t=0.84, Hole_d=14, Stop_l=3, GlueAllowance=0.40);
 } // RockerArmConnector
 
-//translate([0,0,2])RockerArmConnector();
+//translate([0,0,2]) RockerArmConnector();
 
 BearingDist=24;
+
+
+module RAC2Bearing1(myFn=90){
+	BossLen=BearingDist-0.4;
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4Hole();
+	difference(){
+		cylinder(d=24,h=BossLen);
+		
+		translate([0,0,-Overlap]) cylinder(d=12.7,h=BossLen+Overlap*2);
+		rotate([0,0,30])translate([-12,0,16]) rotate([0,-90,0]) Bolt10Hole(depth=10);
+	} // diff
+} // RAC2Bearing1
+
+//RAC2Bearing1(myFn=90);
+
+module RAC2Bearing2(myFn=90){
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=24+IDXtra, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=4+IDXtra, myFn=myFn) Bolt4HeadHole();
+	//difference(){
+	//	cylinder(d=24,h=20);
+		
+	//	translate([0,0,-Overlap]) cylinder(d=12.7,h=20+Overlap*2);
+	//} // diff
+} // RAC2Bearing2
+
+//translate([0,0,12+Overlap]) rotate([180,0,0]) RAC2Bearing2(myFn=90);
+
+module RAC2Bearing3(myFn=90){
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4Hole();
+	//difference(){
+	//	cylinder(d=24,h=20);
+		
+	//	translate([0,0,-Overlap]) cylinder(d=12.7,h=20+Overlap*2);
+	//} // diff
+} // RAC2Bearing3
+//translate([0,0,BearingDist])RAC2Bearing3(myFn=90);
+
+module RAC2Bearing4(myFn=90){
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4ClearHole();
+	
+	translate([0,0,Overlap])
+	difference(){
+		union(){
+			translate([0,0,-5])cylinder(d=54,h=5+Overlap);
+			translate([0,0,-5])cylinder(d=65,h=3,$fn=myFn);
+		}// union
+		
+		translate([0,0,-5-Overlap]) cylinder(d=12.7,h=5+Overlap*3);
+		InsideRaceBoltPattern(Race_ID=12.7, nBolts=6, RaceBoltInset=10) Bolt4HeadHole();
+		
+		dmfe_a=10;
+		rotate([0,0,dmfe_a]) translate([0,-20,-5-Overlap]) linear_extrude(1) mirror([0,1]) text("D",halign="center");
+		rotate([0,0,dmfe_a+27]) translate([0,-20,-5-Overlap]) linear_extrude(1) mirror([0,1]) text("M",halign="center");
+		rotate([0,0,dmfe_a+54]) translate([0,-20,-5-Overlap]) linear_extrude(1) mirror([0,1]) text("F",halign="center");
+		//rotate([0,0,dmfe_a+75]) translate([0,-20,-5-Overlap]) linear_extrude(1) mirror([0,1]) text("E",halign="center");
+		
+		/*
+		Mapping_a=-55;
+		Mapping_r=28;
+		//rotate([0,0,Mapping_a]) translate([0,-29,-5-Overlap]) linear_extrude(1) text("M",halign="center");
+		//rotate([0,0,Mapping_a-23]) translate([0,-29,-5-Overlap]) linear_extrude(1) text("A",halign="center");
+		//cartography
+		rotate([0,0,Mapping_a]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("C",halign="center");
+		rotate([0,0,Mapping_a-20]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("a",halign="center");
+		rotate([0,0,Mapping_a-35]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("r",halign="center");
+		rotate([0,0,Mapping_a-50]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("t",halign="center");
+		rotate([0,0,Mapping_a-65]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("o",halign="center");
+		rotate([0,0,Mapping_a-85]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("g",halign="center");
+		rotate([0,0,Mapping_a-100]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("r",halign="center");
+		rotate([0,0,Mapping_a-115]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("a",halign="center");
+		rotate([0,0,Mapping_a-132]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("p",halign="center");
+		rotate([0,0,Mapping_a-150]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("h",halign="center");
+		rotate([0,0,Mapping_a-168]) translate([0,-Mapping_r,-5-Overlap]) linear_extrude(1) mirror([1,0]) text("y",halign="center");
+		/**/
+	} // diff
+} // RAC2Bearing4
+
+//translate([0,0,BearingDist+12+Overlap]) rotate([180,0,0]) RAC2Bearing4(myFn=90);
 
 module RockerArmConnector2Flange(myFn=90){
 	RP_OD=RockerPivot_bc+Ball_d+6;

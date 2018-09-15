@@ -3,11 +3,12 @@
 // Filename: TubeConnectorLib.scad
 // by David M. Flynn
 // Created: 3/4/2018
-// Revision: 1.1.3 7/2/2018
+// Revision: 1.1.4 9/3/2018
 // Units: mm
 // ***************************************************
 // History:
-echo(str("TubeConnectorLib 1.1.3"));
+echo(str("TubeConnectorLib 1.1.4"));
+// 1.1.4 9/3/2018  Added GluingFixture()
 // 1.1.3 7/2/2018  Added TubeSocketBolts
 // 1.1.2 5/14/2018 Added DoubleBoltFlange.
 // 1.1.1 4/14/2018 Added TubeFlange.
@@ -31,6 +32,7 @@ echo(str("TubeConnectorLib 1.1.3"));
 // TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true);
 // rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=false);
 // rotate([180,0,0])DoubleBoltFlange(TubeOD=19.05,FlangeLen=7,Threaded=true);
+// GluingFixture(TubeOD=25.4);
 
 // ***************************************************
 // Routines
@@ -77,6 +79,23 @@ module TubeFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 } // TubeFlange
 
 //TubeFlange(TubeOD=19.05,FlangeLen=10,Threaded=false);
+
+module GluingFixture(TubeOD=25.4){
+	difference(){
+		translate([0,0,3]) cube([70,70,6],center=true);
+		
+		// bolts
+		for (j=[0:7]) rotate([0,0,360/8*j]) translate([TubeOD/2+BoltOffset,0,6]) Bolt4Hole();
+		
+		// 15° edge
+		translate([36,-35,-Overlap]) rotate([0,0,15])cube([70,100,6+Overlap*2]);
+		
+		// 22.5° edge
+		translate([-37,-35,-Overlap]) rotate([0,0,-22.5]) mirror([1,0,0]) cube([70,100,6+Overlap*2]);
+	} // diff
+} // GluingFixture
+
+//GluingFixture(TubeOD=25.4);
 
 module DoubleBoltFlange(TubeOD=25.4,FlangeLen=10,Threaded=true){
 		
