@@ -3,10 +3,11 @@
 // by David M. Flynn
 // Filename: BearingLib.scad
 // Created: 2/2/2018
-// Revision: 1.2.3 8/7/2018
+// Revision: 1.2.4 9/25/2018
 // **********************************************
 // History
- echo("BearingLib 1.2.3");
+ echo("BearingLib 1.2.4");
+// 1.2.4 9/25/2018 Fixed ball elongation math.
 // 1.2.3 8/7/2018 Smoother outer race.
 // 1.2.2 8/3/2018 Added VOffset.
 // 1.2.1 4/22/2018 Added PreLoadAdj to OutsideRace
@@ -39,7 +40,7 @@ $fn=90;
 IDXtra=0.2;
 Overlap=0.05;
 
-kEL=1.04;
+kEL=1.04; // 4% ball elongation to prevent center of ball contacting race
 BL_RaceBoltInset=3.5;
 
 module TwoPartBallSpacer(BallCircle_d=72,Ball_d=7.9375,nBalls=15){ // 9.525
@@ -114,7 +115,7 @@ module BallTrack(BallCircle_d=100, Ball_d=9.525, myFn=360){
 	
 	
 	rotate_extrude(convexity = 10,$fn=myFn)
-			translate([BallCircle_d/2, 0, 0]) scale([kEL,1.00])circle(d = Ball_d);
+			translate([BallCircle_d/2, 0, 0]) scale([kEL,1.00]) circle(d = Ball_d);
 } // BallTrack
 
 //BallTrack();
@@ -133,8 +134,8 @@ module OnePieceInnerRace(BallCircle_d=100,
 		// center hole
 		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
 		
-		// ball track
-		translate([0,0,Race_w/2+VOffset]) BallTrack(BallCircle_d=BallCircle_d+(1-kEL)*Ball_d+PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
+		// ball track, add the 4% elongation to the ball circle
+		translate([0,0,Race_w/2+VOffset]) BallTrack(BallCircle_d=BallCircle_d+(kEL-1)*Ball_d+PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 			
 	} // diff
 } // OnePieceInnerRace
@@ -156,8 +157,8 @@ module OnePieceOuterRace(BallCircle_d=60,
 		// center hole
 		translate([0,0,-Overlap]) cylinder(d=BallCircle_d+Ball_d*0.7,h=Race_w+Overlap*2,$fn=myFn);
 		
-		// ball track
-		translate([0,0,Race_w/2+VOffset]) BallTrack(BallCircle_d=BallCircle_d-(1-kEL)*Ball_d-PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
+		// ball track, subtract the 4% elongation from the ball circle
+		translate([0,0,Race_w/2+VOffset]) BallTrack(BallCircle_d=BallCircle_d-(kEL-1)*Ball_d-PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 	} // diff
 } // OnePieceOuterRace
 
@@ -179,8 +180,8 @@ module InsideRace(BallCircle_d=100,
 		// center hole
 		translate([0,0,-Overlap]) cylinder(d=Race_ID,h=Race_w+Overlap*2);
 		
-		// ball track
-		translate([0,0,Race_w]) BallTrack(BallCircle_d=BallCircle_d+(1-kEL)*Ball_d+PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
+		// ball track, add the 4% elongation to the ball circle
+		translate([0,0,Race_w]) BallTrack(BallCircle_d=BallCircle_d+(kEL-1)*Ball_d+PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 		
 		// Bolts
 		if (nBolts!=0)
@@ -220,8 +221,8 @@ module OutsideRace(BallCircle_d=60,
 		for (j=[0:nBolts-1]) rotate([0,0,360/nBolts*j]) translate([Race_OD/2-RaceBoltInset,0,0]) 
 			 rotate([180,0,0]) children();
 		
-		// ball track
-		translate([0,0,Race_w]) BallTrack(BallCircle_d=BallCircle_d-(1-kEL)*Ball_d-PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
+		// ball track, subtract the 4% elongation from the ball circle
+		translate([0,0,Race_w]) BallTrack(BallCircle_d=BallCircle_d-(kEL-1)*Ball_d-PreLoadAdj, Ball_d=Ball_d, myFn=myFn);
 		
 	} // diff
 } // OutsideRace

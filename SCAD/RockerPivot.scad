@@ -3,9 +3,11 @@
 // by David M. Flynn
 // Filename: RockerPivot.scad
 // Created: 3/21/2018
-// Revision: 1.0.0 3/21/2018
+// Revision: 1.0.2 9/27/2018
 // **********************************************
 // History
+// 1.0.2 9/27/2018 RockerArmConnector2Flange: Outer cover fixes, keyed inner to outer.
+// 1.0.1 9/26/2018 Bearing preload applied to RAC2BearingX and set to 0.3
 // 1.0.0 3/21/2018 first code
 // **********************************************
 // for STL output
@@ -59,7 +61,8 @@ ShaftCollar_t=10.2;
 RP_ID=ShaftCollar_d; //RockerPivot_bc-26;
 Ball_d=9.525;
 RP_OD=RockerPivot_bc+26;
-BearingPreload=0.2;
+BearingPreload=0.3; // testing, should be tight
+
 
 module RockerArmConnector(){
 	difference(){
@@ -90,11 +93,14 @@ BearingDist=24;
 
 module RAC2Bearing1(myFn=90){
 	BossLen=BearingDist-0.4;
-	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4Hole();
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, PreLoadAdj=BearingPreload, myFn=myFn) Bolt4Hole();
 	difference(){
-		cylinder(d=24,h=BossLen);
+		union(){
+			cylinder(d=24,h=BossLen);
+			for (j=[0:3]) rotate([0,0,j*120]) translate([12.7/2,0,BossLen-Overlap]) cylinder(d=6,h=3);
+		} // union
 		
-		translate([0,0,-Overlap]) cylinder(d=12.7,h=BossLen+Overlap*2);
+		translate([0,0,-Overlap]) cylinder(d=12.7,h=BossLen+3+Overlap*2);
 		rotate([0,0,30])translate([-12,0,16]) rotate([0,-90,0]) Bolt10Hole(depth=10);
 	} // diff
 } // RAC2Bearing1
@@ -102,7 +108,7 @@ module RAC2Bearing1(myFn=90){
 //RAC2Bearing1(myFn=90);
 
 module RAC2Bearing2(myFn=90){
-	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=24+IDXtra, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=4+IDXtra, myFn=myFn) Bolt4HeadHole();
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=24+IDXtra*2, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=4+IDXtra, PreLoadAdj=BearingPreload, myFn=myFn) Bolt4HeadHole();
 	//difference(){
 	//	cylinder(d=24,h=20);
 		
@@ -113,17 +119,17 @@ module RAC2Bearing2(myFn=90){
 //translate([0,0,12+Overlap]) rotate([180,0,0]) RAC2Bearing2(myFn=90);
 
 module RAC2Bearing3(myFn=90){
-	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4Hole();
-	//difference(){
-	//	cylinder(d=24,h=20);
+	difference(){
+		InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, PreLoadAdj=BearingPreload, myFn=myFn) 		Bolt4Hole();
 		
-	//	translate([0,0,-Overlap]) cylinder(d=12.7,h=20+Overlap*2);
-	//} // diff
+		for (j=[0:3]) rotate([0,0,j*120]) translate([12.7/2,0,-Overlap]) cylinder(d=6+IDXtra,h=4);
+	} // diff
+	
 } // RAC2Bearing3
-//translate([0,0,BearingDist])RAC2Bearing3(myFn=90);
+//translate([0,0,BearingDist]) RAC2Bearing3(myFn=90);
 
 module RAC2Bearing4(myFn=90){
-	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, myFn=myFn) Bolt4ClearHole();
+	InsideRace(BallCircle_d=RockerPivot_bc, Race_ID=12.7, Ball_d=Ball_d, Race_w=6, nBolts=6, RaceBoltInset=10, PreLoadAdj=BearingPreload, myFn=myFn) Bolt4ClearHole();
 	
 	translate([0,0,Overlap])
 	difference(){
@@ -132,8 +138,8 @@ module RAC2Bearing4(myFn=90){
 			translate([0,0,-5])cylinder(d=65,h=3,$fn=myFn);
 		}// union
 		
-		translate([0,0,-5-Overlap]) cylinder(d=12.7,h=5+Overlap*3);
-		InsideRaceBoltPattern(Race_ID=12.7, nBolts=6, RaceBoltInset=10) Bolt4HeadHole();
+		translate([0,0,-4]) cylinder(d=12.7,h=5+Overlap*3);
+		InsideRaceBoltPattern(Race_ID=12.7, nBolts=6, RaceBoltInset=10) rotate([180,0,0]) Bolt4HeadHole();
 		
 		dmfe_a=10;
 		rotate([0,0,dmfe_a]) translate([0,-20,-5-Overlap]) linear_extrude(1) mirror([0,1]) text("D",halign="center");

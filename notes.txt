@@ -117,13 +117,13 @@ Conn Plug 6 Pos DK WM1031-ND
 Conn Term Male DK WM2500-ND
 Conn Term Female DK WM2501-ND
 
-Pin		Use
-1		Motor +	18AWG orange
-2		Enc +5V 22AWG Red
-3		Enc A 24AWG Blue
-4		Motor - 18AWG white
-5		Enc Gnd 22AWG Black
-6		Enc B 24AWG Blue
+Pin	Use
+1	Motor + 18AWG orange
+2	Enc +5V 22AWG Red
+3	Enc A 24AWG Blue
+4	Motor - 18AWG white
+5	Enc Gnd 22AWG Black
+6	Enc B 24AWG Blue
 
 Optical Switch wiring
 A anode Red 470Ω to Enc +5V Red 22AWG
