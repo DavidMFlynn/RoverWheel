@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.2 3/11/2018
+// Rev: 1.0.3 10/12/2018
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.3 10/12/2018 Solid HubCap(SolidFace=true);
 // 1.0.2 3/11/2018 Added JackStand().
 // 1.0.1 2/10/2018 Little fixes. Planet drilling tool.
 // 1.0.0 2/7/2018 First complete working wheel. Time to make more...
@@ -22,7 +23,7 @@
 // 1.0.0 1/5/2018 First code
 // **************************************************
 // for STL output, from outside inward
-//	HubCap(); // used w/ Traxxas tire
+//	HubCap(SolidFace=true); // used w/ Traxxas tire
 //	rotate([180,0,0]) InnerRim(); // used w/ Traxxas tire, Print 2
 //  OuterPlanetCarrier();
 //  PlanetA();
@@ -1515,9 +1516,10 @@ module OuterRim(){
 
  //OuterRim(); 
 
-module HubCap(){
+module HubCap(SolidFace=false){
 	
 	nSpokes=8;
+	Hub_OD=bead_d+bead_t*2;
 	
 	OuterRim();
 	difference(){
@@ -1534,6 +1536,8 @@ module HubCap(){
 		
 		translate([0,0,2]) cylinder(d=15+IDXtra,h=6);
 	} // diff
+	
+	if (SolidFace==true) cylinder(d=Hub_OD-18,h=0.9);
 } // HubCap
 
 //HubCap();
