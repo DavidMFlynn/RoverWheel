@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: FifthDoF.scad
 // Created: 6/26/2018
-// Rev: 1.0d3 7/25/2018
+// Rev: 1.0d4 1/5/2019
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0d4 1/5/2019 Changed to DMFE Enc1 Shaft Angle Encoder
 // 1.0d3 7/25/2018 Changed BackLash=0.2; was 0.4, BearingPreload=0.4; was 0.2
 // 1.0d2 7/5/2018 Added BearingPreload=0.2;
 // 1.0d1 6/25/2018 First code.
@@ -27,15 +28,17 @@
 // rotate([180,0,0]) DriveGear();
 // **************************************************
 // ***** for Viewing *****
-ShowFifthDoF();
+// ShowFifthDoF();
 // **************************************************
 
 include<SG90ServoLib.scad>
 include<involute_gears.scad>
+include<ShaftEncoder.scad>
 include<TubeConnectorLib.scad>
 include<CommonStuffSAEmm.scad>
 include<BearingLib.scad>
 include<PlanetDriveLib.scad>
+
 
 $fn=90;
 IDXtra=0.2;
@@ -260,7 +263,7 @@ module OuterRacePart2(myFn=90){
 	
 } // OuterRacePart2
 
-//translate([0,0,6+Overlap]) OuterRacePart2();
+//translate([0,0,6+Overlap])OuterRacePart2();
 
 module EncoderMount(){
 		//Encoder shaft
@@ -301,10 +304,10 @@ module DriveGear(){
 	} // diff
 } // DriveGear
 
+ //rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5]) DriveGear();
 
-
- //rotate([0,0,Servo_a])translate([ServoOffset,0,-28.5])DriveGear();
 BottomCover_h=12;
+
 module BasePlate(){
 	nBolts=8;
 	
@@ -338,7 +341,12 @@ module BasePlate(){
 			for (j=[0:nBolts-2]) rotate([0,0,360/nBolts*j]) translate([LargeRace_d/2,0,-5.95]) 
 				rotate([180,0,0]) Bolt4HeadHole(depth=8);
 			
-		translate([0,0,-BottomCover_h-0.5]) EncoderMount();
+		// BroadCom 6012 encoder
+		//translate([0,0,-BottomCover_h-0.5]) EncoderMount();
+			
+		// DMFE Shaft Angle Encoder hole
+		translate([0,0,-BottomCover_h-0.5]) rotate([180,0,0]) Enc1IntegratedShaftHole(Dia=6.35, Height=10);
+
 			
 		rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) ServoSG90();
 			
@@ -346,6 +354,9 @@ module BasePlate(){
 		rotate([0,0,Servo_a]) translate([ServoOffset,0,-BottomCover_h+2]) cylinder(d=24,h=BottomCover_h-2+Overlap);
 			
 	} // diff
+	
+	// DMFE Shaft Angle Encoder
+	translate([0,0,-BottomCover_h-0.5]) rotate([180,0,0]) IntegratedBase(); // Used to add an encoder base to a robot joint cover plate.
 	
 	/*
 	MR_h=26;
@@ -363,8 +374,7 @@ module BasePlate(){
 	*/
 } // BasePlate
 
-//translate([0,0,-RingGear_h])
-//BasePlate(HasMountRing=true);
+//translate([0,0,-RingGear_h])BasePlate(HasMountRing=true);
 
 //translate([0,0,-BottomCover_h-0.5]) color("Red") EncoderMount();
 //rotate([0,0,Servo_a]) translate([ServoOffset,0,-21]) rotate([0,0,120]) color("Red") ServoSG90();

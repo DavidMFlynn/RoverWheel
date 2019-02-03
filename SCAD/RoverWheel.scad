@@ -3,10 +3,11 @@
 // David M. Flynn
 // Filename: RoverWheel.scad
 // Created: 1/5/2018
-// Rev: 1.0.3 10/12/2018
+// Rev: 1.0.4 1/6/2019
 // Units: millimeters
 // **************************************************
 // History:
+// 1.0.4 1/6/2019 Added magnet holes to HubCap and SpikedHub.
 // 1.0.3 10/12/2018 Solid HubCap(SolidFace=true);
 // 1.0.2 3/11/2018 Added JackStand().
 // 1.0.1 2/10/2018 Little fixes. Planet drilling tool.
@@ -24,6 +25,8 @@
 // **************************************************
 // for STL output, from outside inward
 //	HubCap(SolidFace=true); // used w/ Traxxas tire
+//  SpikedHub(); // decoration
+//  HubCap(SolidFace=false, Magnets=true); // used w/ Traxxas tire
 //	rotate([180,0,0]) InnerRim(); // used w/ Traxxas tire, Print 2
 //  OuterPlanetCarrier();
 //  PlanetA();
@@ -1516,14 +1519,14 @@ module OuterRim(){
 
  //OuterRim(); 
 
-module HubCap(SolidFace=false){
+module HubCap(SolidFace=false, Magnets=false){
 	
 	nSpokes=8;
 	Hub_OD=bead_d+bead_t*2;
 	
-	OuterRim();
 	difference(){
 		union(){
+			OuterRim();
 			// spokes
 			for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)]) hull(){
 				translate([bead_minD/2-3,0,0]) cylinder(d=5,h=3);
@@ -1535,12 +1538,75 @@ module HubCap(SolidFace=false){
 		translate([0,0,-Overlap]) cylinder(d=13,h=4);
 		
 		translate([0,0,2]) cylinder(d=15+IDXtra,h=6);
+		
+		if (Magnets==true) for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)])
+			translate([bead_minD/2-3,0,-Overlap]) cylinder(d=0.125*25.4+IDXtra,h=0.125*25.4);
 	} // diff
 	
 	if (SolidFace==true) cylinder(d=Hub_OD-18,h=0.9);
 } // HubCap
 
-//HubCap();
+//HubCap(SolidFace=false, Magnets=true);
+
+module SpikedHub(){
+	nSpokes=8;
+	
+	difference(){
+		union(){
+			cylinder(d=bead_minD,h=2);
+			
+			// magnets
+			for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)])
+				translate([bead_minD/2-3,0,-Overlap]) cylinder(d1=7,d2=1,h=10);
+		
+			for (j=[0:3]) rotate([0,0,90*j]) hull(){
+				cylinder(d=2,h=50);
+				translate([25,0,0]) cylinder(d=2,h=3);
+			}
+			
+			for (j=[0:3]) rotate([0,0,90*j]) hull(){
+				translate([0,0,40]) cylinder(d=2,h=20);
+				translate([20,0,65]) cylinder(d=2,h=1);
+			}
+			
+			for (j=[0:7]) rotate([0,0,45*j+22.5]) hull(){
+				translate([35,0,0]) cylinder(d=2,h=25);
+				translate([5,0,0]) cylinder(d=2,h=3);
+				translate([41,0,0]) cylinder(d=2,h=3);
+			}
+		} // union
+		
+		// magnets
+		for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)])
+			translate([bead_minD/2-3,0,-Overlap]) cylinder(d=0.125*25.4+IDXtra,h=0.125*25.4);
+	} // diff
+} // SpikedHub
+
+//SpikedHub();
+
+module LetterHub(){
+	nSpokes=8;
+	
+	difference(){
+		union(){
+			cylinder(d=bead_minD,h=2);
+			
+			// magnets
+			for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)])
+				translate([bead_minD/2-3,0,-Overlap]) cylinder(d=7,h=5);
+			
+			translate([0,12,2-Overlap]) linear_extrude(2) text(text="SGV",font="Verdana",size=14,halign="center",valign="center");
+			translate([0,-12,2-Overlap]) linear_extrude(2) text(text="HAK",font="Verdana",size=14,halign="center",valign="center");
+		
+		} // union
+		
+		// magnets
+		for (j=[0:nSpokes-1]) rotate([0,0,360/nSpokes*(j+0.5)])
+			translate([bead_minD/2-3,0,-Overlap]) cylinder(d=0.125*25.4+IDXtra,h=0.125*25.4+IDXtra);
+	} // diff
+} // LetterHub
+
+LetterHub();
 
 module ShowWheelExploded(){
 	ExpX=10;
