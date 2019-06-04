@@ -1,0 +1,46 @@
+Rocker Bogie Wiring Notes
+
+AMP 37 Pin Connector
+====================================================================
+1	Front Wheel Motor +
+2	Front Wheel Motor -
+3	Front Wheel Encoder +5V
+4	Front Wheel Encoder GND
+5	Front Wheel Encoder A
+6	Front Wheel Encoder B
+
+7	Middle Wheel Motor +
+8	Middle Wheel Motor -
+9	Middle Wheel Encoder +5V
+10	Middle Wheel Encoder GND
+11	Middle Wheel Encoder A
+12	Middle Wheel Encoder B
+
+13	Rear Wheel Motor +
+14	Rear Wheel Motor -
+15	Rear Wheel Encoder +5V
+16	Rear Wheel Encoder GND
+17	Rear Wheel Encoder A
+18	Rear Wheel Encoder B
+
+19	Front Corner Pivot Motor +
+20	Front Corner Pivot Motor -
+21	Front Corner Pivot Encoder +5V
+22	Front Corner Pivot Encoder GND
+23	Front Corner Pivot Encoder A
+24	Front Corner Pivot Encoder B
+
+25	Rear Corner Pivot Motor +
+26	Rear Corner Pivot Motor -
+27	Rear Corner Pivot Encoder +5V
+28	Rear Corner Pivot Encoder GND
+29	Rear Corner Pivot Encoder A
+30	Rear Corner Pivot Encoder B
+
+31
+32
+33
+34
+35
+36
+37
